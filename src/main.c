@@ -6,24 +6,7 @@
 
 #include "../submodule/c-library/struct.h"
 
-typedef unsigned long int luint;
-
-#define DECH(LUINT) ((uint)((LUINT) >> 32))
-#define DECL(LUINT) ((uint)(LUINT))
-
-luint uint_add(uint a, uint b) 
-{
-    return (luint)a + (luint)b;
-}
-luint uint_add_3(uint a, uint b, uint c) 
-{
-    return (luint)a + (luint)b + (luint)c;
-}
-
-luint uint_mul(uint a, uint b) 
-{
-    return (luint)a * (luint)b;
-}
+#include "../lib/uint/header.h"
 
 #define SCALAR 8
 typedef uint bytes32[SCALAR];

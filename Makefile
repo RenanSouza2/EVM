@@ -7,6 +7,7 @@ run: $(TGT)
 build: $(TGT)
 	
 .PHONY: $(TGT)
+$(TGT):
 	$(MAKE) --directory=src
 
 clean:
