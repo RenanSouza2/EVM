@@ -1,15 +1,18 @@
-SRC = src/main.c
-TGT = bin/main.o
-
-FLAGS = -Wall -Werror -Wfatal-errors
+BIN = bin
+TGT = $(BIN)/main.o
 
 run: $(TGT)
 	./$(TGT)
 
 build: $(TGT)
-
-$(TGT): $(SRC)
-	gcc -o $@ $^ $(FLAGS)
+	
+.PHONY: $(TGT)
+	$(MAKE) --directory=src
 
 clean:
-	rm -f bin/*.o;
+	rm -rf $(BIN)/*.o
+	$(MAKE) clean --directory=lib
+	
+.PHONY: test
+test: 
+	$(MAKE) test --directory=lib
