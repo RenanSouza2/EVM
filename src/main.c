@@ -11,6 +11,9 @@
 #define SCALAR 8
 typedef uint bytes32[SCALAR];
 
+#define BYTES32_RESET(PTR) memset(PTR, 0, 32)
+#define BYTES32_ASSIGN(PTR1, PTR2) memcpy(PTR1, PTR2, 32);
+
 void bytes32_display(bytes32 value)
 {
     printf("0x");
@@ -19,26 +22,11 @@ void bytes32_display(bytes32 value)
     }
 }
 
-void bytes32_reset(bytes32 value)
-{
-    memset(value, 0, 32);
-}
-
 void bytes32_convert(bytes32 res, luint value_int)
 {
-    bytes32_reset(res);
+    BYTES32_RESET(res);
     res[1] = DECH(value_int);
     res[0] = DECL(value_int);
-}
-
-void bytes32_add(bytes32 res, bytes32 a, bytes32 b)
-{
-    uint r = 0;
-    for(int i=0; i<SCALAR; i++) {
-        luint aux = uint_add_3(a[i], b[i], r);
-        res[i] = DECL(aux);
-        r = DECH(aux);
-    }
 }
 
 void bytes32_add_uint(bytes32 res, uint a, int i)
@@ -52,9 +40,17 @@ void bytes32_add_uint(bytes32 res, uint a, int i)
     bytes32_add_uint(res, DECH(aux), i+1);
 }
 
+void bytes32_add(bytes32 res, bytes32 a, bytes32 b)
+{
+    BYTES32_ASSIGN(res, a);
+
+    for(int i=0; i<SCALAR; i++)
+        bytes32_add_uint(res, b[i], i);
+}
+
 void bytes32_mul(bytes32 res, bytes32 a, bytes32 b)
 {
-    bytes32_reset(res);
+    BYTES32_RESET(res);
     for(int i=0; i<SCALAR; i++)
     for(int j=0; j+i<SCALAR; j++)
     {
