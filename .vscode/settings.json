@@ -26,6 +26,7 @@
         "limits.h": "c",
         "stdio.h": "c",
         "climits": "c",
-        "struct.h": "c"
+        "struct.h": "c",
+        "stdlib.h": "c"
     }
 }

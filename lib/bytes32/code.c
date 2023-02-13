@@ -6,8 +6,8 @@
 
 #ifdef DEBUG
 
-#define BYTES32_DISPLAY(TAG, BYTES32) \
-    printf("\n%s: ", TAG);bytes32_display(BYTES32);printf("\n")
+#define BYTES32_DISPLAY(BYTES32) \
+    printf("\n%s: ", #BYTES32);bytes32_display(BYTES32);
 
 void bytes32_display(bytes32_t b)
 {
@@ -22,14 +22,6 @@ bytes32_t bytes32_set( \
     uint value3, uint value2, uint value1, uint value0
 )
 {
-    // b.v[7] = value7;
-    // b.v[6] = value6;
-    // b.v[5] = value5;
-    // b.v[4] = value4;
-    // b.v[3] = value3;
-    // b.v[2] = value2;
-    // b.v[1] = value1;
-    // b.v[0] = value0;
     return (bytes32_t){{ \
         value0, value1, value2, value3, \
         value4, value5, value6, value7 \
@@ -64,6 +56,13 @@ bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
     for(int i=0; i<SCALAR; i++)
         b1 = bytes32_add_uint(b1, b2.v[i], i);
     return b1;
+}
+
+bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=0; i<SCALAR; i++)
+        b1 = bytes32_add_uint(b1, ~b2.v[i], i);
+    return bytes32_add_uint(b1, 1, 0);
 }
 
 bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)

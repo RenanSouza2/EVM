@@ -88,6 +88,41 @@ void test_add()
     ASSERT_BYTES32(b_res, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
 }
 
+void test_sub()
+{
+    printf("\n\ttest sub");
+
+    bytes32_t b_res, b1, b2;
+    b1 = bytes32_convert(5);
+    b2 = bytes32_convert(3);
+    b_res = bytes32_sub(b1, b2);
+    ASSERT_BYTES32_UINT(b_res, 2);
+    
+    b1 = bytes32_convert(0);
+    b2 = bytes32_convert(1);
+    b_res = bytes32_sub(b1, b2);
+    ASSERT_BYTES32(b_res, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+
+    b1 = bytes32_convert(0);
+    b2 = bytes32_convert(0);
+    b_res = bytes32_sub(b1, b2);
+    ASSERT_BYTES32_UINT(b_res, 0);
+
+    b1 = bytes32_set(7, 6, 5, 4, 3, 2, 1, 0);
+    b2 = bytes32_set(0, 1, 2, 3, 4, 5, 6, 7);
+    b_res = bytes32_sub(b1, b2);
+    ASSERT_BYTES32(b_res, 7, 5, 3, 0, 0xFFFFFFFE, 0xFFFFFFFC, 0xFFFFFFFA, 0xFFFFFFF9);
+    
+    b1 = bytes32_set(7, 6, 5, 4, 3, 2, 1, 0);
+    b2 = bytes32_set(0, 1, 2, 3, 4, 5, 6, 7);
+    b_res = bytes32_sub(b1, b2);
+
+    b1 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b2 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b_res = bytes32_sub(b1, b2);
+    ASSERT_BYTES32_UINT(b_res, 0);
+}
+
 void test_mul()
 {
     printf("\n\ttest mul");
@@ -118,6 +153,7 @@ void test_bytes32()
     test_convert();
     test_add_uint();
     test_add();
+    test_sub();
     test_mul();
 }
 

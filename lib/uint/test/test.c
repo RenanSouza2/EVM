@@ -4,6 +4,8 @@
 
 #include "../code.c"
 
+
+
 void test_dec()
 {
     printf("\n\ttest_dec");
@@ -19,7 +21,7 @@ void test_dec()
 
 void test_add()
 {
-    printf("\n\ttest_add");
+    printf("\n\ttest add");
 
     luint res = uint_add(0, 0);
     assert(res == 0);
@@ -36,7 +38,7 @@ void test_add()
 
 void test_mul()
 {
-    printf("\n\ttest_mul");
+    printf("\n\ttest mul");
 
     luint res = uint_mul(2, 2);
     assert(res == 4);
@@ -51,6 +53,8 @@ void test_mul()
     assert(res == 0xFFFFFFFE00000001);
 }
 
+
+
 void test_uint()
 {
     printf("\ntest uint");
@@ -59,6 +63,8 @@ void test_uint()
     test_add();
     test_mul();
 }
+
+
 
 int main() {
     setbuf(stdout, NULL);

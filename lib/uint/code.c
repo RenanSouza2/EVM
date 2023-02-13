@@ -2,12 +2,12 @@
 
 #include "header.h"
 
-luint uint_add(uint a, uint b) 
+luint uint_add(uint u1, uint u2) 
 {
-    return (luint)a + (luint)b;
+    return (luint)u1 + (luint)u2;
 }
 
-luint uint_mul(uint a, uint b) 
+luint uint_mul(uint u1, uint u2) 
 {
-    return (luint)a * (luint)b;
+    return (luint)u1 * (luint)u2;
 }
