@@ -73,3 +73,4 @@ void bytes32_mul(bytes32 res, bytes32 value1, bytes32 value2)
         bytes32_add_uint(res, DECH(aux), i+j+1);
     }
 }
+

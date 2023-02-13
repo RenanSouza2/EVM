@@ -29,6 +29,8 @@
 #define BYTES32_DISPLAY(STRING, VALUE) \
     printf("%s", STRING);bytes32_display(VALUE);printf("\n")
 
+
+
 void test_convert()
 {
     printf("\n\ttest convert");
@@ -39,6 +41,8 @@ void test_convert()
     bytes32_convert(res, value);
     ASSERT_BYTES32(res, 0, 0, 0, 0, 0, 0, 1, 2);
 }
+
+
 
 void test_add_uint()
 {
@@ -111,6 +115,8 @@ void test_mul()
     ASSERT_BYTES32_UINT(value, 1);
 }
 
+
+
 void test_bytes32()
 {
     printf("\ntest bytes32");
@@ -120,6 +126,8 @@ void test_bytes32()
     test_add();
     test_mul();
 }
+
+
 
 int main() {
     setbuf(stdout, NULL);
