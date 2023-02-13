@@ -6,71 +6,77 @@
 
 #ifdef DEBUG
 
-void bytes32_display(bytes32 value)
+#define BYTES32_DISPLAY(TAG, BYTES32) \
+    printf("\n%s: ", TAG);bytes32_display(BYTES32);printf("\n")
+
+void bytes32_display(bytes32_t b)
 {
     printf("0x");
     for(int i=SCALAR-1; i>=0; i--) {
-        printf("%08X", value[i]);
+        printf("%08X", b.v[i]);
     }
 }
 
-void bytes32_set(bytes32 res, \
-    uint value7, \
-    uint value6, \
-    uint value5, \
-    uint value4, \
-    uint value3, \
-    uint value2, \
-    uint value1, \
-    uint value0
+bytes32_t bytes32_set( \
+    uint value7, uint value6, uint value5, uint value4, \
+    uint value3, uint value2, uint value1, uint value0
 )
 {
-    res[7] = value7;
-    res[6] = value6;
-    res[5] = value5;
-    res[4] = value4;
-    res[3] = value3;
-    res[2] = value2;
-    res[1] = value1;
-    res[0] = value0;
+    // b.v[7] = value7;
+    // b.v[6] = value6;
+    // b.v[5] = value5;
+    // b.v[4] = value4;
+    // b.v[3] = value3;
+    // b.v[2] = value2;
+    // b.v[1] = value1;
+    // b.v[0] = value0;
+    return (bytes32_t){{ \
+        value0, value1, value2, value3, \
+        value4, value5, value6, value7 \
+    }};
 }
 
-void bytes32_convert(bytes32 res, luint value_int)
+bytes32_t bytes32_convert(luint u)
 {
-    BYTES32_RESET(res);
-    res[1] = DECH(value_int);
-    res[0] = DECL(value_int);
+    bytes32_t b;
+    BYTES32_RESET(b);
+    b.v[1] = DECH(u);
+    b.v[0] = DECL(u);
+    return b;
 }
 
 #endif
 
-void bytes32_add_uint(bytes32 res, uint value, int i)
+bytes32_t bytes32_add_uint(bytes32_t b, uint value, int i)
 {
-    if(i >= SCALAR) return;
-    if(value == 0) return;
+    if(i >= SCALAR) return b;
+    if(value == 0) return b;
 
-    luint aux = uint_add(res[i], value);
-    res[i] = DECL(aux);
+    luint aux = uint_add(b.v[i], value);
+    b.v[i] = DECL(aux);
 
-    bytes32_add_uint(res, DECH(aux), i+1);
+    return bytes32_add_uint(b, DECH(aux), i+1);
 }
 
-void bytes32_add(bytes32 res, bytes32 value1, bytes32 value2)
+bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 {
-    BYTES32_ASSIGN(res, value1);
+    
     for(int i=0; i<SCALAR; i++)
-        bytes32_add_uint(res, value2[i], i);
+        b1 = bytes32_add_uint(b1, b2.v[i], i);
+    return b1;
 }
 
-void bytes32_mul(bytes32 res, bytes32 value1, bytes32 value2)
+bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
 {
-    BYTES32_RESET(res);
+    bytes32_t b_res;
+    BYTES32_RESET(b_res);
     for(int i=0; i<SCALAR; i++)
     for(int j=0; j+i<SCALAR; j++)
     {
-        luint aux = uint_mul(value1[i], value2[j]);
-        bytes32_add_uint(res, DECL(aux), i+j);
-        bytes32_add_uint(res, DECH(aux), i+j+1);
+        luint aux = uint_mul(b1.v[i], b2.v[j]);
+        b_res = bytes32_add_uint(b_res, DECL(aux), i+j);
+        b_res = bytes32_add_uint(b_res, DECH(aux), i+j+1);
     }
+    return b_res;
 }
 

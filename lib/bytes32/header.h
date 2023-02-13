@@ -3,19 +3,21 @@
 
 #include <stdlib.h>
 
+#include "../../submodule/c-library/struct.h"
 #include "../uint/header.h"
 
 #define SCALAR 8
-typedef uint bytes32[SCALAR];
+STRUCT(bytes32)
+{
+    uint v[SCALAR];
+};
 
-void bytes32_display(bytes32 value);
+void bytes32_display(bytes32_t value);
 
-#define BYTES32_RESET(PTR) memset(PTR, 0, 32)
-#define BYTES32_ASSIGN(PTR1, PTR2) memcpy(PTR1, PTR2, 32);
+#define BYTES32_RESET(VALUE) memset(VALUE.v, 0, 32)
+#define BYTES32_ASSIGN(VALUE1, VALUE2) memcpy(VALUE1, VALUE2, 32);
 
-void bytes32_convert(bytes32 res, luint value_int);
-void bytes32_add_uint(bytes32 res, uint value, int i);
-void bytes32_add(bytes32 res, bytes32 value1, bytes32 value2);
-void bytes32_mul(bytes32 res, bytes32 value1, bytes32 value2);
+bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2);
 
 #endif

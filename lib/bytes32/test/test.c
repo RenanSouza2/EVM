@@ -5,29 +5,26 @@
 
 #include "../code.c"
 
-#define ASSERT_BYTES32_MUTUAL(VALUE1, VALUE2) \
-    assert(memcmp(VALUE1, VALUE2, 32) == 0)
+#define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
+    assert(memcmp(BYTES1.v, BYTES2.v, 32) == 0)
 
-#define ASSERT_BYTES32(VALUE, \
+#define ASSERT_BYTES32(BYTES, \
     VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0 \
 ) \
 { \
-    bytes32 expected; \
-    bytes32_set(expected, \
+    bytes32_t b_exp; \
+    b_exp = bytes32_set( \
         VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0 \
     ); \
-    ASSERT_BYTES32_MUTUAL(VALUE, expected); \
+    ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
 }
 
-#define ASSERT_BYTES32_UINT(VALUE, UINT) \
+#define ASSERT_BYTES32_UINT(BYTES, UINT) \
 { \
-    bytes32 res; \
-    bytes32_convert(res, UINT); \
-    ASSERT_BYTES32_MUTUAL(VALUE, res); \
+    bytes32_t b_exp; \
+    b_exp = bytes32_convert(UINT); \
+    ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
 }
-
-#define BYTES32_DISPLAY(STRING, VALUE) \
-    printf("%s", STRING);bytes32_display(VALUE);printf("\n")
 
 
 
@@ -35,11 +32,9 @@ void test_convert()
 {
     printf("\n\ttest convert");
 
-    luint value = 0x100000002;
-
-    bytes32 res;
-    bytes32_convert(res, value);
-    ASSERT_BYTES32(res, 0, 0, 0, 0, 0, 0, 1, 2);
+    luint lu = 0x100000002;
+    bytes32_t b_res = bytes32_convert(lu);
+    ASSERT_BYTES32(b_res, 0, 0, 0, 0, 0, 0, 1, 2);
 }
 
 
@@ -48,71 +43,70 @@ void test_add_uint()
 {
     printf("\n\ttest add uint");
 
-    bytes32 value;
-    bytes32_set(value, 7, 6, 5, 4, 3, 2, 1, 0);
+    bytes32_t b = bytes32_set(7, 6, 5, 4, 3, 2, 1, 0);
     
     for(int i=0; i<SCALAR; i++)
     {
-        bytes32_add_uint(value, 1, i);
-        assert(value[i] == i+1);
+        b = bytes32_add_uint(b, 1, i);
+        assert(b.v[i] == i+1);
     }
 
-    bytes32_convert(value, UINT_MAX);
-    bytes32_add_uint(value, 1, 0);
-    assert(value[1] == 1);
-    assert(value[0] == 0);
+    b = bytes32_convert(UINT_MAX);
+    b = bytes32_add_uint(b, 1, 0);
+    assert(b.v[1] == 1);
+    assert(b.v[0] == 0);
 
     
-    bytes32_set(value, 0, 0, 0, 0, 0, 0, UINT_MAX, UINT_MAX);
-    bytes32_add_uint(value, 1, 0);
-    assert(value[2] == 1);
-    assert(value[1] == 0);
-    assert(value[0] == 0);
+    b = bytes32_set(0, 0, 0, 0, 0, 0, UINT_MAX, UINT_MAX);
+    b = bytes32_add_uint(b, 1, 0);
+    assert(b.v[2] == 1);
+    assert(b.v[1] == 0);
+    assert(b.v[0] == 0);
 
-    bytes32_convert(value, 0);
-    bytes32_add_uint(value, 1, 8);
-    ASSERT_BYTES32_UINT(value, 0);
+    b = bytes32_convert(0);
+    b = bytes32_add_uint(b, 1, 8);
+    ASSERT_BYTES32_UINT(b, 0);
 }
 
 void test_add()
 {
     printf("\n\ttest add");
 
-    bytes32 value, value1, value2;
-    bytes32_set(value1, 7, 6, 5, 4, 3, 2, 1, 0);
-    bytes32_set(value2, 0, 1, 2, 3, 4, 5, 6, 7);
-    bytes32_add(value, value1, value2);
-    ASSERT_BYTES32(value, 7, 7, 7, 7, 7, 7, 7, 7);
+    bytes32_t b_res, b1, b2;
+    b1 = bytes32_set(7, 6, 5, 4, 3, 2, 1, 0);
+    b2 = bytes32_set(0, 1, 2, 3, 4, 5, 6, 7);
+    b_res = bytes32_add(b1, b2);
+    ASSERT_BYTES32(b_res, 7, 7, 7, 7, 7, 7, 7, 7);
     
-    bytes32_set(value1, 7, 6, 5, 4, 3, 2, 1, 0);
-    bytes32_set(value2, 0, 1, 2, 3, 4, 5, 6, 7);
-    bytes32_add(value, value1, value2);
+    b1 = bytes32_set(7, 6, 5, 4, 3, 2, 1, 0);
+    b2 = bytes32_set(0, 1, 2, 3, 4, 5, 6, 7);
+    b_res = bytes32_add(b1, b2);
 
-    bytes32_set(value1, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    bytes32_set(value2, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    bytes32_add(value, value1, value2);
-    ASSERT_BYTES32(value, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
+    b1 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b2 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b_res = bytes32_add(b1, b2);
+    ASSERT_BYTES32(b_res, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
 }
 
 void test_mul()
 {
     printf("\n\ttest mul");
 
-    bytes32 value, value1, value2;
-    bytes32_convert(value1, 2);
-    bytes32_convert(value2, 3);
-    bytes32_mul(value, value1, value2);
-    ASSERT_BYTES32_UINT(value, 6);
+    bytes32_t b_res, b1, b2;
+    b1 = bytes32_convert(2);
+    b2 = bytes32_convert(3);
+    b_res = bytes32_mul(b1, b2);
+    ASSERT_BYTES32_UINT(b_res, 6);
 
-    bytes32_set(value1, 1, 1, 1, 1, 1, 1, 1, 1);
-    bytes32_set(value2, 1, 1, 1, 1, 1, 1, 1, 1);
-    bytes32_mul(value, value1, value2);
-    ASSERT_BYTES32(value, 8, 7, 6, 5, 4, 3, 2, 1);
+    b1 = bytes32_set(1, 1, 1, 1, 1, 1, 1, 1);
+    b2 = bytes32_set(1, 1, 1, 1, 1, 1, 1, 1);
+    b_res = bytes32_mul(b1, b2);
+    ASSERT_BYTES32(b_res, 8, 7, 6, 5, 4, 3, 2, 1);
 
-    bytes32_set(value1, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    bytes32_set(value2, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    bytes32_mul(value, value1, value2);
-    ASSERT_BYTES32_UINT(value, 1);
+    b1 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b2 = bytes32_set(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b_res = bytes32_mul(b1, b2);
+    ASSERT_BYTES32_UINT(b_res, 1);
 }
 
 
