@@ -1,12 +1,12 @@
 SRC  = main.c
-ROOT = ../
+ROOT = ..
 OBJ  = $(ROOT)/bin/main.o
 
 FLAGS=-Wall -Wall -Werror -Wfatal-errors
 
 LIB = $(ROOT)/lib
 
-UINT_PATH = $(LIB)/uint
+UINT_PATH = $(LIB)/bytes32
 UINT_FILE = $(UINT_PATH)/lib.o
 
 build: $(OBJ)
@@ -20,3 +20,7 @@ $(UINT_FILE):
 
 clean:
 	rm -rf $(OBJ)
+
+.PHONY: show
+show:
+	echo "$(LIB)"
