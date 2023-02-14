@@ -53,7 +53,22 @@ void test_mul()
     assert(res == 0xFFFFFFFE00000001);
 }
 
+void test_mix()
+{
+    printf("\n\ttest mix");
 
+    uint res = uint_mix(0, 1, 3);
+    assert(res == 8);
+
+    res = uint_mix(1 << 31, 0, 3);
+    assert(res == 4);
+
+    res = uint_mix(1 << 31, 1, 3);
+    assert(res == 12);
+
+    res = uint_mix(1, 0, 0);
+    assert(res == 0);
+}
 
 void test_uint()
 {
@@ -62,6 +77,7 @@ void test_uint()
     test_dec();
     test_add();
     test_mul();
+    test_mix();
 }
 
 

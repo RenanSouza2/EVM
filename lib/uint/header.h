@@ -6,8 +6,8 @@ typedef unsigned long int luint;
 #define DECH(LUINT) ((uint)(((luint)(LUINT)) >> 32))
 #define DECL(LUINT) ((uint)(LUINT))
 
-uint  uint_not(uint u);
 luint uint_add(uint u1, uint u2);
 luint uint_mul(uint u1, uint u2);
+uint  uint_mix(uint u1, uint u2, uint shift);
 
 #endif

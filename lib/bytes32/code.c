@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdbool.h>
 
 #include "header.h"
 
@@ -27,8 +28,8 @@ void bytes32_display(bytes32_t b)
 
 #define BYTES32_UINT(UINT) BYTES32_SET(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
 
-const bytes32_t b_zero = (bytes32_t){{  0, 0, 0, 0, 0, 0, 0, 0}};
-const bytes32_t b_256  = (bytes32_t){{256, 0, 0, 0, 0, 0, 0, 0}};
+const bytes32_t b_zero = BYTES32_UINT(0);
+const bytes32_t b_256  = BYTES32_UINT(256);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint value, int i)
 {
@@ -48,6 +49,37 @@ bytes32_t bytes32_revert(bytes32_t b)
         b_res.v[i] = b.v[SCALAR-1-i];
     return b_res;
 }
+
+bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
+{
+    if(shift > 255) return b_zero;
+
+    int jmp = shift >> 5;
+    int off = shift & 31;
+
+    bytes32_t b_res = b_zero;
+    b_res.v[jmp] = uint_mix(0, b.v[0], off);
+    for(int i=1; i+jmp<SCALAR; i++)
+        b_res.v[i + jmp] = uint_mix(b.v[i-1], b.v[i], off);
+
+    return b_res;
+}
+
+bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
+{
+    if(shift > 255) return b_zero;
+
+    int jmp = shift >> 5;
+    int off = 32 - (shift & 31);
+
+    bytes32_t b_res = b_zero;
+    b_res.v[SCALAR-1 - jmp] = uint_mix(b.v[SCALAR-1], 0, off);
+    for(int i=jmp; i<SCALAR-1; i++)
+        b_res.v[i-jmp] = uint_mix(b.v[i], b.v[i+1], off);
+    
+    return b_res;
+}
+
 
 
 
@@ -87,3 +119,9 @@ bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
     return b_res;
 }
 
+bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=0; i<SCALAR; i++)
+        b1 = bytes32_add_uint(b1, ~b2.v[i], i);
+    return bytes32_add_uint(b1, 1, 0);
+}

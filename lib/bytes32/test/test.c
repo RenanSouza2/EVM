@@ -122,6 +122,80 @@ void test_cmp()
     assert(res > 0);
 }
 
+void test_shl_uint()
+{
+    printf("\n\t\ttest shl uint");
+
+    bytes32_t b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 14);
+    ASSERT_BYTES32_UINT(b, 0x4000);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 0);
+    ASSERT_BYTES32_UINT(b, 1);
+    
+    b = BYTES32_UINT(2);
+    b = bytes32_shl_uint(b, 31);
+    ASSERT_BYTES32_UINT(b, 0x100000000);
+
+    b = BYTES32_UINT(0x11111111);
+    b = bytes32_shl_uint(b, 16);
+    ASSERT_BYTES32_UINT(b, 0x111111110000);
+    
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 48);
+    ASSERT_BYTES32_UINT(b, 0x1000000000000);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 256);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 257);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_SET(0, 0, 0, 1, 0, 0, 0, 0);
+    b = bytes32_shl_uint(b, 128);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 255);
+    ASSERT_BYTES32(b, 0x80000000, 0, 0, 0, 0, 0, 0, 0);
+}
+
+void test_shr_uint()
+{
+    printf("\n\t\ttest shr uint");
+
+    bytes32_t b = BYTES32_SET(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
+    b = bytes32_shr_uint(b, 80);
+    ASSERT_BYTES32(b, 0, 0, 0xFFFF, 0xFFFF0000, 0, 0, 0, 0);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shr_uint(b, 1);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shr_uint(b, 0);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b = BYTES32_UINT(0x80000000);
+    b = bytes32_shr_uint(b, 16);
+    ASSERT_BYTES32_UINT(b, 0x8000);
+    
+    b = BYTES32_UINT(0x80000000);
+    b = bytes32_shr_uint(b, 31);
+    ASSERT_BYTES32_UINT(b, 1);
+    
+    b =  BYTES32_SET(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
+    b = bytes32_shl_uint(b, 256);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b =  BYTES32_SET(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
+    b = bytes32_shl_uint(b, 257);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
 void test_tools()
 {
     printf("\n\ttest tools");
@@ -131,6 +205,8 @@ void test_tools()
     test_revert();
     test_is_zero_bool();
     test_cmp();
+    test_shl_uint();
+    test_shr_uint();
 }
 
 
