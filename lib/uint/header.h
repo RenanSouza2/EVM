@@ -3,7 +3,7 @@
 
 typedef unsigned long int luint;
 
-#define DECH(LUINT) ((uint)((LUINT) >> 32))
+#define DECH(LUINT) ((uint)(((luint)(LUINT)) >> 32))
 #define DECL(LUINT) ((uint)(LUINT))
 
 uint  uint_not(uint u);
