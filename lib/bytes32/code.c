@@ -23,32 +23,33 @@ void bytes32_display(bytes32_t b)
 
 
 
-#define BYTES32_SET(VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0) \
+#define BYTES32(VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0) \
     (bytes32_t){{VALUE0, VALUE1, VALUE2, VALUE3, VALUE4, VALUE5, VALUE6, VALUE7}}
 
-#define BYTES32_UINT(UINT) BYTES32_SET(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
+#define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
 
 const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_256  = BYTES32_UINT(256);
 
-bytes32_t bytes32_add_uint(bytes32_t b, uint value, int i)
+bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 {
     if(i >= SCALAR) return b;
-    if(value == 0) return b;
+    if(u == 0) return b;
 
-    luint aux = uint_add(b.v[i], value);
-    b.v[i] = DECL(aux);
+    luint lu = uint_add(b.v[i], u);
+    b.v[i] = DECL(lu);
 
-    return bytes32_add_uint(b, DECH(aux), i+1);
+    return bytes32_add_uint(b, DECH(lu), i+1);
 }
 
-bytes32_t bytes32_revert(bytes32_t b)
-{
-    bytes32_t b_res;
-    for(int i=0; i<SCALAR; i++)
-        b_res.v[i] = b.v[SCALAR-1-i];
-    return b_res;
-}
+// bytes32_t bytes32_revert(bytes32_t b)
+// {
+//     bytes32_t b_res;
+//     for(int i=0; i<SCALAR; i++)
+//         b_res.v[i] = b.v[SCALAR-1-i];
+//
+//     return b_res;
+// }
 
 bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
 {
@@ -90,9 +91,12 @@ bool bytes32_is_zero_bool(bytes32_t b)
 
 int bytes32_cmp(bytes32_t b1, bytes32_t b2)
 {
-    b1 = bytes32_revert(b1);
-    b2 = bytes32_revert(b2);
-    return memcmp(b1.v, b2.v, 32);
+    for(int i=SCALAR-1; i>=0; i--)
+    {
+        if(b1.v[i] > b2.v[i]) return  1;
+        if(b1.v[i] < b2.v[i]) return -1;
+    }
+    return 0;
 }
 
 
@@ -124,4 +128,16 @@ bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
     for(int i=0; i<SCALAR; i++)
         b1 = bytes32_add_uint(b1, ~b2.v[i], i);
     return bytes32_add_uint(b1, 1, 0);
+}
+
+bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
+    return bytes32_shl_uint(b1, b2.v[0]);
+}
+
+bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
+    return bytes32_shr_uint(b1, b2.v[0]);
 }
