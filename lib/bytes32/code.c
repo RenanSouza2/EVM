@@ -33,6 +33,26 @@ const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_one = BYTES32_UINT(1);
 const bytes32_t b_256 = BYTES32_UINT(256);
 
+
+
+
+bool bytes32_is_zero_bool(bytes32_t b)
+{
+    return memcmp(b.v, b_zero.v, 32) == 0;
+}
+
+int bytes32_cmp(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=SCALAR-1; i>=0; i--)
+    {
+        if(b1.v[i] > b2.v[i]) return  1;
+        if(b1.v[i] < b2.v[i]) return -1;
+    }
+    return 0;
+}
+
+
+
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 {
     if(i >= SCALAR) return b;
@@ -43,15 +63,6 @@ bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 
     return bytes32_add_uint(b, DECH(lu), i+1);
 }
-
-// bytes32_t bytes32_revert(bytes32_t b)
-// {
-//     bytes32_t b_res;
-//     for(int i=0; i<SCALAR; i++)
-//         b_res.v[i] = b.v[SCALAR-1-i];
-//
-//     return b_res;
-// }
 
 bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
 {
@@ -82,26 +93,6 @@ bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
     
     return b_res;
 }
-
-
-
-
-bool bytes32_is_zero_bool(bytes32_t b)
-{
-    return memcmp(b.v, b_zero.v, 32) == 0;
-}
-
-int bytes32_cmp(bytes32_t b1, bytes32_t b2)
-{
-    for(int i=SCALAR-1; i>=0; i--)
-    {
-        if(b1.v[i] > b2.v[i]) return  1;
-        if(b1.v[i] < b2.v[i]) return -1;
-    }
-    return 0;
-}
-
-
 
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
 {
@@ -141,6 +132,40 @@ bytes32_t bytes32_is_zero(bytes32_t b1)
     return b_zero;
 }
 
+bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b1, b2) < 0) return b_one;
+    return b_zero;
+}
+
+bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b1, b2) > 0) return b_one;
+    return b_zero;
+}
+
+bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b1, b2) == 0) return b_one;
+    return b_zero;
+}
+
+
+
+bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
+    return bytes32_shl_uint(b1, b2.v[0]);
+}
+
+bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
+    return bytes32_shr_uint(b1, b2.v[0]);
+}
+
+
+
 bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 {
     
@@ -168,18 +193,6 @@ bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
     for(int i=0; i<SCALAR; i++)
         b1 = bytes32_add_uint(b1, ~b2.v[i], i);
     return bytes32_add_uint(b1, 1, 0);
-}
-
-bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
-{
-    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
-    return bytes32_shl_uint(b1, b2.v[0]);
-}
-
-bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
-{
-    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
-    return bytes32_shr_uint(b1, b2.v[0]);
 }
 
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
