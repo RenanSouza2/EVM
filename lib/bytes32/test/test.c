@@ -262,12 +262,56 @@ void test_lt()
     ASSERT_BYTES32_UINT(b, 1);
 }
 
+void test_gt()
+{
+    printf("\n\t\t\ttest gt");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(UINT_MAX);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(UINT_MAX);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
+void test_eq()
+{
+    printf("\n\t\t\ttest eq");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(UINT_MAX);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_eq(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_eq(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(UINT_MAX);
+    b = bytes32_eq(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
 void test_bytes32_compare()
 {
     printf("\n\t\ttest bytes compare");
 
     test_is_zero();
     test_lt();
+    test_gt();
+    test_eq();
 }
 
 
