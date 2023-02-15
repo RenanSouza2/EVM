@@ -226,6 +226,25 @@ void test_tools()
 
 
 
+void test_is_zero()
+{
+    printf("\n\t\ttest is zero");
+
+    bytes32_t b_in, b_out;
+    b_in = BYTES32_UINT(0);
+    b_out = bytes32_is_zero(b_in);
+    ASSERT_BYTES32_UINT(b_out, 1);
+
+    for(int i=0; i<SCALAR; i++)
+    {
+        b_in = BYTES32_UINT(0);
+        b_in.v[i] = 1;
+
+        b_out = bytes32_is_zero(b_in);
+        ASSERT_BYTES32_UINT(b_out, 0);
+    }
+}
+
 void test_add()
 {
     printf("\n\t\ttest add");
@@ -334,15 +353,70 @@ void test_shr()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+void test_div()
+{
+    printf("\n\t\ttest div");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(108);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_div(b1, b2);
+    ASSERT_BYTES32_UINT(b, 21);
+    
+    b1 = BYTES32_UINT(80);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_div(b1, b2);
+    ASSERT_BYTES32_UINT(b, 16);
+    
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_div(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_div(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
+void test_mod()
+{
+    printf("\n\t\ttest mod");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(108);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_mod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 3);
+    
+    b1 = BYTES32_UINT(80);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_mod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_mod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 2);
+    
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_mod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+}
 
 void test_operations()
 {
     printf("\n\n\ttest operation");
 
+    test_is_zero();
     test_add();
     test_sub();
     test_mul();
     test_shl();
+    test_shr();
+    test_div();
+    test_mod();
 }
 
 

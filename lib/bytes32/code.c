@@ -3,8 +3,6 @@
 
 #include "header.h"
 
-
-
 #ifdef DEBUG
 #include <stdio.h>
 
@@ -21,15 +19,19 @@ void bytes32_display(bytes32_t b)
 
 #endif
 
-
-
 #define BYTES32(VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0) \
     (bytes32_t){{VALUE0, VALUE1, VALUE2, VALUE3, VALUE4, VALUE5, VALUE6, VALUE7}}
 
 #define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
 
+STRUCT(bytes32_dual)
+{
+    bytes32_t b1, b2;
+};
+
 const bytes32_t b_zero = BYTES32_UINT(0);
-const bytes32_t b_256  = BYTES32_UINT(256);
+const bytes32_t b_one = BYTES32_UINT(1);
+const bytes32_t b_256 = BYTES32_UINT(256);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 {
@@ -101,6 +103,44 @@ int bytes32_cmp(bytes32_t b1, bytes32_t b2)
 
 
 
+bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_is_zero_bool(b2)) return (bytes32_dual_t){b_zero, b_zero};
+
+    bytes32_t b_base = BYTES32_UINT(1);
+    while(bytes32_cmp(b1, b2) >= 0)
+    {
+        b2 = bytes32_shl_uint(b2, 1);
+        b_base = bytes32_shl_uint(b_base, 1);
+    }
+
+    b2 = bytes32_shr_uint(b2, 1);
+    b_base = bytes32_shr_uint(b_base, 1);
+
+    bytes32_t b_res = b_zero;
+    while(!bytes32_is_zero_bool(b_base))
+    {
+        if(bytes32_cmp(b1, b2) >= 0)
+        {
+            b1 = bytes32_sub(b1, b2);
+            b_res = bytes32_add(b_res, b_base);
+        }
+        
+        b2 = bytes32_shr_uint(b2, 1);
+        b_base = bytes32_shr_uint(b_base, 1);
+    }
+
+    return (bytes32_dual_t){b_res, b1};
+}
+
+
+
+bytes32_t bytes32_is_zero(bytes32_t b1)
+{
+    if(bytes32_is_zero_bool(b1)) return b_one;
+    return b_zero;
+}
+
 bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 {
     
@@ -140,4 +180,16 @@ bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
     if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
     return bytes32_shr_uint(b1, b2.v[0]);
+}
+
+bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
+    return bd.b1;
+}
+
+bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
+    return bd.b2;
 }
