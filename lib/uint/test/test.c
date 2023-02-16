@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "../code.c"
+#include "../debug.h"
 
 
 

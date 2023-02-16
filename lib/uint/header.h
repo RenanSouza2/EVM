@@ -1,6 +1,8 @@
 #ifndef __UINT_H__
 #define __UINT_H__
 
+#include <stdlib.h>
+
 typedef unsigned long int luint;
 
 #define DECH(LUINT) ((uint)(((luint)(LUINT)) >> 32))

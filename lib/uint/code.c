@@ -1,8 +1,4 @@
-#include <stdlib.h>
-
-#include <stdio.h>
-
-#include "header.h"
+#include "debug.h"
 
 luint uint_add(uint u1, uint u2) 
 {
