@@ -55,6 +55,8 @@
 
 int main() 
 {
+    printf("\nNo implementation\n\n");
+
     printf("\n");
     return 0;
 }

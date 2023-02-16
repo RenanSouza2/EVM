@@ -1,26 +1,22 @@
-SRC  = main.c
+FLAGS = -Wall -Werror -Wfatal-errors
+
+LIBS = bytes32
+
 ROOT = ..
-OBJ  = $(ROOT)/bin/main.o
+LIB_PATH = $(ROOT)/lib
+LIB_FILES = $(foreach LIB,$(LIBS),$(LIB_PATH)/$(LIB)/lib.o)
 
-FLAGS=-Wall -Wall -Werror -Wfatal-errors
+run: main.o
+	./main.o
 
-LIB = $(ROOT)/lib
+build: main.o
 
-UINT_PATH = $(LIB)/bytes32
-UINT_FILE = $(UINT_PATH)/lib.o
+main.o: main.c $(LIB_FILES)
+	gcc $(FLAGS) -o $@ $^
 
-build: $(OBJ)
-
-$(OBJ): main.c $(UINT_FILE)
-	gcc $(FLAGS) -o $(OBJ) $^
-
-.PHONY: $(UINT_FILE)
-$(UINT_FILE):
-	$(MAKE) --directory $(UINT_PATH)
+.PHONY: $(LIB_FILES)
+$(LIB_FILES):
+	$(MAKE) --directory=$(dir $@)
 
 clean:
-	rm -rf $(OBJ)
-
-.PHONY: show
-show:
-	echo "$(LIB)"
+	rm -rf *.o

@@ -1,7 +1,12 @@
+FLAGS =  -c -Wall -Werror -Wfatal-errors
+
 build: lib.o
 
-lib.o debug.o: code.c
-	gcc -o $@ code.c -c -Wall -Werror -Wfatal-errors
+lib.o: code.c
+	gcc $(FLAGS) -o $@ code.c
+
+debug.o: code.c
+	gcc $(FLAGS) -o $@ code.c -D DEBUG
 
 .PHONY: clean
 clean:

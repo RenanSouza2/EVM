@@ -1,19 +1,15 @@
-BIN = bin
-TGT = $(BIN)/main.o
+SRC = src
+LIB = lib
 
-run: $(TGT)
-	./$(TGT)
+run:
+	$(MAKE) --directory=$(SRC) 
 
-build: $(TGT)
+build:
+	$(MAKE) build --directory=$(SRC)
 	
-.PHONY: $(TGT)
-$(TGT):
-	$(MAKE) --directory=src
-
 clean:
-	rm -rf $(BIN)/*.o
-	$(MAKE) clean --directory=lib
+	$(MAKE) clean --directory=$(SRC)
+	$(MAKE) clean --directory=$(LIB)
 	
-.PHONY: test
 test: 
-	$(MAKE) test --directory=lib
+	$(MAKE) test --directory=$(LIB)

@@ -1,29 +1,49 @@
-FLAGS=-c -Wall -Werror -Wfatal-errors
+FLAGS = -c -Wall -Werror -Wfatal-errors
 
-UINT_PATH=../uint
-UINT_FILE=$(UINT_PATH)/lib.o
+LIBS = uint
 
-build: lib.o 
+LIB_ROOT = ..
+LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))
+LIB_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/lib.o)
+DBG_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/debug.o)
 
-lib.o: tmp.o $(UINT_FILE)
+build: lib.o
+
+
+
+lib.o: tmp.o $(LIB_FILES)
 	ld -r -o $@ $^
-
-debug.o: tmp.o $(UINT_FILE)
-	ld -r -o $@ $^ -D DEBUG
 
 .INTERMEDIATE: tmp.o
 tmp.o: code.c
-	gcc $(FLAGS) -o tmp.o $^
+	gcc $(FLAGS) -o $@ $^
 
-.PHONY: $(UINT_FILE)
-$(UINT_FILE):
-	$(MAKE) --directory=$(UINT_PATH)
+.PHONY: $(LIB_FILES)
+$(LIB_FILES):
+	$(MAKE) --directory=$(dir $@)
 
-.PHONY: clean
+
+
+
+debug.o: dbg.o $(DBG_FILES)
+	ld -r -o $@ $^
+
+.INTERMEDIATE: dbg.o
+dbg.o: code.c
+	gcc $(FLAGS) -o $@ $^
+
+.PHONY: $(DBG_FILES)
+$(DBG_FILES):
+	$(MAKE) debug.o --directory=$(dir $@)
+
+
+
 clean:
 	rm -f *.o
-	$(MAKE) clean --directory=$(UINT_PATH)
 	$(MAKE) clean --directory=test
+	for DIR in $(LIB_DIR) ; do \
+		$(MAKE) clean --directory=$$DIR ; \
+	done
 
 .PHONY: test
 test:

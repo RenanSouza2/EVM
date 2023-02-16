@@ -1,19 +1,15 @@
-FLAGS=-Wall -Werror -Wfatal-errors
+FLAGS = -Wall -Werror -Wfatal-errors
+DEBUG_FILE = ../debug.o
 
-UINT_PATH=../../uint
-UINT_FILE=$(UINT_PATH)/debug.o
-
-.PHONY: test
 test: test.o
 	./test.o 
 
-.PHONY: test.o
-test.o: test.c $(UINT_FILE)
+test.o: test.c $(DEBUG_FILE)
 	gcc $(FLAGS) -o $@ $^ -D DEBUG
 
-.PHONY: $(UINT_FILE)
-$(UINT_FILE):
-	$(MAKE) debug.o --directory=$(UINT_PATH)
+.PHONY: $(DEBUG_FILE)
+$(DEBUG_FILE):
+	$(MAKE) debug.o --directory=$(dir $@)
 
 clean:
 	rm -rf test.o

@@ -1,10 +1,10 @@
-.PHONY: test
+FLAGS = -Wall -Werror -Wfatal-errors
+
 test: test.o
 	./test.o 
 
-test.o: test.c ../code.c
-	gcc test.c -o test.o -Wall -Werror -Wfatal-errors
+test.o: test.c
+	gcc $(FLAGS) test.c -o test.o
 
-.PHONY: clean
 clean:
 	rm -rf test.o

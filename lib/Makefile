@@ -1,7 +1,13 @@
-clean:
-	$(MAKE) clean --directory=uint
-	$(MAKE) clean --directory=bytes32
+DIRS := $(wildcard */.)
 
+.PHONY: clean
+clean:
+	for DIR in $(DIRS) ; do \
+		$(MAKE) clean --directory=$$DIR ; \
+	done
+
+.PHONY: test
 test:
-	$(MAKE) test --directory=uint
-	$(MAKE) test --directory=bytes32
+	for DIR in $(DIRS) ; do \
+		$(MAKE) test --directory=$$DIR ; \
+	done

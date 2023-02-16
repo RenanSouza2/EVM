@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <string.h>
 
-#include "../code.c"
+#include "../debug.h"
 
 #define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
     assert(memcmp(BYTES1.v, BYTES2.v, 32) == 0)
@@ -71,7 +71,7 @@ void test_cmp()
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32_UINT(0);
-    res = bytes32_cmp(b1, b_zero);
+    res = bytes32_cmp(b1, b2);
     assert(res > 0);
 
     b1 = BYTES32_UINT(5);
@@ -501,7 +501,7 @@ void test_arithmetic()
 
 void test_operations()
 {
-    printf("\n\n\ttest operation");
+    printf("\n\ttest operation");
 
     test_bytes32_compare();
     test_shift();
@@ -518,7 +518,8 @@ void test_bytes32()
     test_operations();
 }
 
-int main() {
+int main() 
+{
     setbuf(stdout, NULL);
     test_bytes32();
     printf("\n\n\tTest successful\n\n");

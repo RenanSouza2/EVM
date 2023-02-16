@@ -1,38 +1,11 @@
 #include <string.h>
-#include <stdbool.h>
 
-#include "header.h"
+#include "debug.h"
 
-#ifdef DEBUG
-#include <stdio.h>
-
-void bytes32_display(bytes32_t b)
-{
-    printf("0x");
-    for(int i=SCALAR-1; i>=0; i--) {
-        printf("%08X", b.v[i]);
-    }
-}
-
-#define BYTES32_DISPLAY(BYTES32) \
-    printf("\n%s: ", #BYTES32);bytes32_display(BYTES32);
-
-#endif
-
-#define BYTES32(VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0) \
-    (bytes32_t){{VALUE0, VALUE1, VALUE2, VALUE3, VALUE4, VALUE5, VALUE6, VALUE7}}
-
-#define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
-
-STRUCT(bytes32_dual)
-{
-    bytes32_t b1, b2;
-};
 
 const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_one = BYTES32_UINT(1);
 const bytes32_t b_256 = BYTES32_UINT(256);
-
 
 
 
@@ -206,3 +179,5 @@ bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
     bytes32_dual_t bd = bytes32_div_mod(b1, b2);
     return bd.b2;
 }
+
+
