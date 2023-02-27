@@ -8,6 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: git submodule init
+    - run: git submodule update
     - run: make
 
   test:
