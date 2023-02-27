@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#include "../submodule/c-library/struct.h"
+#include "../utils/struct.h"
 
 #include "../lib/uint/header.h"
 #include "../lib/bytes32/header.h"
