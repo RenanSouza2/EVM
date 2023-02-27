@@ -1,3 +1,0 @@
-[submodule "submodule/c-library"]
-	path = submodule/c-library
-	url = git@github.com:RenanSouza2/c-library.git

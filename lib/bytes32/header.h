@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "../../submodule/c-library/struct.h"
+#include "../../utils/struct.h"
 #include "../uint/header.h"
 
 #define SCALAR 8
