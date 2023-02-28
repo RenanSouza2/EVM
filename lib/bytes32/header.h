@@ -1,8 +1,6 @@
 #ifndef __BYTES32_H__
 #define __BYTES32_H__
 
-#include <stdlib.h>
-
 #include "../../utils/struct.h"
 #include "../uint/header.h"
 
@@ -14,6 +12,7 @@ STRUCT(bytes32)
 
 #define BYTES32_RESET(VALUE) memset(VALUE.v, 0, 32)
 
+bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
 bytes32_t bytes32_is_zero(bytes32_t b1);
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2);

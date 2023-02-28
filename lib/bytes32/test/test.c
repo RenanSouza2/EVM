@@ -5,27 +5,6 @@
 
 #include "../debug.h"
 
-#define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
-    assert(memcmp(BYTES1.v, BYTES2.v, 32) == 0)
-
-#define ASSERT_BYTES32(BYTES, \
-    VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0 \
-) \
-{ \
-    bytes32_t b_exp; \
-    b_exp = BYTES32( \
-        VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0 \
-    ); \
-    ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
-}
-
-#define ASSERT_BYTES32_UINT(BYTES, UINT) \
-{ \
-    bytes32_t b_exp; \
-    b_exp = BYTES32_UINT(UINT); \
-    ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
-}
-
 
 
 void test_is_zero_bool()
@@ -44,8 +23,7 @@ void test_is_zero_bool()
         assert(is_zero == false);
     }
 
-    b = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    is_zero = bytes32_is_zero_bool(b);
+    is_zero = bytes32_is_zero_bool(b_max);
     assert(is_zero == false);
 }
 
@@ -372,10 +350,8 @@ void test_add()
     b2 = BYTES32(0, 1, 2, 3, 4, 5, 6, 7);
     b_res = bytes32_add(b1, b2);
 
-    b1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b2 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b_res = bytes32_add(b1, b2);
-    ASSERT_BYTES32(b_res, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
+    b_res = bytes32_add(b_max, b_max);
+    ASSERT_BYTES32_MUTUAL(b_res, b_max_1);
 }
 
 void test_mul()
@@ -393,9 +369,7 @@ void test_mul()
     b_res = bytes32_mul(b1, b2);
     ASSERT_BYTES32(b_res, 8, 7, 6, 5, 4, 3, 2, 1);
 
-    b1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b2 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b_res = bytes32_mul(b1, b2);
+    b_res = bytes32_mul(b_max, b_max);
     ASSERT_BYTES32_UINT(b_res, 1);
 }
 
@@ -412,7 +386,7 @@ void test_sub()
     b1 = BYTES32_UINT(0);
     b2 = BYTES32_UINT(1);
     b_res = bytes32_sub(b1, b2);
-    ASSERT_BYTES32(b_res, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    ASSERT_BYTES32_MUTUAL(b_res, b_max);
 
     b1 = BYTES32_UINT(0);
     b2 = BYTES32_UINT(0);
@@ -428,9 +402,7 @@ void test_sub()
     b2 = BYTES32(0, 1, 2, 3, 4, 5, 6, 7);
     b_res = bytes32_sub(b1, b2);
 
-    b1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b2 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
-    b_res = bytes32_sub(b1, b2);
+    b_res = bytes32_sub(b_max, b_max);
     ASSERT_BYTES32_UINT(b_res, 0);
 }
 

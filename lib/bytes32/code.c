@@ -1,7 +1,21 @@
-#include <string.h>
-
 #include "debug.h"
 
+#ifdef DEBUG
+
+#include <stdio.h>
+#include <limits.h>
+
+const bytes32_t b_max = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+const bytes32_t b_max_1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
+
+void bytes32_display(bytes32_t b)
+{
+    printf("0x");
+    for(int i=SCALAR-1; i>=0; i--)
+        printf("%08x", b.v[i]);
+}
+
+#endif
 
 const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_one = BYTES32_UINT(1);
@@ -28,8 +42,8 @@ int bytes32_cmp(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 {
-    if(i >= SCALAR) return b;
     if(u == 0) return b;
+    if(i >= SCALAR) return b;
 
     luint lu = uint_add(b.v[i], u);
     b.v[i] = DECL(lu);
