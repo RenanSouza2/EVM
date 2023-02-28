@@ -81,10 +81,7 @@ bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
     return b_res;
 }
 
-bytes32_dual_t bytes32_mul_full(bytes32_t b1, bytes32_t b2)
-{
-    
-}
+
 
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
 {
