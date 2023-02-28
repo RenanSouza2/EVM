@@ -1,6 +1,8 @@
 #ifndef __BYTES32_H__
 #define __BYTES32_H__
 
+#include <stdbool.h>
+
 #include "../../utils/struct.h"
 #include "../uint/header.h"
 
@@ -11,6 +13,8 @@ STRUCT(bytes32)
 };
 
 #define BYTES32_RESET(VALUE) memset(VALUE.v, 0, 32)
+
+bool bytes32_is_zero_bool(bytes32_t b);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
 bytes32_t bytes32_is_zero(bytes32_t b1);

@@ -1,7 +1,6 @@
 #ifndef __BYTES32_DEBUG_H__
 #define __BYTES32_DEBUG_H__
 
-#include <stdbool.h>
 #include <string.h>
 
 #include "header.h"
@@ -50,8 +49,6 @@ extern const bytes32_t b_256;
 extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 
-
-bool bytes32_is_zero_bool(bytes32_t b);
 int bytes32_cmp(bytes32_t b1, bytes32_t b2);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);

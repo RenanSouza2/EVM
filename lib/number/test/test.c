@@ -5,6 +5,8 @@
 #include "../debug.h"
 #include "../../bytes32/debug.h"
 
+#include <stdlib.h>
+
 
 
 void test_copy()
@@ -38,11 +40,11 @@ void test_add_uint()
     ASSERT_NUMBER_UINT(n, 1);
 
     n = number_add_uint(NULL, 1, SCALAR);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 2, 0, 1));
 
-    n = number_add_uint(NULL, 1, SCALAR);
+    n = NUMBER_UINT_OFF(1, 1);
     n = number_add_uint(n, 1, SCALAR);
-    ASSERT_NUMBER_UINT(n->next, 2);
+    assert(number_uint_mult(n, 2, 0, 2));
 
     n = NUMBER_UINT(UINT_MAX);
     n = number_add_uint(n, 3, 0);
@@ -50,8 +52,7 @@ void test_add_uint()
 
     n = number_create_bytes32(b_max);
     n = number_add_uint(n, 3, 0);
-    ASSERT_NUMBER_UINT(n, 2);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 2, 2, 1));
 }
 
 void test_add_bytes32()
@@ -67,20 +68,50 @@ void test_add_bytes32()
     b = BYTES32_UINT(3);
     n = number_create_bytes32(b_max);
     n = number_add_bytes32(n, b, 0);
-    ASSERT_NUMBER_UINT(n, 2);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 2, 2, 1));
 
     printf("\n\t\ttest add bytes32 3\t\t");
     n = NUMBER_UINT(1);
-    b = BYTES32_UINT(1);
+    b = BYTES32_UINT(2);
     n = number_add_bytes32(n, b, 1);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 2, 1, 2));
 
     printf("\n\t\ttest add bytes32 4\t\t");
+    n = NUMBER_UINT_OFF(2, 2);
     b = BYTES32_UINT(1);
-    n = number_create_bytes32_dbg(b, 2);
     n = number_add_bytes32(n, b, 1);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 3, 0, 1, 2));
+}
+
+void test_add_off()
+{
+    printf("\n\ttest add off\t\t");
+    
+    number_p n = number_add_off(NULL, NULL, 0);
+    assert(n == NULL);
+    
+    n = NUMBER_UINT(2);
+    n = number_add_off(n, NULL, 0);
+    ASSERT_NUMBER_UINT(n, 2);
+
+    n = NUMBER_UINT(2);
+    n = number_add_off(NULL, n, 0);
+    ASSERT_NUMBER_UINT(n, 2);
+
+    number_p n1, n2;
+    n1 = NUMBER_UINT(2);
+    n2 = NUMBER_UINT(2);
+    n = number_add_off(n1, n2, 0);
+    ASSERT_NUMBER_UINT(n, 4);
+
+    n1 = number_create_uint_mult(4, 0, 0, 0, 3);
+    n2 = number_create_uint_mult(2, 1, 2);
+    n = number_add_off(n1, n2, 1);
+    assert(number_uint_mult(n, 4, 0, 1, 2, 3));
+
+    n2 = number_create_uint_mult(2, 1, 2);
+    n = number_add_off(NULL, n2, 1);
+    assert(number_uint_mult(n, 3, 0, 1, 2));
 }
 
 void test_bytes32_mul()
@@ -103,8 +134,40 @@ void test_bytes32_mul()
     ASSERT_NUMBER_UINT(n, 6);
 
     n = number_bytes32_mul(b_max, b_max);
-    ASSERT_NUMBER_UINT(n, 1);
-    ASSERT_NUMBER_BYTES32(n->next, b_max_1);
+    assert(number_bytes32_mult(n, 1, b_one, b_max_1));
+}
+
+void test_mul_bytes32()
+{
+    printf("\n\ttest mul bytes32\t\t");
+
+    printf("\n\t\ttest mul bytes32 1\t\t");
+    number_p n = number_mul_bytes32(NULL, b_zero);
+    assert(n == NULL);
+
+    printf("\n\t\ttest mul bytes32 2\t\t");
+    n = number_mul_bytes32(NULL, b_256);
+    assert(n == NULL);
+
+    printf("\n\t\ttest mul bytes32 3\t\t");
+    n = NUMBER_UINT(2);
+    n = number_mul_bytes32(n, b_zero);
+    assert(n == NULL);
+
+    printf("\n\t\ttest mul bytes32 4\t\t");
+    n = NUMBER_UINT(2);
+    n = number_mul_bytes32(n, b_256);
+    ASSERT_NUMBER_UINT(n, 512);
+
+    printf("\n\t\ttest mul bytes32 5\t\t");
+    n = number_create_bytes32_mult(2, b_max, b_max);
+    n = number_mul_bytes32(n, b_max);
+    assert(number_bytes32_mult(n, 3, b_one, b_max, b_max_1));
+
+    printf("\n\t\ttest mul bytes32 6\t\t");
+    n = NUMBER_UINT_OFF(2, 1);
+    n = number_mul_bytes32(n, b_256);
+    assert(number_uint_mult(n, 2, 0, 512));
 }
 
 
@@ -130,17 +193,15 @@ void test_add()
     ASSERT_NUMBER_UINT(n, 2);
 
     number_p n1, n2;
-    n1 = NUMBER_UINT_DBG(1, 1);
+    n1 = NUMBER_UINT_OFF(1, 1);
     n2 = NUMBER_UINT(2);
     n = number_add(n1, n2);
-    ASSERT_NUMBER_UINT(n, 2);
-    ASSERT_NUMBER_UINT(n->next, 1);
+    assert(number_uint_mult(n, 2, 2, 1));
     
     n1 = NUMBER_UINT(1);
-    n2 = NUMBER_UINT_DBG(2, 1);
+    n2 = NUMBER_UINT_OFF(2, 1);
     n = number_add(n1, n2);
-    ASSERT_NUMBER_UINT(n, 1);
-    ASSERT_NUMBER_UINT(n->next, 2);
+    assert(number_uint_mult(n, 2, 1, 2));
 }
 
 void test_mul()
@@ -163,21 +224,15 @@ void test_mul()
     ASSERT_NUMBER_UINT(n, 1);
 
     number_p n1, n2;
-    n1 = NUMBER_UINT(1);
-    n = NUMBER_UINT_DBG(2, 1);
-    n1 = number_add(n1, n);
-    n2 = NUMBER_UINT(3);
-    n = NUMBER_UINT_DBG(4, 1);
-    n2 = number_add(n2, n);
-    n = NUMBER_UINT_DBG(5, 2);
-    n2 = number_add(n2, n);
-    printf("\n");
-    number_display(n1);
-    printf("\n");
-    number_display(n2);
+    n1 = number_create_uint_mult(2, 1, 2);
+    n2 = number_create_uint_mult(3, 3, 4, 5);
     n = number_mul(n1, n2);
-    printf("\n");
-    number_display(n);
+    assert(number_uint_mult(n, 4, 3, 10, 13, 10));
+
+    n1 = number_create_bytes32_mult(2, b_max, b_max);
+    n2 = number_create_bytes32_mult(2, b_max, b_max);
+    n = number_mul(n1, n2);
+    assert(number_bytes32_mult(n, 4, b_one, b_zero, b_max_1, b_max));
 }
 
 
@@ -189,7 +244,9 @@ void test_number()
     test_copy();
     test_add_uint();
     test_add_bytes32();
+    test_add_off();
     test_bytes32_mul();
+    test_mul_bytes32();
 
     test_add();
     test_mul();

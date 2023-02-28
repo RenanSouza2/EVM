@@ -16,8 +16,8 @@ STRUCT(number)
 #define NUMBER_UINT(UINT) \
     number_create_bytes32(BYTES32_UINT(UINT))
 
-#define NUMBER_UINT_DBG(UINT, INT)    \
-    number_create_bytes32_dbg(BYTES32_UINT(UINT), INT)
+#define NUMBER_UINT_OFF(UINT, INT)    \
+    number_create_bytes32_off(BYTES32_UINT(UINT), INT)
 
 #define ASSERT_NUMBER_BYTES32(NUMBER, BYTES32)  \
     {   \
@@ -34,10 +34,17 @@ STRUCT(number)
 void number_display(number_p n);
 
 number_p number_copy(number_p n);
-number_p number_create_bytes32_dbg(bytes32_t b, int i);
+number_p number_create_bytes32_off(bytes32_t b, int i);
+number_p number_create_uint_mult(int count, ...);
+number_p number_create_bytes32_mult(int count, ...);
+
+bool number_uint_mult(number_p n, int count, ...);
+bool number_bytes32_mult(number_p n, int count, ...);
 
 number_p number_add_uint(number_p n, uint u, int i);
 number_p number_add_bytes32(number_p n, bytes32_t b, int i);
+number_p number_add_off(number_p n1, number_p n2, int i);
 number_p number_bytes32_mul(bytes32_t b1, bytes32_t b2);
+number_p number_mul_bytes32(number_p n, bytes32_t b);
 
 #endif
