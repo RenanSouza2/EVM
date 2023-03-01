@@ -510,8 +510,8 @@ void delete()
 int main() 
 {
     setbuf(stdout, NULL);
-    // test_bytes32();
-    delete();
+    test_bytes32();
+    // delete();
     printf("\n\n\tTest successful\n\n");
     return 0;
 }

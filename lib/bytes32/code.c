@@ -44,6 +44,7 @@ bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
 {
     if(u == 0) return b;
     if(i >= SCALAR) return b;
+    if(i <  0) return b;
 
     luint lu = uint_add(b.v[i], u);
     b.v[i] = DECL(lu);
@@ -58,12 +59,15 @@ bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
     int jmp = shift >> 5;
     int off = shift & 31;
 
-    bytes32_t b_res = b_zero;
-    b_res.v[jmp] = uint_mix(0, b.v[0], off);
+    bytes32_t b_out = b_zero;
+    b_out.v[jmp] = b.v[0] << off;
     for(int i=1; i+jmp<SCALAR; i++)
-        b_res.v[i + jmp] = uint_mix(b.v[i-1], b.v[i], off);
+    {
+        luint lu = (*((luint*)(&(b.v[i-1])))) << off;
+        b_out.v[i+jmp] = DECH(lu);
+    }
 
-    return b_res;
+    return b_out;
 }
 
 bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
