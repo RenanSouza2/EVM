@@ -109,28 +109,38 @@ void test_add_uint()
 
 void test_shl_uint()
 {
-    printf("\n\t\t\ttest shl uint");
+    printf("\n\t\t\ttest shl uint\t\t");
 
     bytes32_t b = BYTES32_UINT(1);
-    b = bytes32_shl_uint(b, 14);
-    ASSERT_BYTES32_UINT(b, 0x4000);
-
-    b = BYTES32_UINT(1);
     b = bytes32_shl_uint(b, 0);
     ASSERT_BYTES32_UINT(b, 1);
-    
-    b = BYTES32_UINT(2);
-    b = bytes32_shl_uint(b, 31);
-    ASSERT_BYTES32_UINT(b, 0x100000000);
 
-    b = BYTES32_UINT(0x11111111);
-    b = bytes32_shl_uint(b, 16);
-    ASSERT_BYTES32_UINT(b, 0x111111110000);
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 1);
+    ASSERT_BYTES32_UINT(b, 2);
     
     b = BYTES32_UINT(1);
-    b = bytes32_shl_uint(b, 48);
-    ASSERT_BYTES32_UINT(b, 0x1000000000000);
+    b = bytes32_shl_uint(b, 16);
+    ASSERT_BYTES32_UINT(b, 0x10000);
 
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 31);
+    ASSERT_BYTES32_UINT(b, 0x80000000);
+
+    b = BYTES32_UINT(1);
+    b = bytes32_shl_uint(b, 32);
+    ASSERT_BYTES32_UINT(b, 0x100000000);
+    
+    b = BYTES32(    \
+        0x88888888, 0x77777777, 0x66666666, 0x55555555, \
+        0x44444444, 0x33333333, 0x22222222, 0x11111111  \
+    );
+    b = bytes32_shl_uint(b, 48);
+    ASSERT_BYTES32(b,   \
+        0x77776666, 0x66665555, 0x55554444, 0x44443333, \
+        0x33332222, 0x22221111, 0x11110000, 0   \
+    );
+    
     b = BYTES32_UINT(1);
     b = bytes32_shl_uint(b, 256);
     ASSERT_BYTES32_UINT(b, 0);
@@ -150,35 +160,38 @@ void test_shl_uint()
 
 void test_shr_uint()
 {
-    printf("\n\t\t\ttest shr uint");
+    printf("\n\t\t\ttest shr uint\t\t");
 
-    bytes32_t b = BYTES32(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
-    b = bytes32_shr_uint(b, 80);
-    ASSERT_BYTES32(b, 0, 0, 0xFFFF, 0xFFFF0000, 0, 0, 0, 0);
-
-    b = BYTES32_UINT(1);
-    b = bytes32_shr_uint(b, 1);
-    ASSERT_BYTES32_UINT(b, 0);
-
-    b = BYTES32_UINT(1);
+    luint lu = 0x80000000;
+    bytes32_t b = BYTES32_UINT(lu);
     b = bytes32_shr_uint(b, 0);
-    ASSERT_BYTES32_UINT(b, 1);
+    ASSERT_BYTES32_UINT(b, lu);
 
-    b = BYTES32_UINT(0x80000000);
+    b = BYTES32_UINT(lu);
+    b = bytes32_shr_uint(b, 1);
+    ASSERT_BYTES32_UINT(b, 0x40000000);
+
+    b = BYTES32_UINT(lu);
     b = bytes32_shr_uint(b, 16);
     ASSERT_BYTES32_UINT(b, 0x8000);
-    
-    b = BYTES32_UINT(0x80000000);
+
+    b = BYTES32_UINT(lu);
     b = bytes32_shr_uint(b, 31);
     ASSERT_BYTES32_UINT(b, 1);
-    
-    b =  BYTES32(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
-    b = bytes32_shl_uint(b, 256);
+
+    b = BYTES32_UINT(lu);
+    b = bytes32_shr_uint(b, 32);
     ASSERT_BYTES32_UINT(b, 0);
-    
-    b =  BYTES32(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
-    b = bytes32_shl_uint(b, 257);
-    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32(    \
+        0x88888888, 0x77777777, 0x66666666, 0x55555555, \
+        0x44444444, 0x33333333, 0x22222222, 0x11111111  \
+    );
+    b = bytes32_shr_uint(b, 48);
+    ASSERT_BYTES32(b,   \
+                 0,     0x8888, 0x88887777, 0x77776666, \
+        0x66665555, 0x55554444, 0x44443333, 0x33332222  \
+    );
 }
 
 void test_base_operations()

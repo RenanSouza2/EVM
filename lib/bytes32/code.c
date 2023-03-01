@@ -63,7 +63,7 @@ bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
     b_out.v[jmp] = b.v[0] << off;
     for(int i=1; i+jmp<SCALAR; i++)
     {
-        luint lu = (*((luint*)(&(b.v[i-1])))) << off;
+        luint lu = LUINT(b.v[i-1]) << off;
         b_out.v[i+jmp] = DECH(lu);
     }
 
@@ -75,14 +75,17 @@ bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
     if(shift > 255) return b_zero;
 
     int jmp = shift >> 5;
-    int off = 32 - (shift & 31);
+    int off = shift & 31;
 
-    bytes32_t b_res = b_zero;
-    b_res.v[SCALAR-1 - jmp] = uint_mix(b.v[SCALAR-1], 0, off);
+    bytes32_t b_out = b_zero;
+    b_out.v[SCALAR-1 - jmp] = b.v[SCALAR-1] >> off;
     for(int i=jmp; i<SCALAR-1; i++)
-        b_res.v[i-jmp] = uint_mix(b.v[i], b.v[i+1], off);
+    {
+        luint lu = LUINT(b.v[i]) >> off;
+        b_out.v[i-jmp] = DECL(lu);
+    }
     
-    return b_res;
+    return b_out;
 }
 
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
@@ -197,4 +200,3 @@ bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
     bytes32_dual_t bd = bytes32_div_mod(b1, b2);
     return bd.b2;
 }
-

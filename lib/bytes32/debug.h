@@ -13,14 +13,15 @@ STRUCT(bytes32_dual)
 void bytes32_display(bytes32_t b);
 
 #define BYTES32_DISPLAY(BYTES32) \
-    printf("\n%s: ", #BYTES32);bytes32_display(BYTES32);
+    printf("\n%s: ", #BYTES32);bytes32_display(BYTES32);printf("\t\t");
     
 #define BYTES32(VALUE7, VALUE6, VALUE5, VALUE4, VALUE3, VALUE2, VALUE1, VALUE0) \
     (bytes32_t){{VALUE0, VALUE1, VALUE2, VALUE3, VALUE4, VALUE5, VALUE6, VALUE7}}
 
 #define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
 
-
+#define LUINT(UINT0)    \
+    (*((luint*)(&(UINT0))))
 
 #define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
     assert(memcmp(BYTES1.v, BYTES2.v, 32) == 0)
