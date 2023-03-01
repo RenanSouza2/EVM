@@ -490,10 +490,28 @@ void test_bytes32()
     test_operations();
 }
 
+
+
+void delete()
+{
+    uint a, b;
+    a = 1;
+    b = 2;
+
+    luint c;
+    ((uint*)&c)[0] = a;
+    ((uint*)&c)[1] = b;
+    printf("\nc: %lx", c);
+
+    luint d = c << 5;
+    printf("\nd: %lx", d);
+}
+
 int main() 
 {
     setbuf(stdout, NULL);
-    test_bytes32();
+    // test_bytes32();
+    delete();
     printf("\n\n\tTest successful\n\n");
     return 0;
 }
