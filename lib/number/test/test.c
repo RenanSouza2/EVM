@@ -61,6 +61,65 @@ void test_add_bytes32()
     assert(number_uint_mult(n, 3, 0, 0, 1));
 }
 
+void test_is_zero()
+{
+    printf("\n\ttest is zero\t\t");
+
+    bool res = number_is_zero(NULL);
+    assert(res == true);
+
+    number_p n = number_create_null();
+    res = number_is_zero(n);
+    assert(res == true);
+
+    n = NUMBER_UINT(1);
+    res = number_is_zero(n);
+    assert(res == false);
+
+    n = number_create_uint_mult(2, 1, 0);
+    res = number_is_zero(n);
+    assert(res == false);
+}
+
+void test_number_cmp()
+{
+    printf("\n\ttest cmp\t\t");
+
+    int res = number_cmp(NULL, NULL);
+    assert(res == 0);
+
+    number_p n1, n2;
+    n1 = NUMBER_UINT(1);
+    n2 = NUMBER_UINT(2);
+    res = number_cmp(n1, n2);
+    assert(res < 0);
+    
+    n1 = NUMBER_UINT(1);
+    res = number_cmp(n1, NULL);
+    assert(res > 0);
+    
+    n1 = NUMBER_UINT(1);
+    res = number_cmp(NULL, n1);
+    assert(res < 0);
+
+    n1 = NUMBER_UINT(1);
+    res = number_cmp(n1, n1);
+    assert(res == 0);
+
+    n1 = number_create_null();
+    res = number_cmp(NULL, n1);
+    assert(res == 0);
+
+    n1 = number_create_uint_mult(2, 1, 2);
+    n2 = number_create_uint_mult(2, 2, 1);
+    res = number_cmp(n1, n2);
+    assert(res > 0);
+    n1 = number_create_uint_mult(2, 2, 1);
+    n2 = number_create_uint_mult(2, 1, 1);
+    res = number_cmp(n1, n2);
+    assert(res > 0);
+}
+
 
 
 
@@ -134,6 +193,8 @@ void test_number()
 
     test_copy();
     test_add_bytes32();
+    test_is_zero();
+    test_number_cmp();
 
     test_add();
     test_mul();

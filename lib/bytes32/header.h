@@ -20,6 +20,7 @@ STRUCT(bytes32_dual)
 #define BYTES32_RESET(VALUE) memset(VALUE.v, 0, 32)
 
 bool bytes32_is_zero_bool(bytes32_t b);
+int bytes32_cmp(bytes32_t b1, bytes32_t b2);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
 bytes32_t bytes32_is_zero(bytes32_t b1);

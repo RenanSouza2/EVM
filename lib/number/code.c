@@ -185,6 +185,24 @@ number_p number_add_bytes32(number_p n, bytes32_t b, int i)
 }
 
 
+bool number_is_zero(number_p n)
+{
+    if(n == NULL) return true;
+    if(!bytes32_is_zero_bool(n->b)) return false;
+    return number_is_zero(n->next);
+}
+
+int number_cmp(number_p n1, number_p n2)
+{
+    if(n1 == NULL) return -!number_is_zero(n2);
+    if(n2 == NULL) return  !number_is_zero(n1);
+
+    int res = number_cmp(n1->next, n2->next);
+    if(res != 0) return res;
+
+    return bytes32_cmp(n1->b, n2->b);
+}
+
 
 number_p number_add(number_p n1, number_p n2)
 {

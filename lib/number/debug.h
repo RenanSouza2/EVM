@@ -33,14 +33,18 @@ STRUCT(number)
 
 void number_display(number_p n);
 
-number_p number_copy(number_p n);
+number_p number_create_null();
 number_p number_create_bytes32_off(bytes32_t b, int i);
 number_p number_create_uint_mult(int count, ...);
 number_p number_create_bytes32_mult(int count, ...);
+number_p number_copy(number_p n);
 
 bool number_uint_mult(number_p n, int count, ...);
 bool number_bytes32_mult(number_p n, int count, ...);
 
 number_p number_add_bytes32(number_p n, bytes32_t b, int i);
+
+bool number_is_zero(number_p n);
+int number_cmp(number_p n1, number_p n2);
 
 #endif

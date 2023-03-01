@@ -544,8 +544,6 @@ void test_full_mul()
     ASSERT_BYTES32_MUTUAL(bd.b[1], b_max_1);
 }
 
-
-
 void test_full()
 {
     printf("\n\t\ttest full\t\t");
@@ -566,8 +564,6 @@ void test_operations()
     test_arithmetic();
     test_full();
 }
-
-
 
 void test_bytes32()
 {
