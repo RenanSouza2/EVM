@@ -159,74 +159,29 @@ number_p number_copy(number_p n)
 } 
 
 
-
-number_p number_add_uint(number_p n, uint u, int i)
+number_p number_add_bytes32_rec2(number_p n, bytes32_t b)
 {
-    if(u == 0) return n;
+    if(n == NULL) return number_create_bytes32(b);
+
+    bytes32_dual_t bd = bytes32_full_add(n->b, b);
+    n->b = bd.b[0];
+    n->next = number_add_bytes32_rec2(n->next, bd.b[1]);
+    return n;
+}
+
+number_p number_add_bytes32_rec1(number_p n, bytes32_t b, int i)
+{
+    if(i == 0) return number_add_bytes32_rec2(n, b);
 
     if(n == NULL) n = number_create_null();
-    if(i >= SCALAR)
-    {
-        n->next = number_add_uint(n->next, u, i-8);
-        return n;
-    }
-
-    luint lu = uint_add(n->b.v[i], u);
-    n->b.v[i] = DECL(lu);
-
-    return number_add_uint(n, DECH(lu), i+1);
+    n->next = number_add_bytes32(n->next, b, i-1);
+    return n;
 }
 
 number_p number_add_bytes32(number_p n, bytes32_t b, int i)
 {
     if(bytes32_is_zero_bool(b)) return n;
-
-    if(i > 0)
-    {
-        if(n == NULL) n = number_create_null();
-        n->next = number_add_bytes32(n->next, b, i-1);
-        return n;
-    }
-
-    for(int i=0; i<SCALAR; i++)
-        n = number_add_uint(n, b.v[i], i);
-
-    return n;
-}
-
-number_p number_add_off(number_p n1, number_p n2, int i)
-{
-    number_p n2_aux = n2;
-    for(; n2; i++, n2 = n2->next)
-        n1 = number_add_bytes32(n1, n2->b, i);
-    number_free(n2_aux);
-    return n1;
-}
-
-number_p number_bytes32_mul(bytes32_t b1, bytes32_t b2)
-{
-    number_p n = NULL;
-    for(int i=0; i<SCALAR; i++)
-    for(int j=0; j<SCALAR; j++)
-    {
-        luint lu = uint_mul(b1.v[i], b2.v[j]);
-        n = number_add_uint(n, DECL(lu), i + j);
-        n = number_add_uint(n, DECH(lu), i + j + 1);
-    }
-    return n;
-}
-
-number_p number_mul_bytes32(number_p n, bytes32_t b)
-{
-    if(bytes32_is_zero_bool(b)) return NULL;
-
-    number_p n_out = NULL;
-    for(int i=0; n; i++, n = n->next)
-    {
-        number_p n_aux = number_bytes32_mul(n->b, b);
-        n_out = number_add_off(n_out, n_aux, i);
-    }
-    return n_out;
+    return number_add_bytes32_rec1(n, b, i);
 }
 
 
@@ -246,11 +201,16 @@ number_p number_mul(number_p n1, number_p n2)
     if(n2 == NULL) return NULL;
 
     
-    number_p n = NULL;
+    number_p n, n2_0;
+    int j;
+    n = NULL;
+    n2_0 = n2;
     for(int i=0; n1; i++, n1 = n1->next)
+    for(j=0, n2 = n2_0; n2; j++, n2 = n2->next)
     {
-        number_p n_aux = number_mul_bytes32(n2, n1->b);
-        n = number_add_off(n, n_aux, i);
+        bytes32_dual_t bd = bytes32_full_mul(n1->b, n2->b);
+        n = number_add_bytes32(n, bd.b[0], i + j);
+        n = number_add_bytes32(n, bd.b[1], i + j + 1);
     }
     return n;
 }
