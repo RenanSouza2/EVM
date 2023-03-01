@@ -9,6 +9,5 @@ typedef unsigned long int luint;
 
 luint uint_add(uint u1, uint u2);
 luint uint_mul(uint u1, uint u2);
-uint  uint_mix(uint u1, uint u2, uint shift);
 
 #endif
