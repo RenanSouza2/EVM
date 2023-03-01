@@ -8,7 +8,7 @@
 
 void test_dec()
 {
-    printf("\n\ttest_dec");
+    printf("\n\ttest dec");
 
     luint value = 0;
     assert(DECH(value) == 0);
