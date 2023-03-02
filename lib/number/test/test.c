@@ -260,7 +260,7 @@ void test_shr()
 
     n = number_create_bytes32(b_Q255);
     n = number_shr(n, 256);
-    ASSERT_NUMBER_UINT(n, 0);
+    assert(n == NULL);
 
     n = number_create_uint_mult(2, 0, 1);
     n = number_shr(n, 256);

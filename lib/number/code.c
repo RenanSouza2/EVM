@@ -230,6 +230,7 @@ number_p number_shl_rec(number_p n, uint u)
     if(n->next == NULL)
     {
         bytes32_t b = bytes32_shr_uint(n->b, 256 - u);
+        if(bytes32_is_zero_bool(b)) return NULL;
         return number_create_bytes32(b);
     }
 
@@ -249,6 +250,7 @@ number_p number_shr_rec(number_p n, uint u)
     {
         bytes32_t b;
         b = bytes32_shr_uint(n->b, u);
+        if(bytes32_is_zero_bool(b)) return NULL;
         return number_create_bytes32(b);
     }
 
