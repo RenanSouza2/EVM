@@ -85,10 +85,9 @@ extern const bytes32_t b_one;
 extern const bytes32_t b_256;
 extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
+extern const bytes32_t b_Q255;
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
-bytes32_t bytes32_shl_uint(bytes32_t b, uint shift);
-bytes32_t bytes32_shr_uint(bytes32_t b, uint shift);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i);

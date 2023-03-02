@@ -114,6 +114,7 @@ void test_number_cmp()
     n2 = number_create_uint_mult(2, 2, 1);
     res = number_cmp(n1, n2);
     assert(res > 0);
+    
     n1 = number_create_uint_mult(2, 2, 1);
     n2 = number_create_uint_mult(2, 1, 1);
     res = number_cmp(n1, n2);
@@ -185,7 +186,111 @@ void test_mul()
     assert(number_bytes32_mult(n, 4, b_one, b_zero, b_max_1, b_max));
 }
 
+void test_shl()
+{
+    printf("\n\ttest shl\t\t");
 
+    number_p n = NUMBER_UINT(1);
+    n = number_shl(n, 0);
+    ASSERT_NUMBER_UINT(n, 1);
+
+    n = NUMBER_UINT(1);
+    n = number_shl(n, 1);
+    ASSERT_NUMBER_UINT(n, 2);
+
+    n = NUMBER_UINT(1);
+    n = number_shl(n, 128);
+    ASSERT_NUMBER(n, 0, 0, 0, 1, 0, 0, 0, 0);
+
+    n = NUMBER_UINT(1);
+    n = number_shl(n, 255);
+    ASSERT_NUMBER(n, 0x80000000, 0, 0, 0, 0, 0, 0, 0);
+
+    n = NUMBER_UINT(1);
+    n = number_shl(n, 256);
+    assert(number_uint_mult(n, 2, 0, 1));
+
+    bytes32_t b0, b1, b2;
+    b1 = BYTES32(   \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
+    );
+    b2 = BYTES32(   \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
+    );
+    n = number_create_bytes32_mult(2, b1, b2);
+    n = number_shl(n, 384);
+    b0 = BYTES32(   \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
+        0x00000000, 0x00000000, 0x00000000, 0x00000000  \
+    );
+    b1 = BYTES32(   \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
+    );
+    b2 = BYTES32(   \
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
+    );
+    assert(number_bytes32_mult(n, 4, b_zero, b0, b1, b2));
+}
+
+void test_shr()
+{
+    printf("\n\ttest shr\t\t");
+
+    number_p n = number_create_bytes32(b_Q255);
+    n = number_shr(n, 0);
+    ASSERT_NUMBER_BYTES32(n, b_Q255);
+
+    n = number_create_bytes32(b_Q255);
+    n = number_shr(n, 1);
+    bytes32_t b0 = BYTES32(0x40000000, 0, 0, 0, 0, 0, 0, 0);
+    ASSERT_NUMBER_BYTES32(n, b0);
+
+    n = number_create_bytes32(b_Q255);
+    n = number_shr(n, 128);
+    b0 = BYTES32(0, 0, 0, 0, 0x80000000, 0, 0, 0);
+    ASSERT_NUMBER_BYTES32(n, b0);
+
+    n = number_create_bytes32(b_Q255);
+    n = number_shr(n, 255);
+    ASSERT_NUMBER_UINT(n, 1);
+
+    n = number_create_bytes32(b_Q255);
+    n = number_shr(n, 256);
+    ASSERT_NUMBER_UINT(n, 0);
+
+    n = number_create_uint_mult(2, 0, 1);
+    n = number_shr(n, 256);
+    ASSERT_NUMBER_UINT(n, 1);
+    
+    bytes32_t b1, b2;
+    b1 = BYTES32(   \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
+    );
+    b2 = BYTES32(   \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
+    );
+    n = number_create_bytes32_mult(4, b_zero, b_zero, b1, b2);
+    n = number_shr(n, 384);
+    b0 = BYTES32(   \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
+        0x00000000, 0x00000000, 0x00000000, 0x00000000  \
+    );
+    b1 = BYTES32(   \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
+        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
+    );
+    b2 = BYTES32(   \
+        0x00000000, 0x00000000, 0x00000000, 0x00000000, \
+        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
+    );
+    assert(number_bytes32_mult(n, 3, b0, b1, b2));
+}
 
 void test_number()
 {
@@ -198,6 +303,8 @@ void test_number()
 
     test_add();
     test_mul();
+    test_shl();
+    test_shr();
 }
 
 

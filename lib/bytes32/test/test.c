@@ -155,7 +155,7 @@ void test_shl_uint()
 
     b = BYTES32_UINT(1);
     b = bytes32_shl_uint(b, 255);
-    ASSERT_BYTES32(b, 0x80000000, 0, 0, 0, 0, 0, 0, 0);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
 }
 
 void test_shr_uint()
@@ -315,7 +315,7 @@ void test_shl()
     b1 = BYTES32_UINT(1);
     b2 = BYTES32_UINT(255);
     b  = bytes32_shl(b1, b2);
-    ASSERT_BYTES32(b, 0x80000000, 0, 0, 0, 0, 0, 0, 0);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
     
     b1 = BYTES32_UINT(1);
     b2 = BYTES32_UINT(256);
@@ -327,15 +327,13 @@ void test_shr()
 {
     printf("\n\t\t\ttest shr");
 
-    bytes32_t b, b1, b2;
-    b1 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
-    b2 = BYTES32_UINT(255);
-    b  = bytes32_shr(b1, b2);
+    bytes32_t b;
+    b = BYTES32_UINT(255);
+    b = bytes32_shr(b_Q255, b);
     ASSERT_BYTES32_UINT(b, 1);
     
-    b1 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
-    b2 = BYTES32_UINT(256);
-    b  = bytes32_shr(b1, b2);
+    b = BYTES32_UINT(256);
+    b = bytes32_shr(b_Q255, b);
     ASSERT_BYTES32_UINT(b, 0);
 }
 
@@ -441,6 +439,11 @@ void test_div()
     
     b1 = BYTES32_UINT(2);
     b2 = BYTES32_UINT(0);
+    b = bytes32_div(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(5);
     b = bytes32_div(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
 }

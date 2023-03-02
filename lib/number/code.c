@@ -80,7 +80,7 @@ bool number_uint_mult(number_p n, int count, ...)
 
     for(int i=0; i<count; i++, n = n->next)
     {
-        if(n == NULL) 
+        if(n == NULL)
         {
             printf("\nfailling at iteraction %d | reason 1", i);
             printf("\nexpected a not null pointer\t\t");
@@ -108,10 +108,22 @@ bool number_bytes32_mult(number_p n, int count, ...)
 
     for(int i=0; i<count; i++, n = n->next)
     {
-        if(n == NULL) return false;
+        if(n == NULL)
+        {
+            printf("\nfailling at iteraction %d | reason 1", i);
+            printf("\nexpected a not null pointer\t\t");
+            return false;
+        }
         
         bytes32_t b = va_arg(args, bytes32_t);
-        if(bytes32_cmp(n->b, b) != 0) return false;
+        if(bytes32_cmp(n->b, b) != 0)
+        {
+            printf("\nfailling at iteraction %d | reason 2", i);
+            printf("\nexpected value: "); bytes32_display(b);
+            printf("\nreturned value: "); bytes32_display(n->b);
+            printf("\n\t\t");
+            return false;
+        }
     }
     return true;
 }
@@ -124,6 +136,15 @@ number_p number_create_null()
 {
     number_p n = calloc(1, sizeof(number_t));
     assert(n);
+    return n;
+}
+
+number_p number_create_null_list(int i, number_p next)
+{
+    if(i == 0) return next;
+
+    number_p n = number_create_null();
+    n->next = number_create_null_list(i-1, next);
     return n;
 }
 
@@ -204,6 +225,45 @@ int number_cmp(number_p n1, number_p n2)
 }
 
 
+number_p number_shl_rec(number_p n, uint u)
+{
+    if(n->next == NULL)
+    {
+        bytes32_t b = bytes32_shr_uint(n->b, 256 - u);
+        return number_create_bytes32(b);
+    }
+
+    bytes32_t b, b1, b2;
+    b1 = bytes32_shr_uint(n->b, 256 - u);
+    b2 = bytes32_shl_uint(n->next->b, u);
+    b = bytes32_add(b1, b2);
+    
+    number_p n_out = number_create_bytes32(b);
+    n_out->next = number_shl_rec(n->next, u);
+    return n_out;
+}
+
+number_p number_shr_rec(number_p n, uint u)
+{
+    if(n->next == NULL)
+    {
+        bytes32_t b;
+        b = bytes32_shr_uint(n->b, u);
+        return number_create_bytes32(b);
+    }
+
+    bytes32_t b, b1, b2;
+    b1 = bytes32_shr_uint(n->b, u);
+    b2 = bytes32_shl_uint(n->next->b, 256-u);
+    b = bytes32_add(b1, b2);
+    
+    number_p n_out = number_create_bytes32(b);
+    n_out->next = number_shr_rec(n->next, u);
+    return n_out;
+}
+
+
+
 number_p number_add(number_p n1, number_p n2)
 {
     n1 = number_copy(n1);
@@ -231,4 +291,34 @@ number_p number_mul(number_p n1, number_p n2)
         n = number_add_bytes32(n, bd.b[1], i + j + 1);
     }
     return n;
+}
+
+number_p number_shl(number_p n, uint u)
+{
+    if(n == NULL) return NULL;
+
+    int jmp = u >> 8;
+    int off = u & 255;
+
+    number_p n_out;
+    if(off == 0) n_out = number_copy(n);
+    else
+    {
+        bytes32_t b = bytes32_shl_uint(n->b, off);
+        n_out = number_create_bytes32(b);
+        n_out->next = number_shl_rec(n, off);
+    }
+
+    return number_create_null_list(jmp, n_out);
+}
+
+number_p number_shr(number_p n, uint u)
+{
+    for(; u > 256; u -= 256, n = n->next)
+        if(n == NULL)
+            return NULL;
+
+    if(u == 0) return number_copy(n);
+
+    return number_shr_rec(n, u);
 }
