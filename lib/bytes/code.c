@@ -9,12 +9,6 @@
 #ifdef DEBUG
 #endif
 
-char bytes_get(bytes_t b, int n)
-{
-    assert(n < b.n);
-    return b.s[n];
-}
-
 char byte_char_1(char c)
 {
     switch (c)
@@ -43,4 +37,30 @@ bytes_t bytes_create_string(char s[])
         s_out[i>>1] = byte_char_2(s[i], s[i+1]);
     
     return (bytes_t){len >> 1, s_out};
+}
+
+char bytes_get(bytes_t b, int n)
+{
+    if(n >= b.n) return 0;
+    return b.s[n];
+}
+
+bytes_t bytes_get_mult(bytes_t b, int n, int size)
+{
+    char *s = malloc(size);
+    assert(s);
+
+    for(int i=0; i<size; i++)
+        s[i] = bytes_get(b, n+i);
+    
+    return (bytes_t){size, s};
+}
+
+bytes32_t bytes32_bytes(bytes_t b)
+{
+    bytes32_t b32 = b_zero;
+    for(int i=0; i<b.n; i++)
+        ((char*)&b32)[i] = b.s[b.n-1-i];
+
+    return b32;
 }

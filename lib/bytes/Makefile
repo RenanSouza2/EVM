@@ -1,6 +1,6 @@
 FLAGS = -c -Wall -Werror -Wfatal-errors
 
-LIBS = 
+LIBS = bytes32
 
 LIB_ROOT = ..
 LIB_DIR = $(foreach LIB,$(LIBS),$(LIB_ROOT)/$(LIB))

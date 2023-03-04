@@ -183,8 +183,7 @@ bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_t b_res;
-    BYTES32_RESET(b_res);
+    bytes32_t b_res = b_zero;
     for(int i=0; i<SCALAR; i++)
     for(int j=0; j+i<SCALAR; j++)
     {

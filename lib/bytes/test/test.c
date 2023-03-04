@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 #include "../debug.h"
@@ -46,20 +45,46 @@ void test_char_2()
     assert(c == (char)0xff);
 }
 
-// bytes_t bytes_create_string(char s[])
 void test_create_string()
 {
     printf("\n\ttest crate string\t\t");
 
-    bytes_t s = bytes_create_string("ab");
-    assert(s.n == 1);
-    assert(s.s[0] == (char)0xab);
-
-    s = bytes_create_string("0123456789abcdef");
-    assert(s.n == 8);
-    char s_exp[] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
-    assert(memcmp(s.s, s_exp, 8) == 0);
+    bytes_t b = bytes_create_string("0123456789abcdef");
+    ASSERT_BYTES(b, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef);
 }
+
+void test_get()
+{
+    printf("\n\ttest get\t\t");
+
+    bytes_t b = bytes_create_string("0123456789abcdef");
+    char b_exp[] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x00};
+    for(int i=0; i<=8; i++)
+    {
+        char c = bytes_get(b, i);
+        assert(c == b_exp[i]);
+    }
+}
+
+void test_get_mult()
+{
+    printf("\n\ttest get mult\t\t");
+
+    bytes_t b = bytes_create_string("0123456789abcdef");
+    b = bytes_get_mult(b, 1, 1);
+    ASSERT_BYTES(b, 1, 0x23);
+
+    b = bytes_create_string("0123456789abcdef");
+    b = bytes_get_mult(b, 10, 1);
+    ASSERT_BYTES(b, 1, 0x00);
+
+    b = bytes_create_string("0123456789abcdef");
+    b = bytes_get_mult(b, 4, 8);
+    ASSERT_BYTES(b, 8, 0x89, 0xab, 0xcd, 0xef, 0x00, 0x00, 0x00, 0x00);
+}
+
+// bytes32_t bytes32_bytes(bytes_t b);
+
 
 
 void test_bytes()
@@ -69,6 +94,8 @@ void test_bytes()
     test_char_1();
     test_char_2();
     test_create_string();
+    test_get();
+    test_get_mult();
 }
 
 int main() 

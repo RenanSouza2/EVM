@@ -17,7 +17,7 @@ STRUCT(bytes32_dual)
     bytes32_t b[2];
 };
 
-#define BYTES32_RESET(VALUE) memset(VALUE.v, 0, 32)
+extern const bytes32_t b_zero;
 
 bool bytes32_is_zero_bool(bytes32_t b);
 int bytes32_cmp(bytes32_t b1, bytes32_t b2);

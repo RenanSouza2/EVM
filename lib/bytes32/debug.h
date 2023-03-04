@@ -80,7 +80,6 @@ void bytes32_display(bytes32_t b);
 }
 
 
-extern const bytes32_t b_zero;
 extern const bytes32_t b_one;
 extern const bytes32_t b_256;
 extern const bytes32_t b_max;
