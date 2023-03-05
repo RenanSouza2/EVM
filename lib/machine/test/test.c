@@ -7,7 +7,8 @@ void test_1()
 {
     printf("\n\ttest 1\t\t");
 
-    machine();
+    // machine();
+    printf("\n\nNO TESTS IMPLEMENTED");
 }
 
 void test_machine()

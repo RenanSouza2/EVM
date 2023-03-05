@@ -3,6 +3,8 @@
 
 #include "header.h"
 
-void machine();
+#include <stdbool.h>
+
+bool machine_exec(char code[]);
 
 #endif
