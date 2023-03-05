@@ -4,15 +4,12 @@
 #include "../debug.h"
 #include "../../bytes32/debug.h"
 
-void stack_push(stack_p s, bytes32_t b);
-bytes32_t stack_pop(stack_p s);
-
 void test_push()
 {
     printf("\n\ttest push\t\t");
 
     stack_t s = stack_init();
-    stack_push(&s, b_one);
+    assert(stack_push(&s, b_one));
 
     bytes32_list_p bl = s.bl;
     assert(bl != NULL);
@@ -22,13 +19,23 @@ void test_push()
 
     s = stack_init();
     bytes32_t b = BYTES32_UINT(2);
-    stack_push(&s, b_one);
-    stack_push(&s, b);
+    assert(stack_push(&s, b_one));
+    assert(stack_push(&s, b));
     bl = s.bl;
     assert(bl != NULL);
     ASSERT_BYTES32_UINT(bl->b, 2);
     assert(bl->next != NULL);
     assert(s.count == 2);
+
+    s = stack_init();
+    for(int i=0; i<STACK_MAX; i++)
+    {
+        bytes32_t b32 = BYTES32_UINT(i);
+        assert(stack_push(&s, b32));
+    }
+    bytes32_t b32 = BYTES32_UINT(STACK_MAX);
+    assert(stack_push(&s, b32) == false);
+    assert(s.count == STACK_MAX);
 }
 
 void test_pop()

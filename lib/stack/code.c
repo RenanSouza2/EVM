@@ -36,11 +36,13 @@ stack_t stack_init()
     return (stack_t){0, NULL};
 }
 
-void stack_push(stack_p s, bytes32_t b)
+bool stack_push(stack_p s, bytes32_t b)
 {
-    assert(s->count < STACK_MAX);
+    if(s->count == STACK_MAX) return false;
+    
     s->bl = stack_list_crate(b, s->bl);
     s->count++;
+    return true;
 }
 
 bytes32_t stack_pop(stack_p s)
