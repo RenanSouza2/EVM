@@ -5,6 +5,20 @@
 #include "debug.h"
 
 #ifdef DEBUG
+
+#include "../bytes32/debug.h"
+
+void stack_display(stack_t s)
+{
+    printf("\nStack count: %d", s.count);
+    bytes32_list_p bl = s.bl;
+    for(int i=0; bl; i++, bl = bl->next)
+    {
+        printf("\nstack[%d]: ", i);bytes32_display(bl->b);
+    }
+    printf("\n");
+}
+
 #endif
 
 bytes32_list_p stack_list_crate(bytes32_t b, bytes32_list_p next)

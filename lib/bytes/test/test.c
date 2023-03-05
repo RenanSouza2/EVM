@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include "../debug.h"
+#include "../../bytes32/debug.h"
 
 
 
@@ -83,7 +84,23 @@ void test_get_mult()
     ASSERT_BYTES(b, 8, 0x89, 0xab, 0xcd, 0xef, 0x00, 0x00, 0x00, 0x00);
 }
 
-// bytes32_t bytes32_bytes(bytes_t b);
+void test_bytes32_bytes()
+{
+    printf("\n\ttest bytes\t\t");
+
+    bytes_t b = bytes_create_string("ab");
+    bytes32_t b32 = bytes32_bytes(b);
+    ASSERT_BYTES32_UINT(b32, 0xab);
+    
+    b = bytes_create_string("abcd");
+    b32 = bytes32_bytes(b);
+    ASSERT_BYTES32_UINT(b32, 0xabcd);
+    
+    b = bytes_create_string("0123456789abcdef");
+    b32 = bytes32_bytes(b);
+    ASSERT_BYTES32(b32, 0, 0, 0, 0, 0, 0, 0x01234567, 0x89abcdef);
+}
+
 
 
 
@@ -96,6 +113,7 @@ void test_bytes()
     test_create_string();
     test_get();
     test_get_mult();
+    test_bytes32_bytes();
 }
 
 int main() 

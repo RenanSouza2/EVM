@@ -9,7 +9,15 @@
 #ifdef DEBUG
 #endif
 
-char byte_char_1(char c)
+void bytes_display(bytes_t b)
+{
+    printf("\nbytes size: %d", b.n);
+    for(int i=0; i<b.n; i++)
+        printf("\nbytes[%d]: %2x", i, b.s[i]);
+    printf("\n");
+}
+
+uchar byte_char_1(uchar c)
 {
     switch (c)
     {
@@ -20,17 +28,17 @@ char byte_char_1(char c)
     }
 }
 
-char byte_char_2(char c1, char c2)
+uchar byte_char_2(uchar c1, uchar c2)
 {
     return byte_char_1(c1) << 4 | byte_char_1(c2);
 }
 
 bytes_t bytes_create_string(char s[])
 {
-    int len = strlen(s);
+    int len = strlen((char*)s);
     assert((len & 1) == 0);
 
-    char *s_out = malloc(len >> 1);
+    uchar *s_out = malloc(len >> 1);
     assert(s_out);
 
     for(int i=0; i<len; i += 2)
@@ -39,7 +47,7 @@ bytes_t bytes_create_string(char s[])
     return (bytes_t){len >> 1, s_out};
 }
 
-char bytes_get(bytes_t b, int n)
+uchar bytes_get(bytes_t b, int n)
 {
     if(n >= b.n) return 0;
     return b.s[n];
@@ -47,7 +55,7 @@ char bytes_get(bytes_t b, int n)
 
 bytes_t bytes_get_mult(bytes_t b, int n, int size)
 {
-    char *s = malloc(size);
+    uchar *s = malloc(size);
     assert(s);
 
     for(int i=0; i<size; i++)
@@ -60,7 +68,7 @@ bytes32_t bytes32_bytes(bytes_t b)
 {
     bytes32_t b32 = b_zero;
     for(int i=0; i<b.n; i++)
-        ((char*)&b32)[i] = b.s[b.n-1-i];
+        ((uchar*)&b32)[i] = b.s[b.n-1-i];
 
     return b32;
 }

@@ -8,14 +8,14 @@ LIB_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/lib.o)
 DBG_FILES = $(foreach LIB,$(LIB_DIR),$(LIB)/debug.o)
 
 build: lib.o
+alone: aln.o
+debug: debug.o
+alone_debug: aln_dbg.o
 
-
-
-lib.o: tmp.o $(LIB_FILES)
+lib.o: aln.o $(LIB_FILES)
 	ld -r -o $@ $^
 
-.INTERMEDIATE: tmp.o
-tmp.o: code.c
+aln.o: code.c
 	gcc -o $@ $^ $(FLAGS)
 
 .PHONY: $(LIB_FILES)
@@ -25,11 +25,10 @@ $(LIB_FILES):
 
 
 
-debug.o: dbg.o $(DBG_FILES)
+debug.o: aln_dbg.o $(DBG_FILES)
 	ld -r -o $@ $^
 
-.INTERMEDIATE: dbg.o
-dbg.o: code.c
+aln_dbg.o: code.c
 	gcc -o $@ $^ $(FLAGS) -D DEBUG
 
 .PHONY: $(DBG_FILES)

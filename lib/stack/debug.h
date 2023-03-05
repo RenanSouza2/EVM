@@ -9,4 +9,6 @@ STRUCT(bytes32_list)
     bytes32_list_p next;
 };
 
+void stack_display(stack_t s);
+
 #endif
