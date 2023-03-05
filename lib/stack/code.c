@@ -39,22 +39,22 @@ stack_t stack_init()
 bool stack_push(stack_p s, bytes32_t b)
 {
     if(s->count == STACK_MAX) return false;
-    
+
     s->bl = stack_list_crate(b, s->bl);
     s->count++;
     return true;
 }
 
-bytes32_t stack_pop(stack_p s)
+bool stack_pop(bytes32_p b32, stack_p s)
 {
-    assert(s->count > 0);
+    if(s->count == 0) return false;
     
     bytes32_list_p bl = s->bl;
     s->bl = bl->next;
 
-    bytes32_t b = bl->b;
+    *b32 = bl->b;
     free(bl);
 
     s->count--;
-    return b;
+    return true;
 }

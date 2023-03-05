@@ -44,15 +44,15 @@ void test_pop()
     
     stack_t s = stack_init();
     bytes32_t b = BYTES32_UINT(2);
-    stack_push(&s, b_one);
-    stack_push(&s, b);
+    assert(stack_push(&s, b_one));
+    assert(stack_push(&s, b));
     
-    b = stack_pop(&s);
+    assert(stack_pop(&b, &s));
     ASSERT_BYTES32_UINT(b, 2);
     assert(s.count == 1);
     assert(s.bl != NULL);
     
-    b = stack_pop(&s);
+    assert(stack_pop(&b, &s));
     ASSERT_BYTES32_UINT(b, 1);
     assert(s.count == 0);
     assert(s.bl == NULL);

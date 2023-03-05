@@ -16,6 +16,6 @@ STRUCT(stack)
 
 stack_t stack_init();
 bool stack_push(stack_p s, bytes32_t b);
-bytes32_t stack_pop(stack_p s);
+bool stack_pop(bytes32_p b32, stack_p s);
 
 #endif
