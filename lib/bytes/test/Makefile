@@ -1,5 +1,5 @@
 FLAGS = -Wall -Werror -Wfatal-errors
-DEBUG_FILE = ../debug.o
+DEBUG_FILE = ../$(LIB_ROOT)/debug.o
 
 test: test.o
 	./test.o 

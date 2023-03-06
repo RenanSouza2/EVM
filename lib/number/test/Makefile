@@ -1,11 +1,11 @@
 FLAGS = -Wall -Werror -Wfatal-errors
-DEBUG_FILE = ../debug.o
+DEBUG_FILE = ../$(LIB_ROOT)/debug.o
 
 test: test.o
 	./test.o 
 
 test.o: test.c $(DEBUG_FILE)
-	gcc $(FLAGS) -o $@ $^ -D DEBUG
+	gcc -o $@ $^ $(FLAGS) -D DEBUG
 
 .PHONY: $(DEBUG_FILE)
 $(DEBUG_FILE):
