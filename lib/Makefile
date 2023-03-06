@@ -4,14 +4,6 @@ LIB_FILES = $(foreach DIR,$(DIRS),$(dir $(DIR))lib.o)
 DGB_FILES = $(foreach DIR,$(DIRS),$(dir $(DIR))debug.o)
 
 build: lib.o
-debug: debug.o
-
-show:
-	echo $(DIRS)
-	echo ""
-	echo $(LIB_FILES)
-	echo ""
-	echo $(DGB_FILES)
 
 lib.o: $(LIB_FILES)
 	ld -r -o $@ $^
