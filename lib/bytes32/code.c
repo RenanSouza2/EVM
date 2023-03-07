@@ -105,15 +105,14 @@ bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
 {
     if(bytes32_is_zero_bool(b2)) return (bytes32_dual_t){{b_zero, b_zero}};
 
-    bytes32_t b_base = BYTES32_UINT(1);
-    while(bytes32_cmp(b1, b2) >= 0)
+    bytes32_t b1_aux, b_base;
+    b1_aux = bytes32_shr_uint(b1, 1);
+    b_base = BYTES32_UINT(1);
+    while(bytes32_cmp(b1_aux, b2) >= 0)
     {
         b2 = bytes32_shl_uint(b2, 1);
         b_base = bytes32_shl_uint(b_base, 1);
     }
-
-    b2 = bytes32_shr_uint(b2, 1);
-    b_base = bytes32_shr_uint(b_base, 1);
 
     bytes32_t b_out = b_zero;
     while(!bytes32_is_zero_bool(b_base))
@@ -129,6 +128,23 @@ bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
     }
 
     return (bytes32_dual_t){{b1, b_out}};
+}
+
+
+
+bytes32_sign_t bytes32_design(bytes32_t b)
+{
+    if((b.v[SCALAR-1] & 0x80000000) == 0) 
+        return (bytes32_sign_t){1, b};
+    
+    b = bytes32_sub(b_zero, b);
+    return (bytes32_sign_t){-1, b};
+}
+
+bytes32_t bytes32_sign(bytes32_sign_t bs)
+{
+    if(bs.sign == 1) return bs.b;
+    return bytes32_sub(b_zero, bs.b);
 }
 
 
@@ -211,6 +227,18 @@ bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
 {
     bytes32_dual_t bd = bytes32_div_mod(b1, b2);
     return bd.b[0];
+}
+
+bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
+
+    bytes32_sign_t bs;
+    bs.sign = bs1.sign * bs2.sign;
+    bs.b = bytes32_div(bs1.b, bs2.b);
+    return bytes32_sign(bs);
 }
 
 

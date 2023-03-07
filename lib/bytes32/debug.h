@@ -11,6 +11,12 @@ STRUCT(bytes64)
     uint v[SCALAR2];
 };
 
+STRUCT(bytes32_sign)
+{
+    int sign;
+    bytes32_t b;
+};
+
 void bytes32_display(bytes32_t b);
 
 #define BYTES32_DISPLAY(BYTES32) \
@@ -88,6 +94,9 @@ extern const bytes32_t b_Q255;
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
+
+bytes32_sign_t bytes32_design(bytes32_t b);
+bytes32_t bytes32_sign(bytes32_sign_t bs);
 
 bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i);
 

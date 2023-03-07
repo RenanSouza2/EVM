@@ -60,7 +60,7 @@ void test_pop()
 
 void test_stack()
 {
-    printf("\ntest example library\t\t");
+    printf("\ntest stack\t\t");
 
     test_push();
     test_pop();

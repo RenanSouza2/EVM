@@ -3,8 +3,8 @@
 #include <assert.h>
 
 #include "debug.h"
-#include "../bytes/header.h"
-#include "../stack/header.h"
+
+#define TRY(CODE) if(!(CODE)) return false
 
 #ifdef DEBUG
 
@@ -13,34 +13,13 @@
 
 #endif
 
-STRUCT(machine)
-{
-    bytes_t code;
-    int pc;
-    stack_t st;
-};
-
 machine_t machine_init(char s[])
 {
     machine_t m;
-    m.code = bytes_create_string("6001600201");
+    m.code = bytes_create_string(s);
     m.pc = 0;
     m.st = stack_init();
     return m;
-}
-
-typedef bytes32_t (*bytes32_arith)(bytes32_t,bytes32_t);
-
-#define TRY(CODE) if(!(CODE)) return false
-
-bool machine_arith(machine_p m, bytes32_arith arith)
-{
-    bytes32_t b32, b32_0, b32_1;
-    TRY(stack_pop(&b32_0, &m->st));
-    TRY(stack_pop(&b32_1, &m->st));
-    b32 = arith(b32_0, b32_1);
-    TRY(stack_push(&m->st, b32));
-    return true;
 }
 
 bool machine_push(machine_p m, uchar op)
@@ -53,26 +32,55 @@ bool machine_push(machine_p m, uchar op)
     return true;
 }
 
-bool machine_exec(char code[])
+bool machine_1_1(machine_p m, bytes32_1_1_f func)
 {
-    machine_t m = machine_init(code);
+    bytes32_t b32;
+    TRY(stack_pop(&b32, &m->st));
+    b32 = func(b32);
+    TRY(stack_push(&m->st, b32));
+    return true;
+}
+
+bool machine_2_1(machine_p m, bytes32_2_1_f func)
+{
+    bytes32_t b32, b32_0, b32_1;
+    TRY(stack_pop(&b32_0, &m->st));
+    TRY(stack_pop(&b32_1, &m->st));
+    b32 = func(b32_0, b32_1);
+    TRY(stack_push(&m->st, b32));
+    return true;
+}
+
+bool machine_exec(machine_p m, char code[])
+{
+    *m = machine_init(code);
 
     while (true)
     {
-        uchar op = bytes_get(m.code, m.pc++);
+        uchar op = bytes_get(m->code, m->pc++);
         switch (op)
         {
             case 0x00: return true;
-            case 0x01: TRY(machine_arith(&m, bytes32_add)); break;
-            case 0x02: TRY(machine_arith(&m, bytes32_mul)); break;
-            case 0x03: TRY(machine_arith(&m, bytes32_sub)); break;
-            case 0x04: TRY(machine_arith(&m, bytes32_div)); break;
-            case 0x06: TRY(machine_arith(&m, bytes32_mod)); break;
+            case 0x01: TRY(machine_2_1(m, bytes32_add)); break;
+            case 0x02: TRY(machine_2_1(m, bytes32_mul)); break;
+            case 0x03: TRY(machine_2_1(m, bytes32_sub)); break;
+            case 0x04: TRY(machine_2_1(m, bytes32_div)); break;
+            case 0x06: TRY(machine_2_1(m, bytes32_mod)); break;
+            
+            case 0x10: TRY(machine_2_1(m, bytes32_lt)); break;
+            case 0x11: TRY(machine_2_1(m, bytes32_gt)); break;
 
-            case 0x60 ... 0x7f: TRY(machine_push(&m, op)); break;
+            case 0x14: TRY(machine_2_1(m, bytes32_eq)); break;
+            case 0x15: TRY(machine_1_1(m, bytes32_is_zero)); break;
+
+            case 0x1b: TRY(machine_2_1(m, bytes32_shr)); break;
+            case 0x1c: TRY(machine_2_1(m, bytes32_shl)); break;
+
+
+
+            case 0x60 ... 0x7f: TRY(machine_push(m, op)); break;
         
-            default:
-            assert(false);
+            default: return false;
         }
     }
 }

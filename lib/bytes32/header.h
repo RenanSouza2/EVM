@@ -38,6 +38,7 @@ bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2);
 
 bytes32_dual_t bytes32_full_add(bytes32_t b1, bytes32_t b2);
 bytes32_dual_t bytes32_full_mul(bytes32_t b1, bytes32_t b2);
