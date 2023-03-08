@@ -149,9 +149,9 @@ bytes32_t bytes32_sign(bytes32_sign_t bs)
 
 
 
-bytes32_t bytes32_is_zero(bytes32_t b1)
+bytes32_t bytes32_is_zero(bytes32_t b)
 {
-    if(bytes32_is_zero_bool(b1)) return b_one;
+    if(bytes32_is_zero_bool(b)) return b_one;
     return b_zero;
 }
 
@@ -175,6 +175,8 @@ bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
 
 
 
+
+
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
     if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
@@ -185,6 +187,13 @@ bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
     if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
     return bytes32_shr_uint(b1, b2.v[0]);
+}
+
+bytes32_t bytes32_not(bytes32_t b)
+{
+    for(int i=0; i<SCALAR; i++)
+        b.v[i] = ~b.v[i];
+    return b;
 }
 
 
@@ -212,8 +221,8 @@ bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
 {
-    for(int i=0; i<SCALAR; i++)
-        b1 = bytes32_add_uint(b1, ~b2.v[i], i);
+    b2 = bytes32_not(b2);
+    b1 = bytes32_add(b1, b2);
     return bytes32_add_uint(b1, 1, 0);
 }
 
@@ -238,6 +247,18 @@ bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2)
     bytes32_sign_t bs;
     bs.sign = bs1.sign * bs2.sign;
     bs.b = bytes32_div(bs1.b, bs2.b);
+    return bytes32_sign(bs);
+}
+
+bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
+
+    bytes32_sign_t bs;
+    bs.sign = bs1.sign * bs2.sign;
+    bs.b = bytes32_mod(bs1.b, bs2.b);
     return bytes32_sign(bs);
 }
 

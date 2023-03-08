@@ -25,29 +25,29 @@ machine_t machine_init(char s[])
 bool machine_push(machine_p m, uchar op)
 {
     uchar size = op - 0x5f;
-    bytes_t b = bytes_get_mult(m->code, m->pc, size);
-    bytes32_t b32 = bytes32_bytes(b);
-    TRY(stack_push(&m->st, b32));
+    bytes_t bs = bytes_get_mult(m->code, m->pc, size);
+    bytes32_t b = bytes32_bytes(bs);
+    TRY(stack_push(&m->st, b));
     m->pc += size;
     return true;
 }
 
 bool machine_1_1(machine_p m, bytes32_1_1_f func)
 {
-    bytes32_t b32;
-    TRY(stack_pop(&b32, &m->st));
-    b32 = func(b32);
-    TRY(stack_push(&m->st, b32));
+    bytes32_t b;
+    TRY(stack_pop(&b, &m->st));
+    b = func(b);
+    TRY(stack_push(&m->st, b));
     return true;
 }
 
 bool machine_2_1(machine_p m, bytes32_2_1_f func)
 {
-    bytes32_t b32, b32_0, b32_1;
-    TRY(stack_pop(&b32_0, &m->st));
-    TRY(stack_pop(&b32_1, &m->st));
-    b32 = func(b32_0, b32_1);
-    TRY(stack_push(&m->st, b32));
+    bytes32_t b, b0, b1;
+    TRY(stack_pop(&b0, &m->st));
+    TRY(stack_pop(&b1, &m->st));
+    b = func(b0, b1);
+    TRY(stack_push(&m->st, b));
     return true;
 }
 
@@ -65,8 +65,10 @@ bool machine_exec(machine_p m, char code[])
             case 0x02: TRY(machine_2_1(m, bytes32_mul)); break;
             case 0x03: TRY(machine_2_1(m, bytes32_sub)); break;
             case 0x04: TRY(machine_2_1(m, bytes32_div)); break;
+            case 0x05: TRY(machine_2_1(m, bytes32_sdiv)); break;
             case 0x06: TRY(machine_2_1(m, bytes32_mod)); break;
-            
+            case 0x07: TRY(machine_2_1(m, bytes32_smod)); break;
+
             case 0x10: TRY(machine_2_1(m, bytes32_lt)); break;
             case 0x11: TRY(machine_2_1(m, bytes32_gt)); break;
 
@@ -75,8 +77,6 @@ bool machine_exec(machine_p m, char code[])
 
             case 0x1b: TRY(machine_2_1(m, bytes32_shr)); break;
             case 0x1c: TRY(machine_2_1(m, bytes32_shl)); break;
-
-
 
             case 0x60 ... 0x7f: TRY(machine_push(m, op)); break;
         

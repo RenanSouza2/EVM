@@ -406,12 +406,24 @@ void test_shr()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+void test_not()
+{
+    printf("\n\t\t\ttest not");
+
+    bytes32_t b = bytes32_not(b_zero);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    b = bytes32_not(b_one);
+    ASSERT_BYTES32_MUTUAL(b, b_max_1);
+}
+
 void test_shift()
 {
     printf("\n\t\ttest shift");
 
     test_shl();
     test_shr();
+    test_not();
 }
 
 
@@ -552,7 +564,6 @@ void test_mod()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
-// bytes32_t bytes32_sdiv(bytes32_t b32_1, bytes32_t b32_2)
 void test_sdiv()
 {
     printf("\n\t\t\ttest sdiv\t\t");
@@ -596,6 +607,43 @@ void test_sdiv()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+void test_smod()
+{
+    printf("\n\t\t\ttest smod\t\t");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(5);
+    b2 = BYTES32_UINT(2);
+    b = bytes32_smod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b1 = BYTES32_UINT(5);
+    b2 = BYTES32_UINT(2);
+    b2 = bytes32_sub(b_zero, b2);
+    b = bytes32_smod(b1, b2);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    b1 = BYTES32_UINT(5);
+    b1 = bytes32_sub(b_zero, b1);
+    b2 = BYTES32_UINT(2);
+    b = bytes32_smod(b1, b2);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    b1 = BYTES32_UINT(5);
+    b1 = bytes32_sub(b_zero, b1);
+    b2 = BYTES32_UINT(2);
+    b2 = bytes32_sub(b_zero, b2);
+    b = bytes32_smod(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b = bytes32_smod(b_Q255, b_Q255);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(5);
+    b = bytes32_smod(b1, b_zero);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
 void test_arithmetic()
 {
     printf("\n\t\ttest arithmetic");
@@ -606,6 +654,7 @@ void test_arithmetic()
     test_div();
     test_mod();
     test_sdiv();
+    test_smod();
 }
 
 
