@@ -20,94 +20,16 @@ void test_copy()
     number_p n2 = number_copy(n1);
     assert(n2 != n1);
     ASSERT_NUMBER_UINT(n2, 1);
+    number_free(n1);
+    number_free(n2);
 
-    n1 = NUMBER_UINT(1);
-    n1->next = NUMBER_UINT(2);
+    n1 = number_create_uint_mult(2, 1, 2);
     n2 = number_copy(n1);
-    ASSERT_NUMBER_UINT(n2, 1);
-    assert(n2->next != n1->next);
-    ASSERT_NUMBER_UINT(n2->next, 2);
-}
+    assert(number_uint_mult(n2, 2, 1, 2));
+    number_free(n1);
+    number_free(n2);
 
-void test_add_bytes32()
-{
-    printf("\n\ttest add bytes32\t\t");
-
-    printf("\n\t\ttest add bytes32 1\t\t");
-    bytes32_t b = BYTES32_UINT(1);
-    number_p n = number_add_bytes32(NULL, b, 0);
-    ASSERT_NUMBER_UINT(n, 1);
-
-    printf("\n\t\ttest add bytes32 2\t\t");
-    b = BYTES32_UINT(3);
-    n = number_create_bytes32(b_max);
-    n = number_add_bytes32(n, b, 0);
-    assert(number_uint_mult(n, 2, 2, 1));
-
-    printf("\n\t\ttest add bytes32 3\t\t");
-    n = NUMBER_UINT(1);
-    b = BYTES32_UINT(2);
-    n = number_add_bytes32(n, b, 1);
-    assert(number_uint_mult(n, 2, 1, 2));
-
-    printf("\n\t\ttest add bytes32 4\t\t");
-    n = NUMBER_UINT_OFF(2, 2);
-    b = BYTES32_UINT(1);
-    n = number_add_bytes32(n, b, 1);
-    assert(number_uint_mult(n, 3, 0, 1, 2));
-    
-    n = number_create_bytes32_mult(2, b_zero, b_max);
-    n = number_add_bytes32(n, b_one, 1);
-    assert(number_uint_mult(n, 3, 0, 0, 1));
-}
-
-void test_sub_bytes32()
-{
-    printf("\n\ttest sub bytes32\t\t");
-
-    printf("\n\t\ttest sub bytes32 1\t\t");
-    number_p n = NUMBER_UINT(5);
-    n = number_sub_bytes32(n, b_zero);
-    ASSERT_NUMBER_UINT(n, 5);
-
-    printf("\n\t\ttest sub bytes32 2\t\t");
-    n = NUMBER_UINT(5);
-    n = number_sub_bytes32(n, b_one);
-    ASSERT_NUMBER_UINT(n, 4);
-
-    printf("\n\t\ttest sub bytes32 3\t\t");
-    n = NUMBER_UINT(5);
-    bytes32_t b = BYTES32_UINT(5);
-    n = number_sub_bytes32(n, b);
-    ASSERT_NUMBER_UINT(n, 0);
-
-    n = number_create_uint_mult(2, 0, 1);
-    n = number_sub_bytes32(n, b_one);
-    assert(number_bytes32_mult(n, 2, b_max, b_zero));
-    
-    n = number_create_uint_mult(3, 0, 0, 1);
-    n = number_sub_bytes32(n, b_one);
-    assert(number_bytes32_mult(n, 3, b_max, b_max, b_zero));
-}
-
-void test_is_zero()
-{
-    printf("\n\ttest is zero\t\t");
-
-    bool res = number_is_zero(NULL);
-    assert(res == true);
-
-    number_p n = number_create_null();
-    res = number_is_zero(n);
-    assert(res == true);
-
-    n = NUMBER_UINT(1);
-    res = number_is_zero(n);
-    assert(res == false);
-
-    n = number_create_uint_mult(2, 1, 0);
-    res = number_is_zero(n);
-    assert(res == false);
+    assert(number_memory());
 }
 
 void test_number_cmp()
@@ -122,32 +44,152 @@ void test_number_cmp()
     n2 = NUMBER_UINT(2);
     res = number_cmp(n1, n2);
     assert(res < 0);
+    number_free(n1);
+    number_free(n2);
     
     n1 = NUMBER_UINT(1);
     res = number_cmp(n1, NULL);
     assert(res > 0);
+    number_free(n1);
     
     n1 = NUMBER_UINT(1);
     res = number_cmp(NULL, n1);
     assert(res < 0);
+    number_free(n1);
 
     n1 = NUMBER_UINT(1);
     res = number_cmp(n1, n1);
     assert(res == 0);
-
-    n1 = number_create_null();
-    res = number_cmp(NULL, n1);
-    assert(res == 0);
+    number_free(n1);
 
     n1 = number_create_uint_mult(2, 1, 2);
     n2 = number_create_uint_mult(2, 2, 1);
     res = number_cmp(n1, n2);
     assert(res > 0);
+    number_free(n1);
+    number_free(n2);
     
     n1 = number_create_uint_mult(2, 2, 1);
     n2 = number_create_uint_mult(2, 1, 1);
     res = number_cmp(n1, n2);
     assert(res > 0);
+    number_free(n1);
+    number_free(n2);
+
+    assert(number_memory());
+}
+
+
+
+void test_add_bytes32()
+{
+    printf("\n\ttest add bytes32\t\t");
+
+    bytes32_t b = BYTES32_UINT(1);
+    number_p n = number_add_bytes32(NULL, b);
+    ASSERT_NUMBER_UINT(n, 1);
+    number_free(n);
+
+    b = BYTES32_UINT(3);
+    n = number_create_bytes32(b_max);
+    n = number_add_bytes32(n, b);
+    assert(number_uint_mult(n, 2, 2, 1));
+    number_free(n);
+
+    b = BYTES32_UINT(0);
+    n = number_add_bytes32(NULL, b);
+    assert(n == NULL);
+
+    assert(number_memory());
+}
+
+void test_sub_bytes32()
+{
+    printf("\n\ttest sub bytes32\t\t");
+
+    printf("\n\t\ttest sub bytes32 1\t\t");
+    number_p n = NUMBER_UINT(5);
+    n = number_sub_bytes32(n, b_zero);
+    ASSERT_NUMBER_UINT(n, 5);
+    number_free(n);
+
+    printf("\n\t\ttest sub bytes32 2\t\t");
+    n = NUMBER_UINT(5);
+    n = number_sub_bytes32(n, b_one);
+    ASSERT_NUMBER_UINT(n, 4);
+    number_free(n);
+
+    printf("\n\t\ttest sub bytes32 3\t\t");
+    n = NUMBER_UINT(5);
+    bytes32_t b = BYTES32_UINT(5);
+    n = number_sub_bytes32(n, b);
+    assert(n == NULL);
+
+    printf("\n\t\ttest sub bytes32 4\t\t");
+    n = number_create_uint_mult(2, 0, 1);
+    n = number_sub_bytes32(n, b_one);
+    ASSERT_NUMBER_BYTES32(n, b_max);
+    assert(n->next == NULL);
+    number_free(n);
+    
+    printf("\n\t\ttest sub bytes32 5\t\t");
+    n = number_create_uint_mult(3, 0, 0, 1);
+    n = number_sub_bytes32(n, b_one);
+    assert(number_bytes32_mult(n, 2, b_max, b_max));
+    number_free(n);
+
+    assert(number_memory());
+}
+
+// number_p number_mul_bytes32(number_p n, number_p n1, bytes32_t b)
+void test_mul_bytes32()
+{
+    printf("\n\ttest mul bytes32\t\t");
+
+    bytes32_t b = BYTES32_UINT(2);
+    number_p n = number_mul_bytes32(NULL, NULL, b);
+    assert(n == NULL);
+
+    b = BYTES32_UINT(2);
+    n = NUMBER_UINT(1);
+    n = number_mul_bytes32(n, NULL, b);
+    ASSERT_NUMBER_UINT(n, 1);
+    number_free(n);
+
+    number_p n1 = NUMBER_UINT(3);
+    b = BYTES32_UINT(2);
+    n = number_mul_bytes32(NULL, n1, b);
+    ASSERT_NUMBER_UINT(n, 6);
+    number_free(n1);
+    number_free(n);
+
+    n1 = number_create_bytes32(b_max);
+    n = number_mul_bytes32(NULL, n1, b_max);
+    assert(number_bytes32_mult(n, 2, b_one, b_max_1));
+    number_free(n1);
+    number_free(n);
+
+    b = BYTES32(0, 0, 0, 1, 0, 0, 0, 0);
+    n1 = number_create_bytes32(b);
+    n = number_mul_bytes32(NULL, n1, b);
+    assert(number_uint_mult(n, 2, 0, 1));
+    number_free(n1);
+    number_free(n);
+    
+    n1 = number_create_bytes32_mult(2, b_max, b_max);
+    n = number_mul_bytes32(NULL, n1, b_max);
+    assert(number_bytes32_mult(n, 3, b_one, b_max, b_max_1));
+    number_free(n1);
+    number_free(n);
+
+    n1 = number_create_bytes32_mult(2, b_max, b_max);
+    n = number_create_bytes32_mult(2, b_max, b_max);
+    n = number_mul_bytes32(n, n1, b_max);
+    assert(number_bytes32_mult(n, 3, b_zero, b_max, b_max));
+    number_free(n1);
+    number_free(n);
+
+    assert(number_memory());
 }
 
 
@@ -157,89 +199,136 @@ void test_add()
 {
     printf("\n\ttest add\t\t");
 
-    number_p n = number_add(NULL, NULL);
-    assert(n == NULL);
+    number_p n1 = number_add(NULL, NULL);
+    assert(n1 == NULL);
 
-    n = NUMBER_UINT(1);
-    n = number_add(n, NULL);
-    ASSERT_NUMBER_UINT(n, 1);
+    number_p n2;
+    n1 = NUMBER_UINT(1);
+    n1 = number_add(n1, NULL);
+    ASSERT_NUMBER_UINT(n1, 1);
+    number_free(n1);
 
-    n = NUMBER_UINT(1);
-    n = number_add(NULL, n);
-    ASSERT_NUMBER_UINT(n, 1);
+    n2 = NUMBER_UINT(1);
+    n1 = number_add(NULL, n2);
+    ASSERT_NUMBER_UINT(n1, 1);
+    number_free(n1);
+    number_free(n2);
 
-    n = NUMBER_UINT(1);
-    n = number_add(n, n);
-    ASSERT_NUMBER_UINT(n, 2);
+    n1 = NUMBER_UINT(1);
+    n2 = NUMBER_UINT(1);
+    n1 = number_add(n1, n2);
+    ASSERT_NUMBER_UINT(n1, 2);
+    number_free(n1);
+    number_free(n2);
 
-    number_p n1, n2;
-    n1 = NUMBER_UINT_OFF(1, 1);
+    n1 = number_create_uint_mult(2, 0, 1);
     n2 = NUMBER_UINT(2);
-    n = number_add(n1, n2);
-    assert(number_uint_mult(n, 2, 2, 1));
+    n1 = number_add(n1, n2);
+    assert(number_uint_mult(n1, 2, 2, 1));
+    number_free(n1);
+    number_free(n2);
     
     n1 = NUMBER_UINT(1);
-    n2 = NUMBER_UINT_OFF(2, 1);
-    n = number_add(n1, n2);
-    assert(number_uint_mult(n, 2, 1, 2));
+    n2 = number_create_uint_mult(2, 0, 2);
+    n1 = number_add(n1, n2);
+    assert(number_uint_mult(n1, 2, 1, 2));
+    number_free(n1);
+    number_free(n2);
+    
+    assert(number_memory());
 }
 
 void test_sub()
 {
     printf("\n\ttest sub\t\t");
 
-    number_p n = number_sub(NULL, NULL);
-    assert(n == NULL);
+    printf("\n\t\ttest sub 1\t\t");
+    number_p n1 = number_sub(NULL, NULL);
+    assert(n1 == NULL);
 
-    n = NUMBER_UINT(1);
-    n = number_sub(n, NULL);
-    ASSERT_NUMBER_UINT(n, 1);
+    printf("\n\t\ttest sub 2\t\t");
+    n1 = NUMBER_UINT(1);
+    n1 = number_sub(n1, NULL);
+    ASSERT_NUMBER_UINT(n1, 1);
+    number_free(n1);
 
-    n = NUMBER_UINT(1);
-    n = number_sub(n, n);
-    ASSERT_NUMBER_UINT(n, 0);
+    printf("\n\t\ttest sub 3\t\t");
+    number_p n2;
+    n1 = NUMBER_UINT(1);
+    n2 = NUMBER_UINT(1);
+    n1 = number_sub(n1, n2);
+    assert(n1 == NULL);
+    number_free(n2);
 
-    // number_p n1, n2;
-    // n1 = NUMBER_UINT_OFF(1, 1);
-    // n2 = NUMBER_UINT(2);
-    // n = number_sub(n1, n2);
-    // assert(number_uint_mult(n, 2, 2, 1));
+    n1 = number_create_uint_mult(2, 0, 1);
+    n2 = NUMBER_UINT(1);
+    n1 = number_sub(n1, n2);
+    ASSERT_NUMBER_BYTES32(n1, b_max);
+    number_free(n1);
+    number_free(n2);
     
-    // n1 = NUMBER_UINT(1);
-    // n2 = NUMBER_UINT_OFF(2, 1);
-    // n = number_sub(n1, n2);
-    // assert(number_uint_mult(n, 2, 1, 2));
+    n1 = number_create_uint_mult(2, 0, 1);
+    n2 = number_create_uint_mult(2, 0, 1);
+    n1 = number_sub(n1, n2);
+    assert(n1 == NULL);
+    number_free(n2);
+
+    assert(number_memory());
 }
 
 void test_mul()
 {
     printf("\n\ttest mul\t\t");
 
-    number_p n = number_mul(NULL, NULL);
-    assert(n == NULL);
+    number_p n1 = number_mul(NULL, NULL);
+    assert(n1 == NULL);
 
-    n = NUMBER_UINT(1);
-    n = number_mul(n, NULL);
-    assert(n == NULL);
+    n1 = NUMBER_UINT(1);
+    n1 = number_mul(n1, NULL);
+    assert(n1 == NULL);
 
-    n = NUMBER_UINT(1);
-    n = number_mul(NULL, n);
-    assert(n == NULL);
+    assert(number_memory());
 
-    n = NUMBER_UINT(1);
-    n = number_mul(n, n);
-    ASSERT_NUMBER_UINT(n, 1);
+    number_p n2 = NUMBER_UINT(1);
+    n1 = number_mul(NULL, n2);
+    assert(n1 == NULL);
+    number_free(n2);
+    
+    assert(number_memory());
 
-    number_p n1, n2;
+    n1 = NUMBER_UINT(1);
+    n2 = NUMBER_UINT(1);
+    n1 = number_mul(n1, n2);
+    ASSERT_NUMBER_UINT(n1, 1);
+    number_free(n1);
+    number_free(n2);
+    
+    assert(number_memory());
+
     n1 = number_create_uint_mult(2, 1, 2);
     n2 = number_create_uint_mult(3, 3, 4, 5);
-    n = number_mul(n1, n2);
-    assert(number_uint_mult(n, 4, 3, 10, 13, 10));
+    n1 = number_mul(n1, n2);
+    assert(number_uint_mult(n1, 4, 3, 10, 13, 10));
+    number_free(n1);
+    number_free(n2);
+    
+    assert(number_memory());
 
     n1 = number_create_bytes32_mult(2, b_max, b_max);
     n2 = number_create_bytes32_mult(2, b_max, b_max);
-    n = number_mul(n1, n2);
-    assert(number_bytes32_mult(n, 4, b_one, b_zero, b_max_1, b_max));
+    n1 = number_mul(n1, n2);
+    assert(number_bytes32_mult(n1, 4, b_one, b_zero, b_max_1, b_max));
+    number_free(n1);
+    number_free(n2);
+
+    n1 = number_create_uint_mult(2, 0, 1);
+    n2 = number_create_uint_mult(2, 0, 1);
+    n1 = number_mul(n1, n2);
+    assert(number_uint_mult(n1, 3, 0, 0, 1));
+    number_free(n1);
+    number_free(n2);
+
+    assert(number_memory());
 }
 
 
@@ -251,49 +340,30 @@ void test_shl()
     number_p n = NUMBER_UINT(1);
     n = number_shl(n, 0);
     ASSERT_NUMBER_UINT(n, 1);
+    number_free(n);
+
+    assert(number_memory());
 
     n = NUMBER_UINT(1);
     n = number_shl(n, 1);
     ASSERT_NUMBER_UINT(n, 2);
+    number_free(n);
+
+    assert(number_memory());
 
     n = NUMBER_UINT(1);
     n = number_shl(n, 128);
     ASSERT_NUMBER(n, 0, 0, 0, 1, 0, 0, 0, 0);
+    number_free(n);
+
+    assert(number_memory());
 
     n = NUMBER_UINT(1);
     n = number_shl(n, 255);
-    ASSERT_NUMBER(n, 0x80000000, 0, 0, 0, 0, 0, 0, 0);
+    ASSERT_NUMBER_BYTES32(n, b_Q255);
+    number_free(n);
 
-    /*
-    n = NUMBER_UINT(1);
-    n = number_shl(n, 256);
-    assert(number_uint_mult(n, 2, 0, 1));
-
-    bytes32_t b0, b1, b2;
-    b1 = BYTES32(   \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
-    );
-    b2 = BYTES32(   \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
-    );
-    n = number_create_bytes32_mult(2, b1, b2);
-    n = number_shl(n, 384);
-    b0 = BYTES32(   \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
-        0x00000000, 0x00000000, 0x00000000, 0x00000000  \
-    );
-    b1 = BYTES32(   \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
-    );
-    b2 = BYTES32(   \
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
-    );
-    assert(number_bytes32_mult(n, 4, b_zero, b0, b1, b2));
-    */
+    assert(number_memory());
 }
 
 void test_shr()
@@ -303,66 +373,44 @@ void test_shr()
     number_p n = number_create_bytes32(b_Q255);
     n = number_shr(n, 0);
     ASSERT_NUMBER_BYTES32(n, b_Q255);
+    number_free(n);
 
     n = number_create_bytes32(b_Q255);
     n = number_shr(n, 1);
     bytes32_t b0 = BYTES32(0x40000000, 0, 0, 0, 0, 0, 0, 0);
     ASSERT_NUMBER_BYTES32(n, b0);
+    number_free(n);
 
     n = number_create_bytes32(b_Q255);
     n = number_shr(n, 128);
     b0 = BYTES32(0, 0, 0, 0, 0x80000000, 0, 0, 0);
     ASSERT_NUMBER_BYTES32(n, b0);
+    number_free(n);
 
     n = number_create_bytes32(b_Q255);
     n = number_shr(n, 255);
     ASSERT_NUMBER_UINT(n, 1);
+    number_free(n);
 
-    /*
-    n = number_create_bytes32(b_Q255);
-    n = number_shr(n, 256);
+    n = number_create_bytes32(b_one);
+    n = number_shr(n, 1);
     assert(n == NULL);
 
-    n = number_create_uint_mult(2, 0, 1);
-    n = number_shr(n, 256);
-    ASSERT_NUMBER_UINT(n, 1);
-    
-    bytes32_t b1, b2;
-    b1 = BYTES32(   \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
-    );
-    b2 = BYTES32(   \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
-    );
-    n = number_create_bytes32_mult(4, b_zero, b_zero, b1, b2);
-    n = number_shr(n, 384);
-    b0 = BYTES32(   \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111, \
-        0x00000000, 0x00000000, 0x00000000, 0x00000000  \
-    );
-    b1 = BYTES32(   \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222, \
-        0x11111111, 0x11111111, 0x11111111, 0x11111111  \
-    );
-    b2 = BYTES32(   \
-        0x00000000, 0x00000000, 0x00000000, 0x00000000, \
-        0x22222222, 0x22222222, 0x22222222, 0x22222222  \
-    );
-    assert(number_bytes32_mult(n, 3, b0, b1, b2));
-    */
+    assert(number_memory());
 }
+
+
 
 void test_number()
 {
     printf("\ntest number library\t\t");
 
     test_copy();
+    test_number_cmp();
+
     test_add_bytes32();
     test_sub_bytes32();
-    test_is_zero();
-    test_number_cmp();
+    test_mul_bytes32();
 
     test_add();
     test_sub();
@@ -370,15 +418,14 @@ void test_number()
 
     test_shl();
     test_shr();
+    
+    assert(number_memory());
 }
-
-
 
 int main() 
 {
     setbuf(stdout, NULL);
     test_number();
-    printf("\nmemory end: %u", number_created - number_freed);
     printf("\n\n\tTest successful\n\n");
     return 0;
 }

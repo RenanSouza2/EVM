@@ -24,13 +24,12 @@ int number_freed;
         number_freed++; \
     }
 
-number_p number_create_bytes32_off(bytes32_t b, int i)
-{    
-    if(i == 0) return number_create_bytes32(b);
+bool number_memory()
+{
+    if(number_created == number_freed) return true;
 
-    number_p n = number_create_null();
-    n->next = number_create_bytes32_off(b, i-1);
-    return n;
+    printf("\nmissed %u number allocated\t\t", number_created - number_freed);
+    return false;
 }
 
 void number_display(number_p n)
@@ -69,7 +68,7 @@ number_p number_create_bytes32_mult(int count, ...)
 
     number_p n, n_out;
     bytes32_t value = va_arg(args, bytes32_t);
-    n_out = n = number_create_bytes32(value);
+    n_out = n = number_create_bytes32_force(value);
 
     for(int i=1; i<count; i++)
     {
@@ -150,8 +149,16 @@ number_p number_create_null()
     return n;
 }
 
+number_p number_create_bytes32_force(bytes32_t b)
+{
+    number_p n = number_create_null();
+    n->b = b;
+    return n;
+}
+
 number_p number_create_bytes32(bytes32_t b)
 {
+    if(bytes32_is_zero_bool(b)) return NULL;
     number_p n = number_create_null();
     n->b = b;
     return n;
@@ -159,13 +166,11 @@ number_p number_create_bytes32(bytes32_t b)
 
 void number_free(number_p n)
 {
-    while(n != NULL)
-    {
-        number_p n_aux = n->next;
-        free(n);
-        NUMBER_DEC();
-        n = n_aux;
-    }
+    if(n == NULL) return;
+    number_free(n->next);
+
+    free(n);
+    NUMBER_DEC();
 }
 
 number_p number_copy(number_p n)
@@ -173,65 +178,63 @@ number_p number_copy(number_p n)
     if(n == NULL) return NULL;
 
     number_p n_copy;
-    n_copy = number_create_bytes32(n->b);
-
-    n = n->next;
-    for(number_p n_aux = n_copy; n != NULL; n = n->next, n_aux = n_aux->next)
-        n_aux->next = number_create_bytes32(n->b);
-
+    n_copy = number_create_bytes32_force(n->b);
+    n_copy->next = number_copy(n->next);
     return n_copy;
 } 
 
-
-
-number_p number_add_bytes32_rec2(number_p n, bytes32_t b)
+number_p number_prune(number_p n)
 {
+    if(n == NULL) return n;
+    if(n->next != NULL) return n;
+    if(!bytes32_is_zero_bool(n->b)) return n;
+
+    free(n);
+    NUMBER_DEC();
+    return NULL;
+}
+
+
+
+number_p number_add_bytes32(number_p n, bytes32_t b)
+{
+    if(bytes32_is_zero_bool(b)) return n;
     if(n == NULL) return number_create_bytes32(b);
 
     bytes32_dual_t bd = bytes32_full_add(n->b, b);
     n->b = bd.b[0];
-    n->next = number_add_bytes32_rec2(n->next, bd.b[1]);
+    n->next = number_add_bytes32(n->next, bd.b[1]);
     return n;
-}
-
-number_p number_add_bytes32_rec1(number_p n, bytes32_t b, int i)
-{
-    if(i == 0) return number_add_bytes32_rec2(n, b);
-
-    if(n == NULL) n = number_create_null();
-    n->next = number_add_bytes32_rec1(n->next, b, i-1);
-    return n;
-}
-
-number_p number_add_bytes32(number_p n, bytes32_t b, int i)
-{
-    if(bytes32_is_zero_bool(b)) return n;
-    return number_add_bytes32_rec1(n, b, i);
 }
 
 number_p number_sub_bytes32(number_p n, bytes32_t b)
 {
     if(bytes32_is_zero_bool(b)) return n;
-    assert(!number_is_zero(n));
+    assert(n != NULL);
 
     if(bytes32_cmp(n->b, b) < 0) 
         n->next = number_sub_bytes32(n->next, b_one);
-
     n->b = bytes32_sub(n->b, b);
-    return n;
+    return number_prune(n);
 }
 
-bool number_is_zero(number_p n)
+number_p number_mul_bytes32(number_p n, number_p n1, bytes32_t b)
 {
-    if(n == NULL) return true;
-    if(!bytes32_is_zero_bool(n->b)) return false;
-    return number_is_zero(n->next);
+    if(n1 == NULL) return n;
+
+    bytes32_dual_t bd = bytes32_full_mul(n1->b, b);
+    n = number_add_bytes32(n, bd.b[0]);
+    if(n == NULL) n = number_create_null();
+    
+    n->next = number_add_bytes32(n->next, bd.b[1]);
+    n->next = number_mul_bytes32(n->next, n1->next, b);
+    return n;
 }
 
 int number_cmp(number_p n1, number_p n2)
 {
-    if(n1 == NULL) return -!number_is_zero(n2);
-    if(n2 == NULL) return  !number_is_zero(n1);
+    if(n1 == NULL) return -!!n2;
+    if(n2 == NULL) return 1;
 
     int res = number_cmp(n1->next, n2->next);
     if(res != 0) return res;
@@ -246,7 +249,6 @@ number_p number_shl_rec(number_p n, uint u)
     if(n->next == NULL)
     {
         bytes32_t b = bytes32_shr_uint(n->b, 256 - u);
-        if(bytes32_is_zero_bool(b)) return NULL;
         return number_create_bytes32(b);
     }
 
@@ -255,7 +257,7 @@ number_p number_shl_rec(number_p n, uint u)
     b2 = bytes32_shl_uint(n->next->b, u);
     b = bytes32_add(b1, b2);
     
-    number_p n_out = number_create_bytes32(b);
+    number_p n_out = number_create_bytes32_force(b);
     n_out->next = number_shl_rec(n->next, u);
     return n_out;
 }
@@ -266,7 +268,6 @@ number_p number_shr_rec(number_p n, uint u)
     {
         bytes32_t b;
         b = bytes32_shr_uint(n->b, u);
-        if(bytes32_is_zero_bool(b)) return NULL;
         return number_create_bytes32(b);
     }
 
@@ -275,58 +276,58 @@ number_p number_shr_rec(number_p n, uint u)
     b2 = bytes32_shl_uint(n->next->b, 256-u);
     b = bytes32_add(b1, b2);
     
-    number_p n_out = number_create_bytes32(b);
+    number_p n_out = number_create_bytes32_force(b);
     n_out->next = number_shr_rec(n->next, u);
     return n_out;
 }
 
-number_p number_sub_rec(number_p n1, number_p n2)
+number_p number_mul_rec(number_p n, number_p n1, number_p n2)
 {
-    if(number_is_zero(n2)) return n1;
-    assert(!number_is_zero(n1));
+    if(n1 == NULL) return n;
 
-    n1 = number_sub_bytes32(n1, n2->b);
-    n1->next = number_sub_rec(n1->next, n2->next);
-    return n1;
+    if(bytes32_is_zero_bool(n1->b))
+    {
+        if(n == NULL) n = number_create_null();
+    }
+    else n = number_mul_bytes32(n, n2, n1->b);
+
+    n->next = number_mul_rec(n->next, n1->next, n2);
+    return n;
 }
 
 
 
 number_p number_add(number_p n1, number_p n2)
 {
-    n1 = number_copy(n1);
-    for(int i=0; n2; i++, n2 = n2->next)
-        n1 = number_add_bytes32(n1, n2->b, i);
+    if(n1 == NULL) return number_copy(n2);
+    if(n2 == NULL) return n1;
 
+    n1 = number_add_bytes32(n1, n2->b);
+    n1->next = number_add(n1->next, n2->next);
     return n1;
 }
 
 number_p number_sub(number_p n1, number_p n2)
 {
-    if(number_is_zero(n2)) return number_copy(n1);
-    assert(!number_is_zero(n1));
+    if(n2 == NULL) return n1;
+    assert(n1 != NULL);
 
-    n1 = number_copy(n1);
-    return number_sub_rec(n1, n2);
+    n1 = number_sub_bytes32(n1, n2->b);
+    if(n1 == NULL) return NULL;
+
+    n1->next = number_sub(n1->next, n2->next);
+    return number_prune(n1);
 }
 
 number_p number_mul(number_p n1, number_p n2)
 {
-    if(n1 == NULL) return NULL;
-    if(n2 == NULL) return NULL;
-
-    
-    number_p n, n2_0;
-    int j;
-    n = NULL;
-    n2_0 = n2;
-    for(int i=0; n1; i++, n1 = n1->next)
-    for(j=0, n2 = n2_0; n2; j++, n2 = n2->next)
+    if(n2 == NULL)
     {
-        bytes32_dual_t bd = bytes32_full_mul(n1->b, n2->b);
-        n = number_add_bytes32(n, bd.b[0], i + j);
-        n = number_add_bytes32(n, bd.b[1], i + j + 1);
+        number_free(n1);
+        return NULL;
     }
+    number_p n = number_mul_rec(NULL, n1, n2);
+    number_free(n1);
     return n;
 }
 
@@ -337,8 +338,9 @@ number_p number_shl(number_p n, uint u)
     if(u == 0) return n;
 
     bytes32_t b = bytes32_shl_uint(n->b, u);
-    number_p n_out = number_create_bytes32(b);
+    number_p n_out = number_create_bytes32_force(b);
     n_out->next = number_shl_rec(n, u);
+    number_free(n);
 
     return n_out;
 }
@@ -347,12 +349,15 @@ number_p number_shr(number_p n, uint u)
 {
     assert(u < 256);
     if(u == 0) return n;
-    return number_shr_rec(n, u);
+    
+    number_p n_out = number_shr_rec(n, u);
+    number_free(n);
+    return n_out;
 }
 
 number_p number_mod(number_p n1, number_p n2)
 {
-    if(number_is_zero(n2)) return NULL;
+    if(n2 == NULL) return NULL;
     n1 = number_copy(n1);
     n2 = number_copy(n2);
 
