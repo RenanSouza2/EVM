@@ -6,10 +6,10 @@
 #include "../../utils/struct.h"
 #include "../uint/header.h"
 
-#define SCALAR 8
+#define SCALAR32 8
 STRUCT(bytes32)
 {
-    uint v[SCALAR];
+    uint v[SCALAR32];
 };
 
 STRUCT(bytes32_dual)
@@ -17,7 +17,7 @@ STRUCT(bytes32_dual)
     bytes32_t b[2];
 };
 
-extern const bytes32_t b_zero;
+extern const bytes32_t b32_zero;
 extern const bytes32_t b_one;
 
 bool bytes32_is_zero_bool(bytes32_t b);

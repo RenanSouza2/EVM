@@ -5,16 +5,21 @@
 
 #include "header.h"
 
-#define SCALAR2 (2*SCALAR)
+#define SCALAR64 (2*SCALAR32)
 STRUCT(bytes64)
 {
-    uint v[SCALAR2];
+    uint v[SCALAR64];
 };
 
 STRUCT(bytes32_sign)
 {
     int sign;
     bytes32_t b;
+};
+
+STRUCT(bytes64_dual)
+{
+    bytes64_t b[2];
 };
 
 void bytes32_display(bytes32_t b);
@@ -116,5 +121,8 @@ bytes32_sign_t bytes32_design(bytes32_t b);
 bytes32_t bytes32_sign(bytes32_sign_t bs);
 
 bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i);
+
+bytes64_t bytes64_add(bytes64_t b1, bytes64_t b2);
+bytes64_t bytes64_sub(bytes64_t b1, bytes64_t b2);
 
 #endif

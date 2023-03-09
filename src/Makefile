@@ -8,7 +8,7 @@ run: main.o
 build: main.o
 
 main.o: main.c $(LIB)
-	gcc $(FLAGS) -o $@ $^
+	gcc -o $@ $^ $(FLAGS)
 
 .PHONY: $(LIB)
 $(LIB):

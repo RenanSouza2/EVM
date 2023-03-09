@@ -66,7 +66,7 @@ bytes_t bytes_get_mult(bytes_t b, int n, int size)
 
 bytes32_t bytes32_bytes(bytes_t b)
 {
-    bytes32_t b32 = b_zero;
+    bytes32_t b32 = b32_zero;
     for(int i=0; i<b.n; i++)
         ((uchar*)&b32)[i] = b.s[b.n-1-i];
 

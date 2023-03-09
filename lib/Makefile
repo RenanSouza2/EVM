@@ -5,17 +5,19 @@ DGB_FILES = $(foreach DIR,$(DIRS),$(dir $(DIR))debug.o)
 
 build: lib.o
 
+
+
 lib.o: $(LIB_FILES)
 	ld -r -o $@ $^
+	
+debug.o: $(DGB_FILES)
+	ld -r -o $@ $^
+
+
 
 .PHONY: $(LIB_FILES)
 $(LIB_FILES):
 	$(MAKE) --directory=$(dir $@)
-
-
-
-debug.o: $(DGB_FILES)
-	ld -r -o $@ $^
 
 .PHONY: $(DGB_FILES)
 $(DGB_FILES):

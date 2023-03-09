@@ -15,7 +15,7 @@ void test_is_zero_bool()
     bool is_zero = bytes32_is_zero_bool(b);
     assert(is_zero == true);
 
-    for(int i=0; i<SCALAR; i++)
+    for(int i=0; i<SCALAR32; i++)
     {
         b = BYTES32_UINT(0);
         b = bytes32_add_uint(b, 1, i);
@@ -84,7 +84,7 @@ void test_add_uint()
 
     bytes32_t b = BYTES32(7, 6, 5, 4, 3, 2, 1, 0);
     
-    for(int i=0; i<SCALAR; i++)
+    for(int i=0; i<SCALAR32; i++)
     {
         b = bytes32_add_uint(b, 1, i);
         assert(b.v[i] == i+1);
@@ -209,7 +209,7 @@ void test_design()
 {
     printf("\n\t\t\ttest design\t\t");
 
-    bytes32_sign_t bs = bytes32_design(b_zero);
+    bytes32_sign_t bs = bytes32_design(b32_zero);
     assert(bs.sign == 1);
     ASSERT_BYTES32_UINT(bs.b, 0);
     
@@ -238,11 +238,11 @@ void test_sign()
 {
     printf("\n\t\t\ttest sign\t\t");
 
-    bytes32_sign_t bs32 = (bytes32_sign_t){1, b_zero};
+    bytes32_sign_t bs32 = (bytes32_sign_t){1, b32_zero};
     bytes32_t b32 = bytes32_sign(bs32);
     ASSERT_BYTES32_UINT(b32, 0);
     
-    bs32 = (bytes32_sign_t){-1, b_zero};
+    bs32 = (bytes32_sign_t){-1, b32_zero};
     b32 = bytes32_sign(bs32);
     ASSERT_BYTES32_UINT(b32, 0);
     
@@ -291,7 +291,7 @@ void test_is_zero()
     b_out = bytes32_is_zero(b_in);
     ASSERT_BYTES32_UINT(b_out, 1);
 
-    for(int i=0; i<SCALAR; i++)
+    for(int i=0; i<SCALAR32; i++)
     {
         b_in = BYTES32_UINT(0);
         b_in.v[i] = 1;
@@ -410,7 +410,7 @@ void test_not()
 {
     printf("\n\t\t\ttest not");
 
-    bytes32_t b = bytes32_not(b_zero);
+    bytes32_t b = bytes32_not(b32_zero);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b = bytes32_not(b_one);
@@ -536,11 +536,29 @@ void test_div()
     printf("\n\t\t\t\ttest div 6\t\t");
     b = bytes32_div(b_Q255, b_one);
     ASSERT_BYTES32_MUTUAL(b, b_Q255);
+
+    printf("\n\t\t\t\ttest div 7\t\t");
+    b = BYTES32_UINT(5);
+    b = bytes32_div(b, b);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    printf("\n\t\t\t\ttest div 8\t\t");
+    b = bytes32_div(b_max, b_one);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    printf("\n\t\t\t\ttest div 9\t\t");
+    b = bytes32_div(b_one, b_max);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+
+    printf("\n\t\t\t\ttest div 9\t\t");
+    b = bytes32_div(b_max, b_max);
+    ASSERT_BYTES32_UINT(b, 1);
 }
 
 void test_mod()
 {
-    printf("\n\t\t\ttest mod");
+    printf("\n\t\t\ttest mod\t\t");
 
     bytes32_t b, b1, b2;
     b1 = BYTES32_UINT(108);
@@ -562,6 +580,13 @@ void test_mod()
     b2 = BYTES32_UINT(0);
     b = bytes32_mod(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
+    
+    b = bytes32_mod(b_Q255, b_one);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(5);
+    b = bytes32_mod(b, b);
+    ASSERT_BYTES32_UINT(b, 0);
 }
 
 void test_sdiv()
@@ -570,7 +595,7 @@ void test_sdiv()
 
     printf("\n\t\t\t\ttest sdiv 1\t\t");
     bytes32_t b;
-    b = bytes32_sdiv(b_one, b_zero);
+    b = bytes32_sdiv(b_one, b32_zero);
     ASSERT_BYTES32_UINT(b, 0);
 
     printf("\n\t\t\t\ttest sdiv 2\t\t");
@@ -619,20 +644,20 @@ void test_smod()
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32_UINT(2);
-    b2 = bytes32_sub(b_zero, b2);
+    b2 = bytes32_sub(b32_zero, b2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b1 = BYTES32_UINT(5);
-    b1 = bytes32_sub(b_zero, b1);
+    b1 = bytes32_sub(b32_zero, b1);
     b2 = BYTES32_UINT(2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b1 = BYTES32_UINT(5);
-    b1 = bytes32_sub(b_zero, b1);
+    b1 = bytes32_sub(b32_zero, b1);
     b2 = BYTES32_UINT(2);
-    b2 = bytes32_sub(b_zero, b2);
+    b2 = bytes32_sub(b32_zero, b2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_UINT(b, 1);
 
@@ -640,7 +665,7 @@ void test_smod()
     ASSERT_BYTES32_UINT(b, 0);
     
     b1 = BYTES32_UINT(5);
-    b = bytes32_smod(b1, b_zero);
+    b = bytes32_smod(b1, b32_zero);
     ASSERT_BYTES32_UINT(b, 0);
 }
 
@@ -668,7 +693,7 @@ void test_full_add_uint()
          7,  6,  5,  4,  3,  2, 1, 0   \
     );
     
-    for(int i=0; i<SCALAR2; i++)
+    for(int i=0; i<SCALAR64; i++)
     {
         bd = bytes64_add_uint(bd, 1, i);
         assert(bd.v[i] == i+1);
@@ -685,7 +710,7 @@ void test_full_add_uint()
     assert(bd.v[2] == 1);
 
     bd = BYTES64_UINT(0);
-    bd = bytes64_add_uint(bd, 1, SCALAR2);
+    bd = bytes64_add_uint(bd, 1, SCALAR64);
     ASSERT_BYTES64_UINT(bd, 0);
 }
 
