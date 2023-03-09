@@ -17,6 +17,11 @@ STRUCT(bytes32_sign)
     bytes32_t b;
 };
 
+STRUCT(bytes32_dual)
+{
+    bytes32_t b[2];
+};
+
 STRUCT(bytes64_dual)
 {
     bytes64_t b[2];

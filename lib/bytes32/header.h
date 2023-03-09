@@ -12,11 +12,6 @@ STRUCT(bytes32)
     uint v[SCALAR32];
 };
 
-STRUCT(bytes32_dual)
-{
-    bytes32_t b[2];
-};
-
 extern const bytes32_t b32_zero;
 extern const bytes32_t b_one;
 
@@ -43,7 +38,7 @@ bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2);
 
-bytes32_dual_t bytes32_full_add(bytes32_t b1, bytes32_t b2);
-bytes32_dual_t bytes32_full_mul(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3);
+bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3);
 
 #endif

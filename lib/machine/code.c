@@ -51,6 +51,17 @@ bool machine_2_1(machine_p m, bytes32_2_1_f func)
     return true;
 }
 
+bool machine_3_1(machine_p m, bytes32_3_1_f func)
+{
+    bytes32_t b, b0, b1, b2;
+    TRY(stack_pop(&b0, &m->st));
+    TRY(stack_pop(&b1, &m->st));
+    TRY(stack_pop(&b2, &m->st));
+    b = func(b0, b1, b2);
+    TRY(stack_push(&m->st, b));
+    return true;
+}
+
 bool machine_exec(machine_p m, char code[])
 {
     *m = machine_init(code);
@@ -68,6 +79,8 @@ bool machine_exec(machine_p m, char code[])
             case 0x05: TRY(machine_2_1(m, bytes32_sdiv)); break;
             case 0x06: TRY(machine_2_1(m, bytes32_mod)); break;
             case 0x07: TRY(machine_2_1(m, bytes32_smod)); break;
+            case 0x08: TRY(machine_3_1(m, bytes32_addmod)); break;
+            case 0x09: TRY(machine_3_1(m, bytes32_mulmod)); break;
 
             case 0x10: TRY(machine_2_1(m, bytes32_lt)); break;
             case 0x11: TRY(machine_2_1(m, bytes32_gt)); break;

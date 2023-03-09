@@ -684,77 +684,6 @@ void test_arithmetic()
 
 
 
-void test_full_add_uint()
-{
-    printf("\n\t\t\ttest full add uint\t\t");
-
-    bytes64_t bd = BYTES64( \
-        15, 14, 13, 12, 11, 10, 9, 8,  \
-         7,  6,  5,  4,  3,  2, 1, 0   \
-    );
-    
-    for(int i=0; i<SCALAR64; i++)
-    {
-        bd = bytes64_add_uint(bd, 1, i);
-        assert(bd.v[i] == i+1);
-    }
-
-    bd = BYTES64_UINT(UINT_MAX);
-    bd = bytes64_add_uint(bd, 1, 0);
-    ASSERT_BYTES64_UINT(bd, 0x100000000);
-
-    bd = BYTES64(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, UINT_MAX, UINT_MAX);
-    bd = bytes64_add_uint(bd, 1, 0);
-    assert(bd.v[0] == 0);
-    assert(bd.v[1] == 0);
-    assert(bd.v[2] == 1);
-
-    bd = BYTES64_UINT(0);
-    bd = bytes64_add_uint(bd, 1, SCALAR64);
-    ASSERT_BYTES64_UINT(bd, 0);
-}
-
-void test_full_add()
-{
-    printf("\n\t\t\ttest full add\t\t");
-
-    bytes32_dual_t bd = bytes32_full_add(b_max, b_one);
-    ASSERT_BYTES32_UINT(bd.b[0], 0);
-    ASSERT_BYTES32_UINT(bd.b[1], 1);
-
-    bd = bytes32_full_add(b_max, b_max);
-    ASSERT_BYTES32_MUTUAL(bd.b[0], b_max_1);
-    ASSERT_BYTES32_MUTUAL(bd.b[1], b_one);
-}
-
-void test_full_mul()
-{
-    printf("\n\t\t\ttest full mul\t\t");
-
-    bytes32_t b1, b2;
-    bytes32_dual_t bd;
-    b1 = BYTES32_UINT(2);
-    b2 = BYTES32_UINT(3);
-    bd = bytes32_full_mul(b1, b2);
-    ASSERT_BYTES32_UINT(bd.b[0], 6);
-    ASSERT_BYTES32_UINT(bd.b[1], 0);
-
-    bd = bytes32_full_mul(b_max, b_max);
-    ASSERT_BYTES32_MUTUAL(bd.b[0], b_one);
-    ASSERT_BYTES32_MUTUAL(bd.b[1], b_max_1);
-}
-
-void test_full()
-{
-    printf("\n\t\ttest full\t\t");
-
-    test_full_add_uint();
-    test_full_add();
-    test_full_mul();
-}
-
-
-
 void test_operations()
 {
     printf("\n\ttest operation");
@@ -762,7 +691,6 @@ void test_operations()
     test_bytes32_compare();
     test_shift();
     test_arithmetic();
-    test_full();
 }
 
 void test_bytes32()

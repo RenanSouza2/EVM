@@ -28,6 +28,7 @@ STRUCT(machine)
 
 typedef bytes32_t (*bytes32_1_1_f)(bytes32_t);
 typedef bytes32_t (*bytes32_2_1_f)(bytes32_t,bytes32_t);
+typedef bytes32_t (*bytes32_3_1_f)(bytes32_t,bytes32_t,bytes32_t);
 
 machine_t machine_init(char s[]);
 

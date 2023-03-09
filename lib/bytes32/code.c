@@ -1,7 +1,7 @@
 #include "debug.h"
 
 #define BYTES64_BYTES32(B) (*((bytes64_p)&((bytes32_dual_t){{(B), b32_zero}})))
-#define DUAL(BD) (*((bytes32_dual_p)&(BD)))               
+#define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))              
 
 #ifdef DEBUG
 
@@ -55,17 +55,20 @@ int bytes##SIZE##_cmp(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 BYTES_N_CMP(32)
 BYTES_N_CMP(64)
 
-
-bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
-{
-    if(u == 0) return b;
-    if(i >= SCALAR32) return b;
-
-    luint lu = uint_add(b.v[i], u);
-    b.v[i] = DECL(lu);
-
-    return bytes32_add_uint(b, DECH(lu), i+1);
+#define BYTES_N_ADD_UINT(SIZE)  \
+bytes##SIZE##_t bytes##SIZE##_add_uint(bytes##SIZE##_t b, uint u, int i)    \
+{   \
+    if(u == 0) return b;    \
+    if(i >= SCALAR##SIZE) return b; \
+    \
+    luint lu = uint_add(b.v[i], u); \
+    b.v[i] = DECL(lu);  \
+    \
+    return bytes##SIZE##_add_uint(b, DECH(lu), i+1);    \
 }
+
+BYTES_N_ADD_UINT(32)
+BYTES_N_ADD_UINT(64)
 
 #define BYTES_N_SHL_UINT(SIZE)  \
 bytes##SIZE##_t bytes##SIZE##_shl_uint(bytes##SIZE##_t b, uint shift)   \
@@ -251,11 +254,15 @@ bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
     return bd.b[1];
 }
 
-bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
-{
-    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
-    return bd.b[0];
+#define BYTES_N_MOD(SIZE)   \
+bytes##SIZE##_t bytes##SIZE##_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
+{   \
+    bytes##SIZE##_dual_t bd = bytes##SIZE##_div_mod(b1, b2);    \
+    return bd.b[0]; \
 }
+
+BYTES_N_MOD(32)
+BYTES_N_MOD(64)
 
 bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2)
 {
@@ -283,37 +290,28 @@ bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
 
 
 
-bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i)
+bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
 {
-    if(u == 0) return bd;
-    if(i >= SCALAR64) return bd;
+    bytes64_t b64_1, b64_2;
+    b64_1 = BYTES64_BYTES32(b1);
+    b64_2 = BYTES64_BYTES32(b2);
+    b64_1 = bytes64_add(b64_1, b64_2);
 
-    luint lu = uint_add(bd.v[i], u);
-    bd.v[i] = DECL(lu);
-    return bytes64_add_uint(bd, DECH(lu), i+1);
+    b64_2 = BYTES64_BYTES32(b3);
+    b64_1 = bytes64_mod(b64_1, b64_2);
+
+    return BYTES32_BYTES64(b64_1);
 }
 
-
-
-bytes32_dual_t bytes32_full_add(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
 {
-    bytes64_t bd = BYTES64_BYTES32(b1);
-    for(int i=0; i<SCALAR32; i++)
-        bd = bytes64_add_uint(bd, b2.v[i], i);
-    
-    return DUAL(bd);
-}
+    bytes64_t b64_1, b64_2;
+    b64_1 = BYTES64_BYTES32(b1);
+    b64_2 = BYTES64_BYTES32(b2);
+    b64_1 = bytes64_mul(b64_1, b64_2);
 
-bytes32_dual_t bytes32_full_mul(bytes32_t b1, bytes32_t b2)
-{
-    bytes64_t bd = b64_zero;
-    for(int i=0; i<SCALAR32; i++)
-    for(int j=0; j<SCALAR32; j++)
-    {
-        luint lu = uint_mul(b1.v[i], b2.v[j]);
-        bd = bytes64_add_uint(bd, DECL(lu), i + j);
-        bd = bytes64_add_uint(bd, DECH(lu), i + j + 1);
-    }
-    
-    return DUAL(bd);
+    b64_2 = BYTES64_BYTES32(b3);
+    b64_1 = bytes64_mod(b64_1, b64_2);
+
+    return BYTES32_BYTES64(b64_1);
 }
