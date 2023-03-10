@@ -224,18 +224,22 @@ bytes##SIZE##_t bytes##SIZE##_add(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 BYTES_N_ADD(32) 
 BYTES_N_ADD(64) 
 
-bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
-{
-    bytes32_t b_res = b32_zero;
-    for(int i=0; i<SCALAR32; i++)
-    for(int j=0; j+i<SCALAR32; j++)
-    {
-        luint aux = uint_mul(b1.v[i], b2.v[j]);
-        b_res = bytes32_add_uint(b_res, DECL(aux), i+j);
-        b_res = bytes32_add_uint(b_res, DECH(aux), i+j+1);
-    }
-    return b_res;
+#define BYTES_N_MUL(SIZE)   \
+bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
+{   \
+    bytes##SIZE##_t b_res = b##SIZE##_zero; \
+    for(int i=0; i<SCALAR##SIZE; i++)   \
+    for(int j=0; j+i<SCALAR##SIZE; j++) \
+    {   \
+        luint aux = uint_mul(b1.v[i], b2.v[j]); \
+        b_res = bytes##SIZE##_add_uint(b_res, DECL(aux), i+j);  \
+        b_res = bytes##SIZE##_add_uint(b_res, DECH(aux), i+j+1);    \
+    }   \
+    return b_res;   \
 }
+
+BYTES_N_MUL(32)
+BYTES_N_MUL(64)
 
 #define BYTES_N_SUB(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_sub(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
@@ -286,6 +290,21 @@ bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
     bs.sign = bs1.sign * bs2.sign;
     bs.b = bytes32_mod(bs1.b, bs2.b);
     return bytes32_sign(bs);
+}
+
+bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b2, b32_zero) == 0) return b_one;
+    if(bytes32_cmp(b2, b_one) == 0) return b1;
+
+    bytes32_t b_res;
+    bool is_odd = b2.v[0] & 1;
+    b2 = bytes32_shr_uint(b1, 1);
+    b_res = bytes32_exp(b1, b2);
+    b_res = bytes32_mul(b_res, b_res);
+
+    if(is_odd) return bytes32_mul(b1, b_res);
+    return b_res;
 }
 
 

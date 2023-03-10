@@ -87,9 +87,11 @@ bool machine_exec(machine_p m, char code[])
 
             case 0x14: TRY(machine_2_1(m, bytes32_eq)); break;
             case 0x15: TRY(machine_1_1(m, bytes32_is_zero)); break;
+            
+            case 0x19: TRY(machine_1_1(m, bytes32_not)); break;
 
-            case 0x1b: TRY(machine_2_1(m, bytes32_shr)); break;
-            case 0x1c: TRY(machine_2_1(m, bytes32_shl)); break;
+            case 0x1b: TRY(machine_2_1(m, bytes32_shl)); break;
+            case 0x1c: TRY(machine_2_1(m, bytes32_shr)); break;
 
             case 0x60 ... 0x7f: TRY(machine_push(m, op)); break;
         
