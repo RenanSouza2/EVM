@@ -730,6 +730,35 @@ void test_exp()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+void test_sign_extend()
+{
+    printf("\n\t\t\ttest sign extend\t\t");
+
+    bytes32_t b, b1, b2;
+    b2 = BYTES32_UINT(UINT_MAX);
+    b = bytes32_sign_extend(b_zero, b2);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+    
+    b2 = BYTES32_UINT(0x7fffffff);
+    b = bytes32_sign_extend(b_zero, b2);
+    ASSERT_BYTES32_UINT(b, 0x7fffffff);
+    
+    b2 = BYTES32_UINT(0x8000000000000000);
+    b = bytes32_sign_extend(b_one, b2);
+    ASSERT_BYTES32(b,   \
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, \
+        UINT_MAX, UINT_MAX, 0x80000000, 0   \
+    );
+
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32(   \
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, \
+        UINT_MAX, 0x7fffffff, UINT_MAX, UINT_MAX  \
+    );
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32(b, 0, 0, 0, 0, 0, 0x7fffffff, UINT_MAX, UINT_MAX);
+}
+
 void test_arithmetic()
 {
     printf("\n\t\ttest arithmetic");
@@ -742,6 +771,7 @@ void test_arithmetic()
     test_sdiv();
     test_smod();
     test_exp();
+    test_sign_extend();
 }
 
 

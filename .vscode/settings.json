@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "climits": "c",
+        "random": "c",
+        "algorithm": "c"
+    }
+}

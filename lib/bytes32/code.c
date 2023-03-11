@@ -1,4 +1,5 @@
 #include "debug.h"
+#include <limits.h>
 
 #define BYTES64_BYTES32(B) (*((bytes64_p)&((bytes32_dual_t){{(B), b32_zero}})))
 #define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))              
@@ -6,7 +7,6 @@
 #ifdef DEBUG
 
 #include <stdio.h>
-#include <limits.h>
 
 const bytes32_t b_max = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
 const bytes32_t b_max_1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
@@ -28,6 +28,7 @@ BYTES_N_DISPLAY(64)
 #define b32_zero b_zero
 const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_one = BYTES32_UINT(1);
+const bytes32_t b_32 = BYTES32_UINT(32);
 const bytes32_t b_256 = BYTES32_UINT(256);
 
 const bytes64_t b64_zero = BYTES64_UINT(0);
@@ -306,6 +307,17 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
     if(is_odd) return bytes32_mul(b1, b_res);
     return b_res;
+}
+
+bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b1, b_32) >= 0) return b2;
+
+    int off = b1.v[0];
+    uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;
+    for(int i=off+1; i<SCALAR32; i++)
+        b2.v[i] = value;
+    return b2;
 }
 
 
