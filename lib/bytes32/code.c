@@ -25,7 +25,8 @@ BYTES_N_DISPLAY(64)
 
 #endif
 
-const bytes32_t b32_zero = BYTES32_UINT(0);
+#define b32_zero b_zero
+const bytes32_t b_zero = BYTES32_UINT(0);
 const bytes32_t b_one = BYTES32_UINT(1);
 const bytes32_t b_256 = BYTES32_UINT(256);
 
@@ -299,7 +300,7 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
     bytes32_t b_res;
     bool is_odd = b2.v[0] & 1;
-    b2 = bytes32_shr_uint(b1, 1);
+    b2 = bytes32_shr_uint(b2, 1);
     b_res = bytes32_exp(b1, b2);
     b_res = bytes32_mul(b_res, b_res);
 

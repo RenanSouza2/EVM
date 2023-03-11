@@ -12,7 +12,7 @@ STRUCT(bytes32)
     uint v[SCALAR32];
 };
 
-extern const bytes32_t b32_zero;
+extern const bytes32_t b_zero;
 extern const bytes32_t b_one;
 
 bool bytes32_is_zero_bool(bytes32_t b);
@@ -37,6 +37,7 @@ bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2);
 
 bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3);
 bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3);

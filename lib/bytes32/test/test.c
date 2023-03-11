@@ -209,7 +209,7 @@ void test_design()
 {
     printf("\n\t\t\ttest design\t\t");
 
-    bytes32_sign_t bs = bytes32_design(b32_zero);
+    bytes32_sign_t bs = bytes32_design(b_zero);
     assert(bs.sign == 1);
     ASSERT_BYTES32_UINT(bs.b, 0);
     
@@ -238,29 +238,29 @@ void test_sign()
 {
     printf("\n\t\t\ttest sign\t\t");
 
-    bytes32_sign_t bs32 = (bytes32_sign_t){1, b32_zero};
-    bytes32_t b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b32, 0);
+    bytes32_sign_t bs32 = (bytes32_sign_t){1, b_zero};
+    bytes32_t b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 0);
     
-    bs32 = (bytes32_sign_t){-1, b32_zero};
-    b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b32, 0);
+    bs32 = (bytes32_sign_t){-1, b_zero};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 0);
     
     bs32 = (bytes32_sign_t){1, b_one};
-    b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b32, 1);
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 1);
     
     bs32 = (bytes32_sign_t){-1, b_one};
-    b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b32, b_max);
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
     
     bs32 = (bytes32_sign_t){1, b_Q255};
-    b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b32, b_Q255);
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
     
     bs32 = (bytes32_sign_t){-1, b_Q255};
-    b32 = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b32, b_Q255);
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
 }
 
 void test_base_sign()
@@ -404,13 +404,17 @@ void test_shr()
     b = BYTES32_UINT(256);
     b = bytes32_shr(b_Q255, b);
     ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(2);
+    b = bytes32_shr_uint(b, 1);
+    ASSERT_BYTES32_UINT(b, 1);
 }
 
 void test_not()
 {
     printf("\n\t\t\ttest not");
 
-    bytes32_t b = bytes32_not(b32_zero);
+    bytes32_t b = bytes32_not(b_zero);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b = bytes32_not(b_one);
@@ -595,7 +599,7 @@ void test_sdiv()
 
     printf("\n\t\t\t\ttest sdiv 1\t\t");
     bytes32_t b;
-    b = bytes32_sdiv(b_one, b32_zero);
+    b = bytes32_sdiv(b_one, b_zero);
     ASSERT_BYTES32_UINT(b, 0);
 
     printf("\n\t\t\t\ttest sdiv 2\t\t");
@@ -644,20 +648,20 @@ void test_smod()
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32_UINT(2);
-    b2 = bytes32_sub(b32_zero, b2);
+    b2 = bytes32_sub(b_zero, b2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b1 = BYTES32_UINT(5);
-    b1 = bytes32_sub(b32_zero, b1);
+    b1 = bytes32_sub(b_zero, b1);
     b2 = BYTES32_UINT(2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_MUTUAL(b, b_max);
 
     b1 = BYTES32_UINT(5);
-    b1 = bytes32_sub(b32_zero, b1);
+    b1 = bytes32_sub(b_zero, b1);
     b2 = BYTES32_UINT(2);
-    b2 = bytes32_sub(b32_zero, b2);
+    b2 = bytes32_sub(b_zero, b2);
     b = bytes32_smod(b1, b2);
     ASSERT_BYTES32_UINT(b, 1);
 
@@ -665,7 +669,64 @@ void test_smod()
     ASSERT_BYTES32_UINT(b, 0);
     
     b1 = BYTES32_UINT(5);
-    b = bytes32_smod(b1, b32_zero);
+    b = bytes32_smod(b1, b_zero);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
+void test_exp()
+{
+    printf("\n\t\t\ttest exp\t\t");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(3);
+    b = bytes32_exp(b1, b2);
+    ASSERT_BYTES32_UINT(b, 8);
+
+    b1 = BYTES32_UINT(2);
+    b = bytes32_exp(b1, b_one);
+    ASSERT_BYTES32_UINT(b, 2);
+
+    b1 = BYTES32_UINT(2);
+    b = bytes32_exp(b1, b_zero);
+    ASSERT_BYTES32_UINT(b, 1);
+
+
+
+    b2 = BYTES32_UINT(2);
+    b = bytes32_exp(b_one, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b = bytes32_exp(b_one, b_one);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b = bytes32_exp(b_one, b_zero);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    
+
+    b2 = BYTES32_UINT(2);
+    b = bytes32_exp(b_zero, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = bytes32_exp(b_zero, b_one);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = bytes32_exp(b_zero, b_zero);
+    ASSERT_BYTES32_UINT(b, 1);
+
+
+
+    b1 = BYTES32_UINT(5);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_exp(b1, b2);
+    ASSERT_BYTES32_UINT(b, 3125);
+
+    
+
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(256);
+    b = bytes32_exp(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
 }
 
@@ -680,6 +741,7 @@ void test_arithmetic()
     test_mod();
     test_sdiv();
     test_smod();
+    test_exp();
 }
 
 
