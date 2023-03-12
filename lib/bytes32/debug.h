@@ -119,8 +119,11 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
+#define BYTES32_CMP(B1, B2) bytes_n_cmp(B1.v, B2.v, SCALAR32)
+#define BYTES64_CMP(B1, B2) bytes_n_cmp(B1.v, B2.v, SCALAR64)
+
 bool bytes_n_is_zero_bool(const uint b[], int scalar);
-int bytes32_cmp(bytes32_t b1, bytes32_t b2);
+int bytes_n_cmp(const uint b1[], const uint b2[], int scalar);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
 bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);

@@ -43,19 +43,15 @@ bool bytes_n_is_zero_bool(const uint b[], int scalar)
     return memcmp(b, b32_zero.v, scalar << 2) == 0;
 }
 
-#define BYTES_N_CMP(SIZE)   \
-int bytes##SIZE##_cmp(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
-{   \
-    for(int i=SCALAR##SIZE-1; i>=0; i--)    \
-    {   \
-        if(b1.v[i] > b2.v[i]) return  1;    \
-        if(b1.v[i] < b2.v[i]) return -1;    \
-    }   \
-    return 0;   \
+int bytes_n_cmp(const uint b1[], const uint b2[], int scalar)
+{
+    for(int i=scalar-1; i>=0; i--) 
+    {
+        if(b1[i] > b2[i]) return  1; 
+        if(b1[i] < b2[i]) return -1; 
+    }
+    return 0;
 }
-
-BYTES_N_CMP(32)
-BYTES_N_CMP(64)
 
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
 {
@@ -68,7 +64,7 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
         case 1:
             switch (bs2.sign)
             {
-                case  1: return bytes32_cmp(bs1.b, bs2.b);
+                case  1: return BYTES32_CMP(bs1.b, bs2.b);
                 case -1: return 1;
             }
         break;
@@ -77,7 +73,7 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
             switch (bs2.sign)
             {
                 case  1: return -1;
-                case -1: return bytes32_cmp(bs2.b, bs1.b);
+                case -1: return BYTES32_CMP(bs2.b, bs1.b);
             }
         break;
     }
@@ -151,7 +147,7 @@ bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b
     bytes##SIZE##_t b1_aux, b_base; \
     b1_aux = bytes##SIZE##_shr_uint(b1, 1); \
     b_base = BYTES##SIZE##_UINT(1); \
-    while(bytes##SIZE##_cmp(b1_aux, b2) >= 0)   \
+    while(BYTES##SIZE##_CMP(b1_aux, b2) >= 0)   \
     {   \
         b2 = bytes##SIZE##_shl_uint(b2, 1); \
         b_base = bytes##SIZE##_shl_uint(b_base, 1); \
@@ -160,7 +156,7 @@ bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b
     bytes##SIZE##_t b_out = b##SIZE##_zero; \
     while(!bytes_n_is_zero_bool(b_base.v, SCALAR##SIZE))  \
     {   \
-        if(bytes##SIZE##_cmp(b1, b2) >= 0)  \
+        if(BYTES##SIZE##_CMP(b1, b2) >= 0)  \
         {   \
             b1 = bytes##SIZE##_sub(b1, b2); \
             b_out = bytes##SIZE##_add(b_out, b_base);   \
@@ -201,19 +197,19 @@ bytes32_t bytes32_is_zero(bytes32_t b)
 
 bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b2) == 0) return b_one;
+    if(BYTES32_CMP(b1, b2) == 0) return b_one;
     return b32_zero;
 }
 
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b2) < 0) return b_one;
+    if(BYTES32_CMP(b1, b2) < 0) return b_one;
     return b32_zero;
 }
 
 bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b2) > 0) return b_one;
+    if(BYTES32_CMP(b1, b2) > 0) return b_one;
     return b32_zero;
 }
 
@@ -233,13 +229,13 @@ bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b2, b_256) >= 0) return b32_zero;
+    if(BYTES32_CMP(b2, b_256) >= 0) return b32_zero;
     return bytes32_shl_uint(b1, b2.v[0]);
 }
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b2, b_256) >= 0) return b32_zero;
+    if(BYTES32_CMP(b2, b_256) >= 0) return b32_zero;
     return bytes32_shr_uint(b1, b2.v[0]);
 }
 
@@ -335,8 +331,8 @@ bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b2, b32_zero) == 0) return b_one;
-    if(bytes32_cmp(b2, b_one) == 0) return b1;
+    if(BYTES32_CMP(b2, b32_zero) == 0) return b_one;
+    if(BYTES32_CMP(b2, b_one) == 0) return b1;
 
     bytes32_t b_res;
     bool is_odd = b2.v[0] & 1;
@@ -350,7 +346,7 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b_32) >= 0) return b2;
+    if(BYTES32_CMP(b1, b_32) >= 0) return b2;
 
     int off = b1.v[0];
     uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;
