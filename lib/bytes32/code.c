@@ -37,14 +37,10 @@ const bytes32_t b_256 = BYTES32_UINT(256);
 const bytes64_t b64_zero = BYTES64_UINT(0);
 
 
-#define BYTES_IS_ZERO_BOOL(SIZE)    \
-bool bytes##SIZE##_is_zero_bool(bytes##SIZE##_t b)  \
-{   \
-    return memcmp(b.v, b32_zero.v, SIZE) == 0;    \
+bool bytes_n_is_zero_bool(const uint b[], int size)
+{
+    return memcmp(b, b32_zero.v, size) == 0;
 }
-
-BYTES_IS_ZERO_BOOL(32)
-BYTES_IS_ZERO_BOOL(64)
 
 #define BYTES_N_CMP(SIZE)   \
 int bytes##SIZE##_cmp(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
@@ -149,7 +145,7 @@ BYTES_N_SHR_UINT(64)
 #define BYTES_N_DIV_MOD(SIZE)   \
 bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)  \
 {   \
-    if(bytes##SIZE##_is_zero_bool(b2)) return (bytes##SIZE##_dual_t){{b##SIZE##_zero, b##SIZE##_zero}}; \
+    if(bytes_n_is_zero_bool(b2.v, SIZE)) return (bytes##SIZE##_dual_t){{b##SIZE##_zero, b##SIZE##_zero}}; \
     \
     bytes##SIZE##_t b1_aux, b_base; \
     b1_aux = bytes##SIZE##_shr_uint(b1, 1); \
@@ -161,7 +157,7 @@ bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b
     }   \
     \
     bytes##SIZE##_t b_out = b##SIZE##_zero; \
-    while(!bytes##SIZE##_is_zero_bool(b_base))  \
+    while(!bytes_n_is_zero_bool(b_base.v, SIZE))  \
     {   \
         if(bytes##SIZE##_cmp(b1, b2) >= 0)  \
         {   \
@@ -198,7 +194,7 @@ bytes32_t bytes32_sign(bytes32_sign_t bs)
 
 bytes32_t bytes32_is_zero(bytes32_t b)
 {
-    if(bytes32_is_zero_bool(b)) return b_one;
+    if(bytes_n_is_zero_bool(b.v, 32)) return b_one;
     return b32_zero;
 }
 

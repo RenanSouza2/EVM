@@ -119,7 +119,7 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
-bool bytes32_is_zero_bool(bytes32_t b);
+bool bytes_n_is_zero_bool(const uint b[], int size);
 int bytes32_cmp(bytes32_t b1, bytes32_t b2);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
