@@ -9,21 +9,21 @@
 
 void test_is_zero_bool()
 {
-    printf("\n\t\t\ttest is zero bool");
+    printf("\n\t\t\ttest is zero bool\t\t");
 
     bytes32_t b = BYTES32_UINT(0);
-    bool is_zero = bytes_n_is_zero_bool(b.v, 32);
+    bool is_zero = bytes_n_is_zero_bool(b.v, SCALAR32);
     assert(is_zero == true);
 
     for(int i=0; i<SCALAR32; i++)
     {
         b = BYTES32_UINT(0);
-        b = bytes32_add_uint(b, 1, i);
-        is_zero = bytes_n_is_zero_bool(b.v, 32);
+        b.v[i] = 1;
+        is_zero = bytes_n_is_zero_bool(b.v, SCALAR32);
         assert(is_zero == false);
     }
 
-    is_zero = bytes_n_is_zero_bool(b_max.v, 32);
+    is_zero = bytes_n_is_zero_bool(b_max.v, SCALAR32);
     assert(is_zero == false);
 }
 
@@ -95,7 +95,6 @@ void test_add_uint()
     assert(b.v[1] == 1);
     assert(b.v[0] == 0);
 
-    
     b = BYTES32(0, 0, 0, 0, 0, 0, UINT_MAX, UINT_MAX);
     b = bytes32_add_uint(b, 1, 0);
     assert(b.v[2] == 1);
