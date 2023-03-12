@@ -34,37 +34,37 @@ void test_cmp()
     bytes32_t b1, b2;
     b1 = BYTES32_UINT(0);
     b2 = BYTES32_UINT(5);
-    int res = BYTES32_CMP(b1, b2);
+    int res = BYTES32_OP(cmp, b1, b2);
     assert(res < 0);
 
     b1 = BYTES32_UINT(0);
     b2 = BYTES32_UINT(0);
-    res = BYTES32_CMP(b1, b1);
+    res = BYTES32_OP(cmp, b1, b1);
     assert(res == 0);
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32_UINT(5);
-    res = BYTES32_CMP(b1, b2);
+    res = BYTES32_OP(cmp, b1, b2);
     assert(res == 0);
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32_UINT(0);
-    res = BYTES32_CMP(b1, b2);
+    res = BYTES32_OP(cmp, b1, b2);
     assert(res > 0);
 
     b1 = BYTES32_UINT(5);
     b2 = BYTES32(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
-    res = BYTES32_CMP(b1, b2);
+    res = BYTES32_OP(cmp, b1, b2);
     assert(res < 0);
 
     b1 = BYTES32(UINT_MAX, 0, 0, 0, 0, 0, 0, 0);
     b2 = BYTES32_UINT(5);
-    res = BYTES32_CMP(b1, b2);
+    res = BYTES32_OP(cmp, b1, b2);
     assert(res > 0);
 
     b1 = BYTES32_UINT(255);
     b2 = BYTES32_UINT(256);
-    res = BYTES32_CMP(b1, b2);
+    res = BYTES32_OP(cmp, b1, b2);
     assert(res < 0); 
 }
 
