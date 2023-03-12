@@ -86,23 +86,23 @@ void test_add_uint()
     
     for(int i=0; i<SCALAR32; i++)
     {
-        b = bytes32_add_uint(b, 1, i);
+        BYTES32_ADD_UINT(b, 1, i);
         assert(b.v[i] == i+1);
     }
 
     b = BYTES32_UINT(UINT_MAX);
-    b = bytes32_add_uint(b, 1, 0);
+    BYTES32_ADD_UINT(b, 1, 0);
     assert(b.v[1] == 1);
     assert(b.v[0] == 0);
 
     b = BYTES32(0, 0, 0, 0, 0, 0, UINT_MAX, UINT_MAX);
-    b = bytes32_add_uint(b, 1, 0);
+    BYTES32_ADD_UINT(b, 1, 0);
     assert(b.v[2] == 1);
     assert(b.v[1] == 0);
     assert(b.v[0] == 0);
 
     b = BYTES32_UINT(0);
-    b = bytes32_add_uint(b, 1, 8);
+    BYTES32_ADD_UINT(b, 1, 8);
     ASSERT_BYTES32_UINT(b, 0);
 }
 

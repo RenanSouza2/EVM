@@ -80,20 +80,16 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
     assert(false);
 }
 
-#define BYTES_N_ADD_UINT(SIZE)  \
-bytes##SIZE##_t bytes##SIZE##_add_uint(bytes##SIZE##_t b, uint u, int i)    \
-{   \
-    if(u == 0) return b;    \
-    if(i >= SCALAR##SIZE) return b; \
-    \
-    luint lu = uint_add(b.v[i], u); \
-    b.v[i] = DECL(lu);  \
-    \
-    return bytes##SIZE##_add_uint(b, DECH(lu), i+1);    \
-}
+void bytes_n_add_uint(uint b[], uint u, int i, int scalar)
+{
+    if(u == 0) return;
+    if(i >= scalar) return;
 
-BYTES_N_ADD_UINT(32)
-BYTES_N_ADD_UINT(64)
+    luint lu = uint_add(b[i], u);
+    b[i] = DECL(lu);
+
+    return bytes_n_add_uint(b, DECH(lu), i+1, scalar);
+}
 
 #define BYTES_N_SHL_UINT(SIZE)  \
 bytes##SIZE##_t bytes##SIZE##_shl_uint(bytes##SIZE##_t b, uint shift)   \
@@ -254,7 +250,7 @@ BYTES_N_NOT(64)
 bytes##SIZE##_t bytes##SIZE##_add(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 {   \
     for(int i=0; i<SCALAR##SIZE; i++)   \
-        b1 = bytes##SIZE##_add_uint(b1, b2.v[i], i);    \
+        BYTES_N_ADD_UINT(b1, b2.v[i], i, SIZE);    \
     return b1;  \
 }
 
@@ -269,8 +265,8 @@ bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
     for(int j=0; j+i<SCALAR##SIZE; j++) \
     {   \
         luint aux = uint_mul(b1.v[i], b2.v[j]); \
-        b_res = bytes##SIZE##_add_uint(b_res, DECL(aux), i+j);  \
-        b_res = bytes##SIZE##_add_uint(b_res, DECH(aux), i+j+1);    \
+        BYTES_N_ADD_UINT(b_res, DECL(aux), i+j, SIZE);  \
+        BYTES_N_ADD_UINT(b_res, DECH(aux), i+j+1, SIZE);    \
     }   \
     return b_res;   \
 }
@@ -283,7 +279,8 @@ bytes##SIZE##_t bytes##SIZE##_sub(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 {   \
     b2 = bytes##SIZE##_not(b2); \
     b1 = bytes##SIZE##_add(b1, b2); \
-    return bytes##SIZE##_add_uint(b1, 1, 0);    \
+    BYTES_N_ADD_UINT(b1, 1, 0, SIZE);   \
+    return b1;    \
 }
 
 BYTES_N_SUB(32)

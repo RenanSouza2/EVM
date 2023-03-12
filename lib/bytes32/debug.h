@@ -122,11 +122,14 @@ extern const bytes32_t b_Q255;
 #define BYTES_N_OP(OP, B1, B2, SIZE) bytes_n_##OP(B1.v, B2.v, SCALAR##SIZE)
 #define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, B1, B2, 32)
 
+#define BYTES_N_ADD_UINT(B, U, I, SIZE) bytes_n_add_uint(B.v, U, I, SCALAR##SIZE)
+#define BYTES32_ADD_UINT(B, U, I) BYTES_N_ADD_UINT(B, U, I, 32)
+
 bool bytes_n_is_zero_bool(const uint b[], int scalar);
 int bytes_n_cmp(const uint b1[], const uint b2[], int scalar);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
-bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i);
+void bytes_n_add_uint(uint b[], uint u, int i, int scalar);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes32_sign_t bytes32_design(bytes32_t b);
