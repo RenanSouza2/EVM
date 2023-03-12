@@ -1,5 +1,8 @@
 #include "debug.h"
+#include <stdbool.h>
 #include <limits.h>
+#include <assert.h>
+
 
 #define BYTES64_BYTES32(B) (*((bytes64_p)&((bytes32_dual_t){{(B), b32_zero}})))
 #define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))              
@@ -56,6 +59,33 @@ int bytes##SIZE##_cmp(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 
 BYTES_N_CMP(32)
 BYTES_N_CMP(64)
+
+int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
+
+    switch (bs1.sign)
+    {
+        case 1:
+            switch (bs2.sign)
+            {
+                case  1: return bytes32_cmp(bs1.b, bs2.b);
+                case -1: return 1;
+            }
+        break;
+        
+        case -11:
+            switch (bs2.sign)
+            {
+                case  1: return -1;
+                case -1: return bytes32_cmp(bs2.b, bs1.b);
+            }
+        break;
+    }
+    assert(false);
+}
 
 #define BYTES_N_ADD_UINT(SIZE)  \
 bytes##SIZE##_t bytes##SIZE##_add_uint(bytes##SIZE##_t b, uint u, int i)    \
@@ -172,6 +202,12 @@ bytes32_t bytes32_is_zero(bytes32_t b)
     return b32_zero;
 }
 
+bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_cmp(b1, b2) == 0) return b_one;
+    return b32_zero;
+}
+
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
 {
     if(bytes32_cmp(b1, b2) < 0) return b_one;
@@ -184,9 +220,15 @@ bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
     return b32_zero;
 }
 
-bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_sign_lt(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b2) == 0) return b_one;
+    if(bytes32_sign_cmp(b1, b2) < 0) return b_one;
+    return b32_zero;
+}
+
+bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
+{
+    if(bytes32_sign_cmp(b1, b2) > 0) return b_one;
     return b32_zero;
 }
 

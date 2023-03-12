@@ -15,16 +15,15 @@ STRUCT(bytes32)
 extern const bytes32_t b_zero;
 extern const bytes32_t b_one;
 
-bool bytes32_is_zero_bool(bytes32_t b);
-int bytes32_cmp(bytes32_t b1, bytes32_t b2);
-
 bytes32_t bytes32_shl_uint(bytes32_t b, uint shift);
 bytes32_t bytes32_shr_uint(bytes32_t b, uint shift);
 
 bytes32_t bytes32_is_zero(bytes32_t b);
+bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2);
-bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_sign_lt(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2);
