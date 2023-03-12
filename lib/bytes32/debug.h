@@ -29,8 +29,8 @@ STRUCT(bytes64_dual)
 
 void bytes32_display(bytes32_t b);
 
-#define BYTES32_DISPLAY(BYTES32) \
-    printf("\n%s: ", #BYTES32);bytes32_display(BYTES32);printf("\t\t");
+#define BYTES32_DISPLAY(B32) \
+    printf("\n%s: ", #B32);bytes32_display(B32);printf("\t\t");
     
 #define BYTES32(    \
         VALUE7, VALUE6, VALUE5, VALUE4, \
@@ -119,7 +119,7 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
-bool bytes_n_is_zero_bool(const uint b[], int size);
+bool bytes_n_is_zero_bool(const uint b[], int scalar);
 int bytes32_cmp(bytes32_t b1, bytes32_t b2);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 

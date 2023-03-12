@@ -15,16 +15,17 @@ const bytes32_t b_max = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
 const bytes32_t b_max_1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
 const bytes32_t b_Q255 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
 
-#define BYTES_N_DISPLAY(SIZE)   \
-void bytes##SIZE##_display(bytes##SIZE##_t b)   \
-{   \
-    printf("0x");   \
-    for(int i=SCALAR##SIZE-1; i>=0; i--)    \
-        printf("%08x", b.v[i]); \
-}   \
+void bytes_n_display(const uint b[], int scalar)
+{
+    printf("0x");
+    for(int i=scalar-1; i>=0; i--) 
+        printf("%08x", b[i]);
+}
 
-BYTES_N_DISPLAY(32)
-BYTES_N_DISPLAY(64)
+void bytes32_display(bytes32_t b)
+{
+    bytes_n_display(b.v, SCALAR32);
+}
 
 #endif
 
@@ -37,9 +38,9 @@ const bytes32_t b_256 = BYTES32_UINT(256);
 const bytes64_t b64_zero = BYTES64_UINT(0);
 
 
-bool bytes_n_is_zero_bool(const uint b[], int size)
+bool bytes_n_is_zero_bool(const uint b[], int scalar)
 {
-    return memcmp(b, b32_zero.v, size << 2) == 0;
+    return memcmp(b, b32_zero.v, scalar << 2) == 0;
 }
 
 #define BYTES_N_CMP(SIZE)   \
