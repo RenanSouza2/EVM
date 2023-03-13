@@ -125,35 +125,45 @@ void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift)
     return;
 }
 
-#define BYTES_N_SHR_UINT(SIZE)  \
-bytes##SIZE##_t bytes##SIZE##_shr_uint(bytes##SIZE##_t b, uint shift)   \
-{   \
-    if(shift > 255) return b##SIZE##_zero;  \
-    \
-    int jmp = shift >> 5;   \
-    int off = shift & 31;   \
-    \
-    bytes##SIZE##_t b_out = b##SIZE##_zero; \
-    b_out.v[SCALAR##SIZE-1 - jmp] = b.v[SCALAR##SIZE-1] >> off; \
-    for(int i=jmp; i<SCALAR##SIZE-1; i++)   \
-    {   \
-        luint lu = LUINT(b.v[i]) >> off;    \
-        b_out.v[i-jmp] = DECL(lu);  \
-    }   \
-    \
-    return b_out;   \
-}
+void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift)
+{
+    if(shift >= scalar << 5)
+    {
+        BYTES_N_RESET(scalar, b);
+        return;
+    }
 
-BYTES_N_SHR_UINT(32)
-BYTES_N_SHR_UINT(64)
+    int jmp = shift >> 5;
+    int off = shift & 31;
+
+    uint b_out[scalar];
+    BYTES_N_RESET(scalar, b_out);
+    if(off == 0)
+    {
+        memcpy(b_out, &b[jmp], (scalar-jmp) << 2);
+        memcpy(b, b_out, scalar << 2);
+        return;
+    }
+
+    b_out[scalar-1-jmp] = b[scalar-1] >> off;
+    for(int i=0; i+jmp+1<scalar; i++)
+    {
+        b_out[i] =  (b[jmp+i+1] << (32 - off)) | (b[jmp+i] >> off);
+    }
+
+    BYTES_N_SET(scalar, b, b_out);
+    return;
+}
 
 #define BYTES_N_DIV_MOD(SIZE)   \
 bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)  \
 {   \
-    if(bytes_n_is_zero_bool(SCALAR##SIZE, b2.v)) return (bytes##SIZE##_dual_t){{b##SIZE##_zero, b##SIZE##_zero}}; \
+    if(bytes_n_is_zero_bool(SCALAR##SIZE, b2.v))    \
+        return (bytes##SIZE##_dual_t){{b##SIZE##_zero, b##SIZE##_zero}}; \
     \
     bytes##SIZE##_t b1_aux, b_base; \
-    b1_aux = bytes##SIZE##_shr_uint(b1, 1); \
+    BYTES_N_SET(SIZE, &b1_aux, &b1);    \
+    BYTES_N_OP_UINT(shr, SIZE, b1_aux, 1); \
     b_base = BYTES##SIZE##_UINT(1); \
     while(BYTES_N_OP(cmp, SIZE, b1_aux, b2) >= 0)   \
     {   \
@@ -170,8 +180,8 @@ bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b
             b_out = bytes##SIZE##_add(b_out, b_base);   \
         }   \
         \
-        b2 = bytes##SIZE##_shr_uint(b2, 1); \
-        b_base = bytes##SIZE##_shr_uint(b_base, 1); \
+        BYTES_N_OP_UINT(shr, SIZE, b2, 1);  \
+        BYTES_N_OP_UINT(shr, SIZE, b_base, 1);  \
     }   \
     \
     return (bytes##SIZE##_dual_t){{b1, b_out}}; \
@@ -244,8 +254,8 @@ bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b2, b_256) >= 0) return b32_zero;
-    return bytes32_shr_uint(b1, b2.v[0]);
+    BYTES32_OP_UINT(shr, b1, b2.v[0]);
+    return b1;
 }
 
 #define BYTES_N_NOT(SIZE)   \
@@ -346,7 +356,7 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
     bytes32_t b_res;
     bool is_odd = b2.v[0] & 1;
-    b2 = bytes32_shr_uint(b2, 1);
+    BYTES32_OP_UINT(shr, b2, 1);
     b_res = bytes32_exp(b1, b2);
     b_res = bytes32_mul(b_res, b_res);
 

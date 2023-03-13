@@ -142,7 +142,7 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
 void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift);
-bytes32_t bytes32_shr_uint(bytes32_t b, uint shift);
+void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes32_sign_t bytes32_design(bytes32_t b);
