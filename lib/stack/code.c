@@ -5,40 +5,66 @@
 #include "debug.h"
 
 #ifdef DEBUG
-#endif
 
-bytes32_list_p stack_list_crate(bytes32_t b, bytes32_list_p next)
+#include "../bytes32/debug.h"
+
+int stack_created;
+
+#define STACK_INC() stack_created++;
+#define STACK_DEC() \
+    {   \
+        assert(stack_created > 0);  \
+        stack_created--;    \
+    }
+
+bool stack_memory()
 {
-    bytes32_list_p bl = calloc(1, sizeof(bytes32_list_t));
-    assert(bl);
-
-    bl->b = b;
-    bl->next = next;
-    return bl;
+    return stack_created == 0;
 }
+
+void stack_display(stack_t s)
+{
+    printf("\nStack count: %d", s.count);
+    for(int i=0; i<s.count; i++)
+    {
+        printf("\nstack[%d]: ", i);
+        bytes32_display(s.b[i]);
+    }
+    printf("\n");
+}
+
+#else
+#define STACK_INC()
+#define STACK_DEC()
+#endif
 
 stack_t stack_init()
 {
-    return (stack_t){0, NULL};
+    bytes32_p b = calloc(STACK_MAX, 32);
+    assert(b);
+    STACK_INC();
+
+    return (stack_t){0, b};
 }
 
-void stack_push(stack_p s, bytes32_t b)
+void stack_free(stack_t s)
 {
-    assert(s->count < STACK_MAX);
-    s->bl = stack_list_crate(b, s->bl);
-    s->count++;
+    STACK_DEC();
+    free(s.b);
 }
 
-bytes32_t stack_pop(stack_p s)
+bool stack_push(stack_p s, bytes32_t b)
 {
-    assert(s->count > 0);
+    if(s->count == STACK_MAX) return false;
+
+    s->b[s->count++] = b;
+    return true;
+}
+
+bool stack_pop(bytes32_p b, stack_p s)
+{
+    if(s->count == 0) return false;
     
-    bytes32_list_p bl = s->bl;
-    s->bl = bl->next;
-
-    bytes32_t b = bl->b;
-    free(bl);
-
-    s->count--;
-    return b;
+    *b = s->b[--s->count];
+    return true;
 }

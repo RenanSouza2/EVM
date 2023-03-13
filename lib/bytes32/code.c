@@ -1,250 +1,436 @@
 #include "debug.h"
+#include <stdbool.h>
+#include <limits.h>
+#include <assert.h>
 
-#define BYTES64_BYTES32(B) (*((bytes64_p)&((bytes32_dual_t){{(B), b_zero}})))
-#define DUAL(BD) (*((bytes32_dual_p)&(BD)))               
+
+#define BYTES64_BYTES32(B64, B32)   \
+    {   \
+        BYTES_N_RESET(SCALAR64, &B64);    \
+        BYTES_N_SET(SCALAR32, &B64, &B32); \
+    }
+#define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))   
+
+#define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
+#define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
 
 #ifdef DEBUG
 
 #include <stdio.h>
-#include <limits.h>
 
+const bytes32_t b_zero = BYTES32_UINT(0);
+const bytes32_t b_one = BYTES32_UINT(1);
+const bytes32_t b_32 = BYTES32_UINT(32);
+const bytes32_t b_256 = BYTES32_UINT(256);
 const bytes32_t b_max = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
 const bytes32_t b_max_1 = BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX - 1);
 const bytes32_t b_Q255 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
 
-void bytes32_display(bytes32_t b)
+void bytes_n_display(int scalar, const uint b[scalar])
 {
     printf("0x");
-    for(int i=SCALAR-1; i>=0; i--)
-        printf("%08x", b.v[i]);
+    for(int i=scalar-1; i>=0; i--) 
+        printf("%08x", b[i]);
 }
 
-void bytes64_display(bytes64_t bd)
+void bytes32_display(bytes32_t b)
 {
-    printf("0x");
-    for(int i=SCALAR2-1; i>=0; i--)
-        printf("%08x", bd.v[i]);
+    bytes_n_display(SCALAR32, b.v);
 }
 
 #endif
 
-
-const bytes32_t b_zero = BYTES32_UINT(0);
-const bytes32_t b_one = BYTES32_UINT(1);
-const bytes32_t b_256 = BYTES32_UINT(256);
-
-const bytes64_t bd_zero = BYTES64_UINT(0);
-
-
-
-bool bytes32_is_zero_bool(bytes32_t b)
+bool bytes_n_is_zero_bool(int scalar, const uint b[scalar])
 {
-    return memcmp(b.v, b_zero.v, 32) == 0;
+    for(int i=0; i<scalar; i++)
+        if(b[i])
+            return false;
+
+    return true;
 }
 
-int bytes32_cmp(bytes32_t b1, bytes32_t b2)
+int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar])
 {
-    for(int i=SCALAR-1; i>=0; i--)
+    for(int i=scalar-1; i>=0; i--) 
     {
-        if(b1.v[i] > b2.v[i]) return  1;
-        if(b1.v[i] < b2.v[i]) return -1;
+        if(b1[i] > b2[i]) return  1; 
+        if(b1[i] < b2[i]) return -1; 
     }
     return 0;
 }
 
-
-
-bytes32_t bytes32_add_uint(bytes32_t b, uint u, int i)
+int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
 {
-    if(u == 0) return b;
-    if(i >= SCALAR) return b;
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
 
-    luint lu = uint_add(b.v[i], u);
-    b.v[i] = DECL(lu);
-
-    return bytes32_add_uint(b, DECH(lu), i+1);
+    switch (bs1.sign)
+    {
+        case  1:
+        switch (bs2.sign)
+        {
+            case  1: return BYTES32_OP_2(cmp, bs1.b, bs2.b);
+            case -1: return 1;
+        }
+        break;
+        
+        case -1:
+        switch (bs2.sign)
+        {
+            case  1: return -1;
+            case -1: return BYTES32_OP_2(cmp, bs2.b, bs1.b);
+        }
+        break;
+    }
+    assert(false);
 }
 
-bytes32_t bytes32_shl_uint(bytes32_t b, uint shift)
+int bytes_n_cmp_uint(int scalar, const uint b[scalar], uint u)
 {
-    if(shift > 255) return b_zero;
+    for(int i=scalar-1; i>0; i--)
+        if(b[i])
+            return 1;
 
-    int jmp = shift >> 5;
-    int off = shift & 31;
+    if(b[0] > u) return  1;
+    if(b[0] < u) return -1;
+    return 0;
+}
 
-    bytes32_t b_out = b_zero;
-    b_out.v[jmp] = b.v[0] << off;
-    for(int i=1; i+jmp<SCALAR; i++)
+void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i)
+{
+    if(u == 0) return;
+    if(i >= scalar) return;
+
+    luint lu = uint_add(b[i], u);
+    b[i] = DECL(lu);
+
+    return bytes_n_add_uint(scalar, b, DECH(lu), i+1);
+}
+
+void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift)
+{
+    if(shift >= scalar << 5)
     {
-        luint lu = LUINT(b.v[i-1]) << off;
-        b_out.v[i+jmp] = DECH(lu);
+        BYTES_N_RESET(scalar, b);
+        return;
     }
 
-    return b_out;
-}
-
-bytes32_t bytes32_shr_uint(bytes32_t b, uint shift)
-{
-    if(shift > 255) return b_zero;
-
-    int jmp = shift >> 5;
-    int off = shift & 31;
-
-    bytes32_t b_out = b_zero;
-    b_out.v[SCALAR-1 - jmp] = b.v[SCALAR-1] >> off;
-    for(int i=jmp; i<SCALAR-1; i++)
+    if(shift == 0) return;
+    
+    int jmp, off;
+    jmp = shift >> 5;
+    off = shift & 31;
+    
+    uint b_out[scalar];
+    BYTES_N_RESET(scalar, b_out);
+    if(off == 0)
     {
-        luint lu = LUINT(b.v[i]) >> off;
-        b_out.v[i-jmp] = DECL(lu);
+        memcpy(&b_out[jmp], b, (scalar-jmp) << 2);
+        memcpy(b, b_out, scalar << 2);
+        return;
     }
     
-    return b_out;
+    b_out[jmp] = b[0] << off;
+    for(int i=1; i+jmp<scalar; i++)
+        b_out[i+jmp] = (b[i-1] >> (32 - off)) | (b[i] << off);
+
+    BYTES_N_SET(scalar, b, b_out);
+    return;
 }
 
-bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2)
+void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift)
 {
-    if(bytes32_is_zero_bool(b2)) return (bytes32_dual_t){{b_zero, b_zero}};
-
-    bytes32_t b_base = BYTES32_UINT(1);
-    while(bytes32_cmp(b1, b2) >= 0)
+    if(shift >= scalar << 5)
     {
-        b2 = bytes32_shl_uint(b2, 1);
-        b_base = bytes32_shl_uint(b_base, 1);
+        BYTES_N_RESET(scalar, b);
+        return;
     }
 
-    b2 = bytes32_shr_uint(b2, 1);
-    b_base = bytes32_shr_uint(b_base, 1);
+    int jmp = shift >> 5;
+    int off = shift & 31;
 
-    bytes32_t b_out = b_zero;
-    while(!bytes32_is_zero_bool(b_base))
+    uint b_out[scalar];
+    BYTES_N_RESET(scalar, b_out);
+    if(off == 0)
     {
-        if(bytes32_cmp(b1, b2) >= 0)
+        memcpy(b_out, &b[jmp], (scalar-jmp) << 2);
+        memcpy(b, b_out, scalar << 2);
+        return;
+    }
+
+    b_out[scalar-1-jmp] = b[scalar-1] >> off;
+    for(int i=0; i+jmp+1<scalar; i++)
+    {
+        b_out[i] =  (b[jmp+i+1] << (32 - off)) | (b[jmp+i] >> off);
+    }
+
+    BYTES_N_SET(scalar, b, b_out);
+    return;
+}
+
+
+
+void bytes_n_not(int scalar, uint b[scalar])
+{
+    for(int i=0; i<scalar; i++)
+        b[i] = ~b[i];
+}
+
+void bytes_n_minus(int scalar, uint b[scalar])
+{
+    bytes_n_not(scalar, b);
+    bytes_n_add_uint(scalar, b, 1, 0);
+}
+
+void bytes_n_add(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    for(int i=0; i<scalar; i++)
+        bytes_n_add_uint(scalar, b1, b2[i], i);
+}
+
+void bytes_n_sub(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    uint b2_aux[scalar];
+    BYTES_N_SET(scalar, b2_aux, b2);
+    bytes_n_minus(scalar, b2_aux);
+    bytes_n_add(scalar, b1, b2_aux);
+}
+
+void bytes_n_mul(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+
+    for(int i=0; i<scalar; i++)
+    for(int j=0; j+i<scalar; j++)
+    {
+        luint lu = uint_mul(b1[i], b2[j]);
+        bytes_n_add_uint(scalar, b, DECL(lu), i+j);
+        bytes_n_add_uint(scalar, b, DECH(lu), i+j+1);
+    }
+    
+    BYTES_N_SET(scalar, b1, b);
+}
+
+void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
+{
+    if(bytes_n_is_zero_bool(scalar, b2))
+    {
+        BYTES_N_RESET(scalar, b1);
+        BYTES_N_RESET(scalar, b2);
+        return;
+    }
+    
+    uint b1_aux[scalar];
+    BYTES_N_SET(scalar, b1_aux, b1);
+    bytes_n_shr_uint(scalar, b1_aux, 1);
+
+    uint b_base[scalar];
+    BYTES_N_RESET(scalar, b_base);
+    b_base[0] = 1;
+
+    while(bytes_n_cmp(scalar, b1_aux, b2) >= 0)
+    {
+        bytes_n_shl_uint(scalar, b2, 1);
+        bytes_n_shl_uint(scalar, b_base, 1);
+    }
+    
+    uint b_out[scalar];
+    BYTES_N_RESET(scalar, b_out);
+    while(!bytes_n_is_zero_bool(scalar, b_base))
+    {
+        if(bytes_n_cmp(scalar, b1, b2) >= 0)
         {
-            b1 = bytes32_sub(b1, b2);
-            b_out = bytes32_add(b_out, b_base);
+            bytes_n_sub(scalar, b1, b2);
+            bytes_n_add(scalar, b_out, b_base);
         }
         
-        b2 = bytes32_shr_uint(b2, 1);
-        b_base = bytes32_shr_uint(b_base, 1);
+        bytes_n_shr_uint(scalar, b2, 1);
+        bytes_n_shr_uint(scalar, b_base, 1);
     }
-
-    return (bytes32_dual_t){{b1, b_out}};
+    
+    BYTES_N_SET(scalar, b2, b_out);
+    return;
 }
 
 
 
-bytes32_t bytes32_is_zero(bytes32_t b1)
+bytes32_sign_t bytes32_design(bytes32_t b)
 {
-    if(bytes32_is_zero_bool(b1)) return b_one;
-    return b_zero;
+    if((b.v[SCALAR32-1] & 0x80000000) == 0) 
+        return (bytes32_sign_t){1, b};
+    
+    BYTES32_OP_1(minus, b);
+    return (bytes32_sign_t){-1, b};
 }
 
-bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_sign(bytes32_sign_t bs)
 {
-    if(bytes32_cmp(b1, b2) < 0) return b_one;
-    return b_zero;
+    if(bs.sign == 1) return bs.b;
+
+    BYTES32_OP_1(minus, bs.b);
+    return bs.b;
 }
 
-bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
+
+
+bytes32_t bytes32_is_zero(bytes32_t b)
 {
-    if(bytes32_cmp(b1, b2) > 0) return b_one;
-    return b_zero;
+    return BYTES32_UINT(bytes_n_is_zero_bool(SCALAR32, b.v));
 }
 
 bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b1, b2) == 0) return b_one;
-    return b_zero;
+    return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) == 0);
+}
+
+bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
+{
+    return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) < 0);
+}
+
+bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
+{
+    return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) > 0);
+}
+
+bytes32_t bytes32_sign_lt(bytes32_t b1, bytes32_t b2)
+{
+    return BYTES32_UINT(bytes32_sign_cmp(b1, b2) < 0);
+}
+
+bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
+{
+    return BYTES32_UINT(bytes32_sign_cmp(b1, b2) > 0);
 }
 
 
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
-    return bytes32_shl_uint(b1, b2.v[0]);
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
+    BYTES32_OP_UINT(shl, b1, b2.v[0]);
+    return b1;
 }
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
-    if(bytes32_cmp(b2, b_256) >= 0) return b_zero;
-    return bytes32_shr_uint(b1, b2.v[0]);
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
+    BYTES32_OP_UINT(shr, b1, b2.v[0]);
+    return b1;
 }
 
-
+bytes32_t bytes32_not(bytes32_t b)
+{
+    BYTES32_OP_1(not, b);
+    return b;
+}
 
 bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 {
-    
-    for(int i=0; i<SCALAR; i++)
-        b1 = bytes32_add_uint(b1, b2.v[i], i);
+    BYTES32_OP_2(add, b1, b2);
     return b1;
 }
 
 bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_t b_res;
-    BYTES32_RESET(b_res);
-    for(int i=0; i<SCALAR; i++)
-    for(int j=0; j+i<SCALAR; j++)
-    {
-        luint aux = uint_mul(b1.v[i], b2.v[j]);
-        b_res = bytes32_add_uint(b_res, DECL(aux), i+j);
-        b_res = bytes32_add_uint(b_res, DECH(aux), i+j+1);
-    }
-    return b_res;
+    BYTES32_OP_2(mul, b1, b2);
+    return b1;
 }
 
 bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
 {
-    for(int i=0; i<SCALAR; i++)
-        b1 = bytes32_add_uint(b1, ~b2.v[i], i);
-    return bytes32_add_uint(b1, 1, 0);
+    BYTES32_OP_2(sub, b1, b2); \
+    return b1;
 }
 
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
-    return bd.b[1];
+    BYTES32_OP_2(div_mod, b1, b2);
+    return b2;
 }
 
 bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
-    return bd.b[0];
+    BYTES32_OP_2(div_mod, b1, b2);
+    return b1;
+}
+
+bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
+
+    bytes32_sign_t bs;
+    bs.sign = bs1.sign * bs2.sign;
+    bs.b = bytes32_div(bs1.b, bs2.b);
+    return bytes32_sign(bs);
+}
+
+bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
+{
+    bytes32_sign_t bs1, bs2;
+    bs1 = bytes32_design(b1);
+    bs2 = bytes32_design(b2);
+
+    bytes32_sign_t bs;
+    bs.sign = bs1.sign * bs2.sign;
+    bs.b = bytes32_mod(bs1.b, bs2.b);
+    return bytes32_sign(bs);
+}
+
+bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
+{
+    if(BYTES32_OP_1(is_zero_bool, b2)) return BYTES32_UINT(1);
+    if(BYTES32_OP_UINT(cmp, b2, 1) == 0) return b1;
+
+    bytes32_t b_res;
+    bool is_odd = b2.v[0] & 1;
+    BYTES32_OP_UINT(shr, b2, 1);
+    b_res = bytes32_exp(b1, b2);
+    b_res = bytes32_mul(b_res, b_res);
+
+    if(is_odd) return bytes32_mul(b1, b_res);
+    return b_res;
+}
+
+bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
+{
+    if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return b2;
+
+    int off = b1.v[0];
+    uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;
+    for(int i=off+1; i<SCALAR32; i++)
+        b2.v[i] = value;
+    return b2;
 }
 
 
 
-bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i)
+bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
 {
-    if(u == 0) return bd;
-    if(i >= SCALAR2) return bd;
+    bytes64_t b64_1, b64_2;
+    BYTES64_BYTES32(b64_1, b1);
+    BYTES64_BYTES32(b64_2, b2);
+    BYTES64_OP_2(add, b64_1, b64_2);
 
-    luint lu = uint_add(bd.v[i], u);
-    bd.v[i] = DECL(lu);
-    return bytes64_add_uint(bd, DECH(lu), i+1);
+    BYTES64_BYTES32(b64_2, b3);
+    BYTES64_OP_2(div_mod, b64_1, b64_2);
+
+    return BYTES32_BYTES64(b64_2);
 }
 
-bytes32_dual_t bytes32_full_add(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
 {
-    bytes64_t bd = BYTES64_BYTES32(b1);
-    for(int i=0; i<SCALAR; i++)
-        bd = bytes64_add_uint(bd, b2.v[i], i);
-    
-    return DUAL(bd);
-}
+    bytes64_t b64_1, b64_2;
+    BYTES64_BYTES32(b64_1, b1);
+    BYTES64_BYTES32(b64_2, b2);
+    BYTES64_OP_2(mul, b64_1, b64_2);
 
-bytes32_dual_t bytes32_full_mul(bytes32_t b1, bytes32_t b2)
-{
-    bytes64_t bd = bd_zero;
-    for(int i=0; i<SCALAR; i++)
-    for(int j=0; j<SCALAR; j++)
-    {
-        luint lu = uint_mul(b1.v[i], b2.v[j]);
-        bd = bytes64_add_uint(bd, DECL(lu), i + j);
-        bd = bytes64_add_uint(bd, DECH(lu), i + j + 1);
-    }
-    
-    return DUAL(bd);
+    BYTES64_BYTES32(b64_2, b3);
+    BYTES64_OP_2(div_mod, b64_1, b64_2);
+
+    return BYTES32_BYTES64(b64_2);
 }

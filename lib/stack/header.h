@@ -6,16 +6,16 @@
 
 #define STACK_MAX 1024
 
-PLACEHOLDER(bytes32_list);
-
 STRUCT(stack)
 {
     int count;
-    bytes32_list_p bl;
+    bytes32_p b;
 };
 
 stack_t stack_init();
-void stack_push(stack_p s, bytes32_t b);
-bytes32_t stack_pop(stack_p s);
+void stack_free(stack_t s);
+
+bool stack_push(stack_p s, bytes32_t b);
+bool stack_pop(bytes32_p b32, stack_p s);
 
 #endif
