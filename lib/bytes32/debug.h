@@ -128,8 +128,12 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
-#define BYTES_N_OP(OP, SCALAR, B1, B2) bytes_n_##OP(SCALAR, B1.v, B2.v)
-#define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, SCALAR32, B1, B2)
+#define BYTES_N_OP_1(OP, SCALAR, B) bytes_n_##OP(SCALAR, B.v)
+#define BYTES32_OP_1(OP, B) BYTES_N_OP_1(OP, SCALAR32, B)
+
+#define BYTES_N_OP_2(OP, SCALAR, B1, B2) bytes_n_##OP(SCALAR, B1.v, B2.v)
+#define BYTES32_OP_2(OP, B1, B2) BYTES_N_OP_2(OP, SCALAR32, B1, B2)
+#define BYTES64_OP_2(OP, B1, B2) BYTES_N_OP_2(OP, SCALAR64, B1, B2)
 
 #define BYTES_N_OP_UINT(OP, SCALAR, B, ARGS...) bytes_n_##OP##_uint(SCALAR, B.v, ARGS)
 #define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, SCALAR32, B, ARGS)

@@ -67,7 +67,7 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
         case  1:
         switch (bs2.sign)
         {
-            case  1: return BYTES32_OP(cmp, bs1.b, bs2.b);
+            case  1: return BYTES32_OP_2(cmp, bs1.b, bs2.b);
             case -1: return 1;
         }
         break;
@@ -76,7 +76,7 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
         switch (bs2.sign)
         {
             case  1: return -1;
-            case -1: return BYTES32_OP(cmp, bs2.b, bs1.b);
+            case -1: return BYTES32_OP_2(cmp, bs2.b, bs1.b);
         }
         break;
     }
@@ -155,6 +155,29 @@ void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift)
     return;
 }
 
+
+
+void bytes_n_not(int scalar, uint b[scalar])
+{
+    for(int i=0; i<scalar; i++)
+        b[i] = ~b[i];
+}
+
+void bytes_n_add(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    for(int i=0; i<scalar; i++)
+        bytes_n_add_uint(scalar, b1, b2[i], i);
+}
+
+void bytes_n_sub(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    uint b2_aux[scalar];
+    BYTES_N_SET(scalar, b2_aux, b2);
+    bytes_n_not(scalar, b2_aux);
+    bytes_n_add(scalar, b1, b2_aux);
+    bytes_n_add_uint(scalar, b1, 1, 0);
+}
+
 void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
 {
     if(bytes_n_is_zero_bool(scalar, b2))
@@ -184,19 +207,17 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
     {
         if(bytes_n_cmp(scalar, b1, b2) >= 0)
         {
-            b1 = bytes##SIZE##_sub(b1, b2); \
-            b_out = bytes##SIZE##_add(b_out, b_base);   \
-        }   \
-        \
-        BYTES_N_OP_UINT(shr, SIZE, b2, 1);  \
-        BYTES_N_OP_UINT(shr, SIZE, b_base, 1);  \
-    }   \
-    \
-    return (bytes##SIZE##_dual_t){{b1, b_out}}; \
+            bytes_n_sub(scalar, b1, b2);
+            bytes_n_add(scalar, b_out, b_base);
+        }
+        
+        bytes_n_shr_uint(scalar, b2, 1);
+        bytes_n_shr_uint(scalar, b_base, 1);
+    }
+    
+    BYTES_N_SET(scalar, b2, b_out);
+    return;
 }
-
-BYTES_N_DIV_MOD(32)
-BYTES_N_DIV_MOD(64)
 
 bytes32_sign_t bytes32_design(bytes32_t b)
 {
@@ -223,19 +244,19 @@ bytes32_t bytes32_is_zero(bytes32_t b)
 
 bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b1, b2) == 0) return b_one;
+    if(BYTES32_OP_2(cmp, b1, b2) == 0) return b_one;
     return b32_zero;
 }
 
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b1, b2) < 0) return b_one;
+    if(BYTES32_OP_2(cmp, b1, b2) < 0) return b_one;
     return b32_zero;
 }
 
 bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b1, b2) > 0) return b_one;
+    if(BYTES32_OP_2(cmp, b1, b2) > 0) return b_one;
     return b32_zero;
 }
 
@@ -255,38 +276,29 @@ bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b2, b_256) >= 0) return b32_zero;
+    if(BYTES32_OP_2(cmp, b2, b_256) >= 0) return b32_zero;
     BYTES32_OP_UINT(shl, b1, b2.v[0]);
     return b1;
 }
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
+    if(BYTES32_OP_2(cmp, b2, b_256) >= 0) return b32_zero;
     BYTES32_OP_UINT(shr, b1, b2.v[0]);
     return b1;
 }
 
-#define BYTES_N_NOT(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_not(bytes##SIZE##_t b)    \
-{   \
-    for(int i=0; i<SCALAR##SIZE; i++)   \
-        b.v[i] = ~b.v[i];   \
-    return b;   \
+bytes32_t bytes32_not(bytes32_t b)
+{
+    BYTES32_OP_1(not, b);
+    return b;
 }
 
-BYTES_N_NOT(32)
-BYTES_N_NOT(64)
-
-#define BYTES_N_ADD(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_add(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
-{   \
-    for(int i=0; i<SCALAR##SIZE; i++)   \
-        BYTES_N_OP_UINT(add, SIZE, b1, b2.v[i], i);    \
-    return b1;  \
+bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
+{
+    BYTES32_OP_2(add, b1, b2);
+    return b1;
 }
-
-BYTES_N_ADD(32) 
-BYTES_N_ADD(64) 
 
 #define BYTES_N_MUL(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
@@ -296,8 +308,8 @@ bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
     for(int j=0; j+i<SCALAR##SIZE; j++) \
     {   \
         luint aux = uint_mul(b1.v[i], b2.v[j]); \
-        BYTES_N_OP_UINT(add, SIZE, b_res, DECL(aux), i+j);  \
-        BYTES_N_OP_UINT(add, SIZE, b_res, DECH(aux), i+j+1);    \
+        BYTES_N_OP_UINT(add, SCALAR##SIZE, b_res, DECL(aux), i+j);  \
+        BYTES_N_OP_UINT(add, SCALAR##SIZE, b_res, DECH(aux), i+j+1);    \
     }   \
     return b_res;   \
 }
@@ -305,29 +317,23 @@ bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 BYTES_N_MUL(32)
 BYTES_N_MUL(64)
 
-#define BYTES_N_SUB(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_sub(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
-{   \
-    b2 = bytes##SIZE##_not(b2); \
-    b1 = bytes##SIZE##_add(b1, b2); \
-    BYTES_N_OP_UINT(add, SIZE, b1, 1, 0);   \
-    return b1;    \
+bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
+{
+    BYTES32_OP_2(sub, b1, b2); \
+    return b1;
 }
-
-BYTES_N_SUB(32)
-BYTES_N_SUB(64)
 
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
-    return bd.b[1];
+    BYTES32_OP_2(div_mod, b1, b2);
+    return b2;
 }
 
 #define BYTES_N_MOD(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 {   \
-    bytes##SIZE##_dual_t bd = bytes##SIZE##_div_mod(b1, b2);    \
-    return bd.b[0]; \
+    BYTES_N_OP_2(div_mod, SCALAR##SIZE, b1, b2);    \
+    return b1; \
 }
 
 BYTES_N_MOD(32)
@@ -359,8 +365,8 @@ bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b2, b32_zero) == 0) return b_one;
-    if(BYTES32_OP(cmp, b2, b_one) == 0) return b1;
+    if(BYTES32_OP_2(cmp, b2, b32_zero) == 0) return b_one;
+    if(BYTES32_OP_2(cmp, b2, b_one) == 0) return b1;
 
     bytes32_t b_res;
     bool is_odd = b2.v[0] & 1;
@@ -374,7 +380,7 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP(cmp, b1, b_32) >= 0) return b2;
+    if(BYTES32_OP_2(cmp, b1, b_32) >= 0) return b2;
 
     int off = b1.v[0];
     uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;
@@ -390,7 +396,7 @@ bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
     bytes64_t b64_1, b64_2;
     b64_1 = BYTES64_BYTES32(b1);
     b64_2 = BYTES64_BYTES32(b2);
-    b64_1 = bytes64_add(b64_1, b64_2);
+    BYTES64_OP_2(add, b64_1, b64_2);
 
     b64_2 = BYTES64_BYTES32(b3);
     b64_1 = bytes64_mod(b64_1, b64_2);
