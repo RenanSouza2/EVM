@@ -3,6 +3,20 @@
         "stdio.h": "c",
         "climits": "c",
         "random": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "array": "c",
+        "bitset": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "__hash_table": "c",
+        "__split_buffer": "c",
+        "deque": "c",
+        "iterator": "c",
+        "queue": "c",
+        "stack": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "vector": "c"
     }
 }
