@@ -134,8 +134,9 @@ extern const bytes32_t b_Q255;
 #define BYTES_N_OP_1(OP, SIZE, B) bytes_n_##OP(SCALAR##SIZE, B.v)
 #define BYTES32_OP_1(OP, B) BYTES_N_OP_1(OP, 32, B)
 
-#define BYTES_N_OP(OP, SIZE, B1, B2) bytes_n_##OP(SCALAR##SIZE, B1.v, B2.v)
-#define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, 32, B1, B2)
+#define BYTES_N_OP_2(OP, SIZE, B1, B2) bytes_n_##OP(SCALAR##SIZE, B1.v, B2.v)
+#define BYTES32_OP_2(OP, B1, B2) BYTES_N_OP_2(OP, 32, B1, B2)
+#define BYTES64_OP_2(OP, B1, B2) BYTES_N_OP_2(OP, 64, B1, B2)
 
 void bytes32_display(bytes32_t b);
 
