@@ -178,40 +178,46 @@ void bytes_n_sub(int scalar, uint b1[scalar], const uint b2[scalar])
     bytes_n_add_uint(scalar, b1, 1, 0);
 }
 
-#define BYTES_N_DIV_MOD(SIZE)   \
-bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)  \
-{   \
-    if(bytes_n_is_zero_bool(SCALAR##SIZE, b2.v))    \
-        return (bytes##SIZE##_dual_t){{b##SIZE##_zero, b##SIZE##_zero}}; \
-    \
-    bytes##SIZE##_t b1_aux, b_base; \
-    BYTES_N_SET(SIZE, &b1_aux, &b1);    \
-    BYTES_N_OP_UINT(shr, SIZE, b1_aux, 1); \
-    b_base = BYTES##SIZE##_UINT(1); \
-    while(BYTES_N_OP_2(cmp, SIZE, b1_aux, b2) >= 0)   \
-    {   \
-        BYTES_N_OP_UINT(shl, SIZE, b2, 1); \
-        BYTES_N_OP_UINT(shl, SIZE, b_base, 1); \
-    }   \
-    \
-    bytes##SIZE##_t b_out = b##SIZE##_zero; \
-    while(!bytes_n_is_zero_bool(SCALAR##SIZE, b_base.v))  \
-    {   \
-        if(BYTES_N_OP_2(cmp, SIZE, b1, b2) >= 0)  \
-        {   \
-            BYTES_N_OP_2(sub, SIZE, b1, b2); \
-            BYTES_N_OP_2(add, SIZE, b_out, b_base);   \
-        }   \
-        \
-        BYTES_N_OP_UINT(shr, SIZE, b2, 1);  \
-        BYTES_N_OP_UINT(shr, SIZE, b_base, 1);  \
-    }   \
-    \
-    return (bytes##SIZE##_dual_t){{b1, b_out}}; \
-}
+void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
+{
+    if(bytes_n_is_zero_bool(scalar, b2))
+    {
+        BYTES_N_RESET(scalar, b1);
+        BYTES_N_RESET(scalar, b2);
+        return;
+    }
+    
+    uint b1_aux[scalar];
+    BYTES_N_SET(scalar, b1_aux, b1);
+    bytes_n_shr_uint(scalar, b1_aux, 1);
 
-BYTES_N_DIV_MOD(32)
-BYTES_N_DIV_MOD(64)
+    uint b_base[scalar];
+    BYTES_N_RESET(scalar, b_base);
+    b_base[0] = 1;
+
+    while(bytes_n_cmp(scalar, b1_aux, b2) >= 0)
+    {
+        bytes_n_shl_uint(scalar, b2, 1);
+        bytes_n_shl_uint(scalar, b_base, 1);
+    }
+    
+    uint b_out[scalar];
+    BYTES_N_RESET(scalar, b_out);
+    while(!bytes_n_is_zero_bool(scalar, b_base))
+    {
+        if(bytes_n_cmp(scalar, b1, b2) >= 0)
+        {
+            bytes_n_sub(scalar, b1, b2);
+            bytes_n_add(scalar, b_out, b_base);
+        }
+        
+        bytes_n_shr_uint(scalar, b2, 1);
+        bytes_n_shr_uint(scalar, b_base, 1);
+    }
+    
+    BYTES_N_SET(scalar, b2, b_out);
+    return;
+}
 
 bytes32_sign_t bytes32_design(bytes32_t b)
 {
@@ -302,8 +308,8 @@ bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
     for(int j=0; j+i<SCALAR##SIZE; j++) \
     {   \
         luint aux = uint_mul(b1.v[i], b2.v[j]); \
-        BYTES_N_OP_UINT(add, SIZE, b_res, DECL(aux), i+j);  \
-        BYTES_N_OP_UINT(add, SIZE, b_res, DECH(aux), i+j+1);    \
+        BYTES_N_OP_UINT(add, SCALAR##SIZE, b_res, DECL(aux), i+j);  \
+        BYTES_N_OP_UINT(add, SCALAR##SIZE, b_res, DECH(aux), i+j+1);    \
     }   \
     return b_res;   \
 }
@@ -319,15 +325,15 @@ bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
 {
-    bytes32_dual_t bd = bytes32_div_mod(b1, b2);
-    return bd.b[1];
+    BYTES32_OP_2(div_mod, b1, b2);
+    return b2;
 }
 
 #define BYTES_N_MOD(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 {   \
-    bytes##SIZE##_dual_t bd = bytes##SIZE##_div_mod(b1, b2);    \
-    return bd.b[0]; \
+    BYTES_N_OP_2(div_mod, SCALAR##SIZE, b1, b2);    \
+    return b1; \
 }
 
 BYTES_N_MOD(32)
