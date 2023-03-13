@@ -12,18 +12,18 @@ void test_is_zero_bool()
     printf("\n\t\t\ttest is zero bool\t\t");
 
     bytes32_t b = BYTES32_UINT(0);
-    bool is_zero = bytes_n_is_zero_bool(b.v, SCALAR32);
+    bool is_zero = bytes_n_is_zero_bool(SCALAR32, b.v);
     assert(is_zero == true);
 
     for(int i=0; i<SCALAR32; i++)
     {
         b = BYTES32_UINT(0);
         b.v[i] = 1;
-        is_zero = bytes_n_is_zero_bool(b.v, SCALAR32);
+        is_zero = bytes_n_is_zero_bool(SCALAR32, b.v);
         assert(is_zero == false);
     }
 
-    is_zero = bytes_n_is_zero_bool(b_max.v, SCALAR32);
+    is_zero = bytes_n_is_zero_bool(SCALAR32, b_max.v);
     assert(is_zero == false);
 }
 

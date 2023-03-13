@@ -27,8 +27,6 @@ STRUCT(bytes64_dual)
     bytes64_t b[2];
 };
 
-void bytes32_display(bytes32_t b);
-
 #define BYTES32_DISPLAY(B32) \
     printf("\n%s: ", #B32);bytes32_display(B32);printf("\t\t");
     
@@ -119,17 +117,19 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
-#define BYTES_N_OP(OP, B1, B2, SIZE) bytes_n_##OP(B1.v, B2.v, SCALAR##SIZE)
-#define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, B1, B2, 32)
+#define BYTES_N_OP(OP, SIZE, B1, B2) bytes_n_##OP(SCALAR##SIZE, B1.v, B2.v)
+#define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, 32, B1, B2)
 
-#define BYTES_N_ADD_UINT(B, U, I, SIZE) bytes_n_add_uint(B.v, U, I, SCALAR##SIZE)
-#define BYTES32_ADD_UINT(B, U, I) BYTES_N_ADD_UINT(B, U, I, 32)
+#define BYTES_N_ADD_UINT(SIZE, B, U, I) bytes_n_add_uint(SCALAR##SIZE, B.v, U, I)
+#define BYTES32_ADD_UINT(B, U, I) BYTES_N_ADD_UINT(32, B, U, I)
 
-bool bytes_n_is_zero_bool(const uint b[], int scalar);
-int bytes_n_cmp(const uint b1[], const uint b2[], int scalar);
+void bytes32_display(bytes32_t b);
+
+bool bytes_n_is_zero_bool(int scalar, const uint b[scalar]);
+int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
-void bytes_n_add_uint(uint b[], uint u, int i, int scalar);
+void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes32_sign_t bytes32_design(bytes32_t b);
