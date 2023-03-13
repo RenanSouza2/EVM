@@ -15,6 +15,7 @@ STRUCT(bytes)
 void bytes_display(bytes_t b);
 
 bytes_t bytes_create_string(char s[]);
+void bytes_free(bytes_t b);
 
 uchar bytes_get(bytes_t b, int n);
 bytes_t bytes_get_mult(bytes_t b, int n, int size);

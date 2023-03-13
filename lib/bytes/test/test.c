@@ -52,6 +52,9 @@ void test_create_string()
 
     bytes_t b = bytes_create_string("0123456789abcdef");
     ASSERT_BYTES(b, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef);
+    bytes_free(b);
+
+    assert(bytes_memory());
 }
 
 void test_get()
@@ -65,23 +68,34 @@ void test_get()
         char c = bytes_get(b, i);
         assert(c == b_exp[i]);
     }
+    bytes_free(b);
+
+    assert(bytes_memory());
 }
 
 void test_get_mult()
 {
     printf("\n\ttest get mult\t\t");
 
-    bytes_t b = bytes_create_string("0123456789abcdef");
-    b = bytes_get_mult(b, 1, 1);
-    ASSERT_BYTES(b, 1, 0x23);
+    bytes_t b1 = bytes_create_string("0123456789abcdef");
+    bytes_t b2 = bytes_get_mult(b1, 1, 1);
+    ASSERT_BYTES(b2, 1, 0x23);
+    bytes_free(b1);
+    bytes_free(b2);
 
-    b = bytes_create_string("0123456789abcdef");
-    b = bytes_get_mult(b, 10, 1);
-    ASSERT_BYTES(b, 1, 0x00);
+    b1 = bytes_create_string("0123456789abcdef");
+    b2 = bytes_get_mult(b1, 10, 1);
+    ASSERT_BYTES(b2, 1, 0x00);
+    bytes_free(b1);
+    bytes_free(b2);
 
-    b = bytes_create_string("0123456789abcdef");
-    b = bytes_get_mult(b, 4, 8);
-    ASSERT_BYTES(b, 8, 0x89, 0xab, 0xcd, 0xef, 0x00, 0x00, 0x00, 0x00);
+    b1 = bytes_create_string("0123456789abcdef");
+    b2 = bytes_get_mult(b1, 4, 8);
+    ASSERT_BYTES(b2, 8, 0x89, 0xab, 0xcd, 0xef, 0x00, 0x00, 0x00, 0x00);
+    bytes_free(b1);
+    bytes_free(b2);
+
+    assert(bytes_memory());
 }
 
 void test_bytes32_bytes()
@@ -98,7 +112,9 @@ void test_bytes32_bytes()
     
     b = bytes_create_string("0123456789abcdef");
     b32 = bytes32_bytes(b);
-    ASSERT_BYTES32(b32, 0, 0, 0, 0, 0, 0, 0x01234567, 0x89abcdef);
+    ASSERT_BYTES32_UINT(b32, 0x0123456789abcdef);
+
+    assert(bytes_memory());
 }
 
 
