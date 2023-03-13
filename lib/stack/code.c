@@ -33,6 +33,9 @@ void stack_display(stack_t s)
     printf("\n");
 }
 
+#else
+#define STACK_INC()
+#define STACK_DEC()
 #endif
 
 stack_t stack_init()

@@ -11,6 +11,11 @@
 #include "../bytes32/debug.h"
 #include "../stack/debug.h"
 
+bool machine_memory()
+{
+    return stack_memory();
+}
+
 #endif
 
 machine_t machine_init(char s[])
@@ -20,6 +25,11 @@ machine_t machine_init(char s[])
     m.pc = 0;
     m.st = stack_init();
     return m;
+}
+
+void machine_free(machine_t m)
+{
+    stack_free(m.st);
 }
 
 bool machine_push(machine_p m, uchar op)
