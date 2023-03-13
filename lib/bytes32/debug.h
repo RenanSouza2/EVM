@@ -17,16 +17,6 @@ STRUCT(bytes32_sign)
     bytes32_t b;
 };
 
-STRUCT(bytes32_dual)
-{
-    bytes32_t b[2];
-};
-
-STRUCT(bytes64_dual)
-{
-    bytes64_t b[2];
-};
-
 #define BYTES32_DISPLAY(B32) \
     printf("\n%s: ", #B32);bytes32_display(B32);printf("\t\t");
     
@@ -117,12 +107,14 @@ STRUCT(bytes64_dual)
     }
 
 #define ASSERT_BYTES64_UINT(BYTES, UINT) \
-{ \
-    bytes64_t bd_exp; \
-    bd_exp = BYTES64_UINT(UINT); \
-    ASSERT_BYTES64_MUTUAL(BYTES, bd_exp); \
-}
+    { \
+        bytes64_t bd_exp; \
+        bd_exp = BYTES64_UINT(UINT); \
+        ASSERT_BYTES64_MUTUAL(BYTES, bd_exp); \
+    }
 
+extern const bytes32_t b_zero;
+extern const bytes32_t b_one;
 extern const bytes32_t b_256;
 extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
@@ -147,7 +139,6 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
 void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift);
 void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift);
-bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes32_sign_t bytes32_design(bytes32_t b);
 bytes32_t bytes32_sign(bytes32_sign_t bs);
