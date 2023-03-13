@@ -86,6 +86,17 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
     assert(false);
 }
 
+int bytes_n_cmp_uint(int scalar, const uint b[scalar], uint u)
+{
+    for(int i=scalar-1; i>0; i--)
+        if(b[i])
+            return 1;
+
+    if(b[0] > u) return  1;
+    if(b[0] < u) return -1;
+    return 0;
+}
+
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i)
 {
     if(u == 0) return;
@@ -298,14 +309,14 @@ bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_2(cmp, b2, b_256) >= 0) return BYTES32_UINT(0);
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
     BYTES32_OP_UINT(shl, b1, b2.v[0]);
     return b1;
 }
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_2(cmp, b2, b_256) >= 0) return BYTES32_UINT(0);
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
     BYTES32_OP_UINT(shr, b1, b2.v[0]);
     return b1;
 }
@@ -373,7 +384,7 @@ bytes32_t bytes32_smod(bytes32_t b1, bytes32_t b2)
 bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 {
     if(BYTES32_OP_1(is_zero_bool, b2)) return BYTES32_UINT(1);
-    if(BYTES32_OP_2(cmp, b2, b_one) == 0) return b1;
+    if(BYTES32_OP_UINT(cmp, b2, 1) == 0) return b1;
 
     bytes32_t b_res;
     bool is_odd = b2.v[0] & 1;
@@ -387,7 +398,7 @@ bytes32_t bytes32_exp(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_2(cmp, b1, b_32) >= 0) return b2;
+    if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return b2;
 
     int off = b1.v[0];
     uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;

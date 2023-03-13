@@ -113,12 +113,17 @@ STRUCT(bytes32_sign)
         ASSERT_BYTES64_MUTUAL(BYTES, bd_exp); \
     }
 
+
+#ifdef DEBUG
+
 extern const bytes32_t b_zero;
 extern const bytes32_t b_one;
 extern const bytes32_t b_256;
 extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
+
+#endif
 
 #define BYTES_N_OP_1(OP, SCALAR, B) bytes_n_##OP(SCALAR, B.v)
 #define BYTES32_OP_1(OP, B) BYTES_N_OP_1(OP, SCALAR32, B)
