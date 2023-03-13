@@ -169,6 +169,15 @@ void bytes_n_add(int scalar, uint b1[scalar], const uint b2[scalar])
         bytes_n_add_uint(scalar, b1, b2[i], i);
 }
 
+void bytes_n_sub(int scalar, uint b1[scalar], const uint b2[scalar])
+{
+    uint b2_aux[scalar];
+    BYTES_N_SET(scalar, b2_aux, b2);
+    bytes_n_not(scalar, b2_aux);
+    bytes_n_add(scalar, b1, b2_aux);
+    bytes_n_add_uint(scalar, b1, 1, 0);
+}
+
 #define BYTES_N_DIV_MOD(SIZE)   \
 bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)  \
 {   \
@@ -190,7 +199,7 @@ bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b
     {   \
         if(BYTES_N_OP_2(cmp, SIZE, b1, b2) >= 0)  \
         {   \
-            b1 = bytes##SIZE##_sub(b1, b2); \
+            BYTES_N_OP_2(sub, SIZE, b1, b2); \
             BYTES_N_OP_2(add, SIZE, b_out, b_base);   \
         }   \
         \
@@ -302,17 +311,11 @@ bytes##SIZE##_t bytes##SIZE##_mul(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 BYTES_N_MUL(32)
 BYTES_N_MUL(64)
 
-#define BYTES_N_SUB(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_sub(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
-{   \
-    BYTES_N_OP_1(not, SIZE, b2); \
-    BYTES_N_OP_2(add, SIZE, b1, b2); \
-    BYTES_N_OP_UINT(add, SIZE, b1, 1, 0);   \
-    return b1;    \
+bytes32_t bytes32_sub(bytes32_t b1, bytes32_t b2)
+{
+    BYTES32_OP_2(sub, b1, b2); \
+    return b1;
 }
-
-BYTES_N_SUB(32)
-BYTES_N_SUB(64)
 
 bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
 {
