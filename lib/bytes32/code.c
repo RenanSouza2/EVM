@@ -155,6 +155,14 @@ void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift)
     return;
 }
 
+
+
+void bytes_n_not(int scalar, uint b[scalar])
+{
+    for(int i=0; i<scalar; i++)
+        b[i] = ~b[i];
+}
+
 #define BYTES_N_DIV_MOD(SIZE)   \
 bytes##SIZE##_dual_t bytes##SIZE##_div_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)  \
 {   \
@@ -258,16 +266,11 @@ bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
     return b1;
 }
 
-#define BYTES_N_NOT(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_not(bytes##SIZE##_t b)    \
-{   \
-    for(int i=0; i<SCALAR##SIZE; i++)   \
-        b.v[i] = ~b.v[i];   \
-    return b;   \
+bytes32_t bytes32_not(bytes32_t b)
+{
+    BYTES32_OP_1(not, b);
+    return b;
 }
-
-BYTES_N_NOT(32)
-BYTES_N_NOT(64)
 
 #define BYTES_N_ADD(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_add(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
@@ -300,7 +303,7 @@ BYTES_N_MUL(64)
 #define BYTES_N_SUB(SIZE)   \
 bytes##SIZE##_t bytes##SIZE##_sub(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
 {   \
-    b2 = bytes##SIZE##_not(b2); \
+    BYTES_N_OP_1(not, SIZE, b2); \
     b1 = bytes##SIZE##_add(b1, b2); \
     BYTES_N_OP_UINT(add, SIZE, b1, 1, 0);   \
     return b1;    \
