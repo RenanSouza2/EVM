@@ -11,15 +11,20 @@ void test_push()
 
     machine_t m = machine_init("ab");
     assert(machine_push(&m, 0x60));
-    ASSERT_BYTES32_UINT(m.st.bl->b, 0xAB);
+    ASSERT_BYTES32_UINT(m.st.b[0], 0xAB);
+    machine_free(m);
     
     m = machine_init("ab");
     assert(machine_push(&m, 0x61));
-    ASSERT_BYTES32_UINT(m.st.bl->b, 0xAB00);
+    ASSERT_BYTES32_UINT(m.st.b[0], 0xAB00);
+    machine_free(m);
     
     m = machine_init("ab");
     assert(machine_push(&m, 0x7f));
-    ASSERT_BYTES32(m.st.bl->b, 0xAB000000, 0, 0, 0, 0, 0, 0, 0);
+    ASSERT_BYTES32(m.st.b[0], 0xAB000000, 0, 0, 0, 0, 0, 0, 0);
+    machine_free(m);
+
+    assert(machine_memory());
 }
 
 void test_2_1()
@@ -28,19 +33,24 @@ void test_2_1()
 
     machine_t m = machine_init("");
     assert(machine_2_1(&m, bytes32_add) == false);
+    machine_free(m);
 
-    bytes32_t b32 = BYTES32_UINT(1);
+    bytes32_t b = BYTES32_UINT(1);
     m = machine_init("");
-    stack_push(&m.st, b32);
+    stack_push(&m.st, b);
     assert(machine_2_1(&m, bytes32_add) == false);
+    machine_free(m);
     
     m = machine_init("");
-    b32 = BYTES32_UINT(1);
-    stack_push(&m.st, b32);
-    b32 = BYTES32_UINT(2);
-    stack_push(&m.st, b32);
+    b = BYTES32_UINT(1);
+    stack_push(&m.st, b);
+    b = BYTES32_UINT(2);
+    stack_push(&m.st, b);
     assert(machine_2_1(&m, bytes32_add));
-    ASSERT_BYTES32_UINT(m.st.bl->b, 3);
+    ASSERT_BYTES32_UINT(m.st.b[0], 3);
+    machine_free(m);
+
+    assert(machine_memory());
 }
 
 // bool machine_exec(machine_p m, char code[])
