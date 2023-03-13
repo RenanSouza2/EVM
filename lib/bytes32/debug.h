@@ -45,7 +45,18 @@ STRUCT(bytes64_dual)
     (*((luint*)(&(UINT0))))
 
 #define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
-    assert(memcmp(BYTES1.v, BYTES2.v, 32) == 0)
+    {   \
+        if(memcmp(BYTES1.v, BYTES2.v, 32))  \
+        {   \
+            printf("\n\nassertion failled");    \
+            printf("\nreturned: "); \
+            bytes32_display(BYTES1);    \
+            printf("\nexpected: "); \
+            bytes32_display(BYTES2);    \
+            printf("\n\n\t\t"); \
+            assert(false);  \
+        }   \
+    }
 
 #define ASSERT_BYTES32(BYTES, \
     VALUE7, VALUE6, VALUE5, VALUE4, \
@@ -120,8 +131,8 @@ extern const bytes32_t b_Q255;
 #define BYTES_N_OP(OP, SIZE, B1, B2) bytes_n_##OP(SCALAR##SIZE, B1.v, B2.v)
 #define BYTES32_OP(OP, B1, B2) BYTES_N_OP(OP, 32, B1, B2)
 
-#define BYTES_N_ADD_UINT(SIZE, B, U, I) bytes_n_add_uint(SCALAR##SIZE, B.v, U, I)
-#define BYTES32_ADD_UINT(B, U, I) BYTES_N_ADD_UINT(32, B, U, I)
+#define BYTES_N_OP_UINT(OP, SIZE, B, ARGS...) bytes_n_##OP##_uint(SCALAR##SIZE, B.v, ARGS)
+#define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, 32, B, ARGS)
 
 void bytes32_display(bytes32_t b);
 
@@ -130,6 +141,8 @@ int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
+void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift);
+bytes32_t bytes32_shr_uint(bytes32_t b, uint shift);
 bytes32_dual_t bytes32_div_mod(bytes32_t b1, bytes32_t b2);
 
 bytes32_sign_t bytes32_design(bytes32_t b);
