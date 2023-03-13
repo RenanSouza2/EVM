@@ -336,15 +336,11 @@ bytes32_t bytes32_div(bytes32_t b1, bytes32_t b2)
     return b2;
 }
 
-#define BYTES_N_MOD(SIZE)   \
-bytes##SIZE##_t bytes##SIZE##_mod(bytes##SIZE##_t b1, bytes##SIZE##_t b2)   \
-{   \
-    BYTES_N_OP_2(div_mod, SCALAR##SIZE, b1, b2);    \
-    return b1; \
+bytes32_t bytes32_mod(bytes32_t b1, bytes32_t b2)
+{
+    BYTES32_OP_2(div_mod, b1, b2);
+    return b1;
 }
-
-BYTES_N_MOD(32)
-BYTES_N_MOD(64)
 
 bytes32_t bytes32_sdiv(bytes32_t b1, bytes32_t b2)
 {
@@ -406,9 +402,9 @@ bytes32_t bytes32_addmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
     BYTES64_OP_2(add, b64_1, b64_2);
 
     b64_2 = BYTES64_BYTES32(b3);
-    b64_1 = bytes64_mod(b64_1, b64_2);
+    BYTES64_OP_2(div_mod, b64_1, b64_2);
 
-    return BYTES32_BYTES64(b64_1);
+    return BYTES32_BYTES64(b64_2);
 }
 
 bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
@@ -419,7 +415,7 @@ bytes32_t bytes32_mulmod(bytes32_t b1, bytes32_t b2, bytes32_t b3)
     BYTES64_OP_2(mul, b64_1, b64_2);
 
     b64_2 = BYTES64_BYTES32(b3);
-    b64_1 = bytes64_mod(b64_1, b64_2);
+    BYTES64_OP_2(div_mod, b64_1, b64_2);
 
-    return BYTES32_BYTES64(b64_1);
+    return BYTES32_BYTES64(b64_2);
 }
