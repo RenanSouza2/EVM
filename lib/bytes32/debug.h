@@ -49,17 +49,17 @@ STRUCT(bytes32_sign)
     }
 
 #define ASSERT_BYTES32(BYTES, \
-    VALUE7, VALUE6, VALUE5, VALUE4, \
-    VALUE3, VALUE2, VALUE1, VALUE0  \
-) \
-{ \
-    bytes32_t b_exp; \
-    b_exp = BYTES32( \
         VALUE7, VALUE6, VALUE5, VALUE4, \
         VALUE3, VALUE2, VALUE1, VALUE0  \
-    ); \
-    ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
-}
+    ) \
+    { \
+        bytes32_t b_exp; \
+        b_exp = BYTES32( \
+            VALUE7, VALUE6, VALUE5, VALUE4, \
+            VALUE3, VALUE2, VALUE1, VALUE0  \
+        ); \
+        ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
+    }
 
 #define ASSERT_BYTES32_UINT(BYTES, UINT) \
     { \
@@ -124,6 +124,17 @@ extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
 #endif
+
+#define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
+#define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
+
+#define BYTES64_BYTES32(B64, B32)   \
+    {   \
+        BYTES_N_RESET(SCALAR64, &B64);  \
+        BYTES_N_SET(SCALAR32, &B64, &B32);  \
+    }
+    
+#define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))   
 
 #define BYTES_N_OP_1(OP, SCALAR, B) bytes_n_##OP(SCALAR, B.v)
 #define BYTES32_OP_1(OP, B) BYTES_N_OP_1(OP, SCALAR32, B)

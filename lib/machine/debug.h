@@ -29,13 +29,14 @@ STRUCT(machine)
 typedef bytes32_t (*bytes32_1_1_f)(bytes32_t);
 typedef bytes32_t (*bytes32_2_1_f)(bytes32_t,bytes32_t);
 typedef bytes32_t (*bytes32_3_1_f)(bytes32_t,bytes32_t,bytes32_t);
+typedef bool (*stack_int_f)(stack_p, int);
 
 bool machine_memory();
 
 machine_t machine_init(char s[]);
 void machine_free(machine_t m);
 
-bool machine_push(machine_p m, uchar op);
+bool machine_push(machine_p m, int size);
 bool machine_1_1(machine_p m, bytes32_1_1_f arith);
 bool machine_2_1(machine_p m, bytes32_2_1_f arith);
 

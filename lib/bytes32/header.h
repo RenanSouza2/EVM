@@ -21,9 +21,15 @@ bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_sign_lt(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2);
 
+bytes32_t bytes32_and(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_or(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_xor(bytes32_t b1, bytes32_t b2);
+bytes32_t bytes32_not(bytes32_t b);
+bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2);
+
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2);
-bytes32_t bytes32_not(bytes32_t b);
+bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2);
 
 bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2);
 bytes32_t bytes32_mul(bytes32_t b1, bytes32_t b2);

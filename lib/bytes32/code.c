@@ -3,17 +3,6 @@
 #include <limits.h>
 #include <assert.h>
 
-
-#define BYTES64_BYTES32(B64, B32)   \
-    {   \
-        BYTES_N_RESET(SCALAR64, &B64);    \
-        BYTES_N_SET(SCALAR32, &B64, &B32); \
-    }
-#define BYTES32_BYTES64(B) (*((bytes32_p)(&(B))))   
-
-#define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
-#define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
-
 #ifdef DEBUG
 
 #include <stdio.h>
@@ -307,6 +296,49 @@ bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
 
 
 
+bytes32_t bytes32_and(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=0; i<SCALAR32; i++)
+        b1.v[i] &= b2.v[i];
+    return b1;
+}
+
+bytes32_t bytes32_or(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=0; i<SCALAR32; i++)
+        b1.v[i] |= b2.v[i];
+    return b1;
+}
+
+bytes32_t bytes32_xor(bytes32_t b1, bytes32_t b2)
+{
+    for(int i=0; i<SCALAR32; i++)
+        b1.v[i] ^= b2.v[i];
+    return b1;
+}
+
+bytes32_t bytes32_not(bytes32_t b)
+{
+    BYTES32_OP_1(not, b);
+    return b;
+}
+
+bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
+{
+    if(BYTES32_OP_UINT(cmp, b1, 32)) return BYTES32_UINT(0);
+    
+    int pos = b1.v[0] >> 4;
+    int off = b1.v[0] &  3;
+
+    uint u = (b2.v[SCALAR32-1-pos] >> (off << 3)) && 3;
+    BYTES_N_RESET(SCALAR32, &b2);
+    b2.v[0] = u;
+
+    return b2;
+}
+
+
+
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
     if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
@@ -321,11 +353,21 @@ bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
     return b1;
 }
 
-bytes32_t bytes32_not(bytes32_t b)
+bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2)
 {
-    BYTES32_OP_1(not, b);
-    return b;
+    if(BYTES32_OP_1(is_zero_bool, b2)) return b1;
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
+
+    bytes32_t b = bytes32_shr(b1, b2);
+    if((b1.v[SCALAR32-1] & 0x80000000) == 0) return b;
+
+    bytes32_t b_q255 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
+    BYTES32_OP_UINT(shr, b_q255, b2.v[0] - 1);
+    BYTES32_OP_1(minus, b_q255);
+    return bytes32_or(b_q255, b1);
 }
+
+
 
 bytes32_t bytes32_add(bytes32_t b1, bytes32_t b2)
 {

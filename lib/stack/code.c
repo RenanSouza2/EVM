@@ -68,3 +68,21 @@ bool stack_pop(bytes32_p b, stack_p s)
     *b = s->b[--s->count];
     return true;
 }
+
+bool stack_dup(stack_p s, int index)
+{
+    if(s->count < index + 1) return false;
+
+    bytes32_t b = s->b[s->count-1 - index];
+    return stack_push(s, b);
+}
+
+bool stack_swap(stack_p s, int index)
+{
+    if(s->count < index + 1) return false;
+
+    bytes32_t b = s->b[s->count-1 - index];
+    s->b[s->count-1 - index] = s->b[s->count-1];
+    s->b[s->count-1 - index] = b;
+    return true;
+}

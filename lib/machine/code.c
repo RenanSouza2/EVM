@@ -34,9 +34,8 @@ void machine_free(machine_t m)
     bytes_free(m.code);
 }
 
-bool machine_push(machine_p m, uchar op)
+bool machine_push(machine_p m, int size)
 {
-    uchar size = op - 0x5f;
     bytes_t bs = bytes_get_mult(m->code, m->pc, size);
     bytes32_t b = bytes32_bytes(bs);
     TRY(stack_push(&m->st, b));
@@ -74,6 +73,21 @@ bool machine_3_1(machine_p m, bytes32_3_1_f func)
     return true;
 }
 
+bool machine_stack(machine_p m, stack_int_f operation, int index)
+{
+    TRY(operation(&m->st, index));
+    return true;
+}
+
+bool machine_pop(machine_p m)
+{
+    bytes32_t b;
+    TRY(stack_pop(&b, &m->st));
+    return true;
+}
+
+
+
 bool machine_exec(machine_p m, char code[])
 {
     *m = machine_init(code);
@@ -98,16 +112,24 @@ bool machine_exec(machine_p m, char code[])
 
             case 0x10: TRY(machine_2_1(m, bytes32_lt)); break;
             case 0x11: TRY(machine_2_1(m, bytes32_gt)); break;
-
+            case 0x12: TRY(machine_2_1(m, bytes32_sign_lt)); break;
+            case 0x13: TRY(machine_2_1(m, bytes32_sign_gt)); break;
             case 0x14: TRY(machine_2_1(m, bytes32_eq)); break;
             case 0x15: TRY(machine_1_1(m, bytes32_is_zero)); break;
-            
+            case 0x16: TRY(machine_2_1(m, bytes32_and)); break;
+            case 0x17: TRY(machine_2_1(m, bytes32_or)); break;
+            case 0x18: TRY(machine_2_1(m, bytes32_xor)); break;
             case 0x19: TRY(machine_1_1(m, bytes32_not)); break;
-
+            case 0x1a: TRY(machine_2_1(m, bytes32_byte)); break;
             case 0x1b: TRY(machine_2_1(m, bytes32_shl)); break;
             case 0x1c: TRY(machine_2_1(m, bytes32_shr)); break;
+            case 0x1d: TRY(machine_2_1(m, bytes32_sar)); break;
 
-            case 0x60 ... 0x7f: TRY(machine_push(m, op)); break;
+            case 0x50: TRY(machine_pop(m)); break;
+
+            case 0x60 ... 0x7f: TRY(machine_push(m, op - 0x5f)); break;
+            case 0x80 ... 0x8f: TRY(machine_stack(m, stack_dup, op - 0x7f)); break;
+            case 0x90 ... 0x9f: TRY(machine_stack(m, stack_swap, op - 0x8f)); break;
         
             default: return false;
         }

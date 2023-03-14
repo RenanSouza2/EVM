@@ -18,4 +18,7 @@ void stack_free(stack_t s);
 bool stack_push(stack_p s, bytes32_t b);
 bool stack_pop(bytes32_p b32, stack_p s);
 
+bool stack_dup(stack_p s, int index);
+bool stack_swap(stack_p s, int index);
+
 #endif
