@@ -123,10 +123,9 @@ extern const bytes32_t b_max;
 extern const bytes32_t b_max_1;
 extern const bytes32_t b_Q255;
 
-#endif
+void bytes32_display(bytes32_t b);
 
-#define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
-#define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
+#endif
 
 #define BYTES64_BYTES32(B64, B32)   \
     {   \
@@ -145,8 +144,6 @@ extern const bytes32_t b_Q255;
 
 #define BYTES_N_OP_UINT(OP, SCALAR, B, ARGS...) bytes_n_##OP##_uint(SCALAR, B.v, ARGS)
 #define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, SCALAR32, B, ARGS)
-
-void bytes32_display(bytes32_t b);
 
 bool bytes_n_is_zero_bool(int scalar, const uint b[scalar]);
 int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
