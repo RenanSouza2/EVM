@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "header.h"
-#include "../bytes/header.h"
+#include "../bytes_din/header.h"
 #include "../stack/header.h"
 
 STRUCT(env)
@@ -13,17 +13,17 @@ STRUCT(env)
     bytes32_t origin;
     bytes32_t caller;
     bytes32_t callvalue;
-    bytes_t calldata;
+    bytes_din_t calldata;
     bytes32_t gasprice;
 };
 
 STRUCT(machine)
 {
-    bytes_t code;
+    bytes_din_t code;
     int pc;
     stack_t st;
     env_t env;
-    bytes_t returndata;
+    bytes_din_t returndata;
 };
 
 typedef bytes32_t (*bytes32_1_1_f)(bytes32_t);

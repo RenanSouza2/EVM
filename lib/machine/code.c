@@ -10,11 +10,11 @@
 
 #include "../bytes32/debug.h"
 #include "../stack/debug.h"
-#include "../bytes/debug.h"
+#include "../bytes_din/debug.h"
 
 bool machine_memory()
 {
-    return stack_memory() && bytes_memory();
+    return stack_memory() && bytes_din_memory();
 }
 
 #endif
@@ -22,7 +22,7 @@ bool machine_memory()
 machine_t machine_init(char s[])
 {
     machine_t m;
-    m.code = bytes_create_string(s);
+    m.code = bytes_din_create_string(s);
     m.pc = 0;
     m.st = stack_init();
     return m;
@@ -31,14 +31,14 @@ machine_t machine_init(char s[])
 void machine_free(machine_t m)
 {
     stack_free(m.st);
-    bytes_free(m.code);
+    bytes_din_free(m.code);
 }
 
 bool machine_push(machine_p m, uchar op)
 {
     int size = op - 0x5f;
-    bytes_t bs = bytes_get_mult(m->code, m->pc, size);
-    bytes32_t b = bytes32_bytes(bs);
+    bytes_din_t bs = bytes_din_get_mult(m->code, m->pc, size);
+    bytes32_t b = bytes32_bytes_din(bs);
     TRY(stack_push(&m->st, b));
     m->pc += size;
     return true;
@@ -95,7 +95,7 @@ bool machine_exec(machine_p m, char code[])
 
     while (true)
     {
-        uchar op = bytes_get(m->code, m->pc++);
+        uchar op = bytes_din_get(m->code, m->pc++);
         switch (op)
         {
             case 0x00: return true;

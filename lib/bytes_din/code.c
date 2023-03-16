@@ -8,21 +8,21 @@
 
 #ifdef DEBUG
 
-int bytes_created;
+int bytes_din_created;
 
-#define BYTES_INC() bytes_created++;
-#define BYTES_DEC() \
+#define BYTES_DIN_INC() bytes_din_created++;
+#define BYTES_DIN_DEC() \
     {   \
-        assert(bytes_created > 0);  \
-        bytes_created--;    \
+        assert(bytes_din_created > 0);  \
+        bytes_din_created--;    \
     }
 
-bool bytes_memory()
+bool bytes_din_memory()
 {
-    return bytes_created == 0;
+    return bytes_din_created == 0;
 }
 
-void bytes_display(bytes_t b)
+void bytes_din_display(bytes_din_t b)
 {
     printf("\nbytes size: %d", b.n);
     for(int i=0; i<b.n; i++)
@@ -31,8 +31,8 @@ void bytes_display(bytes_t b)
 }
 
 #else
-#define BYTES_INC()
-#define BYTES_DEC()
+#define BYTES_DIN_INC()
+#define BYTES_DIN_DEC()
 #endif
 
 
@@ -57,54 +57,54 @@ uchar byte_char_2(uchar c1, uchar c2)
 
 
 
-bytes_t bytes_create_string(char s[])
+bytes_din_t bytes_din_create_string(char s[])
 {
     int len = strlen((char*)s);
     assert((len & 1) == 0);
 
     uchar *s_out = malloc(len >> 1);
     assert(s_out);
-    BYTES_INC();
+    BYTES_DIN_INC();
 
     for(int i=0; i<len; i += 2)
         s_out[i>>1] = byte_char_2(s[i], s[i+1]);
     
-    return (bytes_t){len >> 1, s_out};
+    return (bytes_din_t){len >> 1, s_out};
 }
 
-void bytes_free(bytes_t b)
+void bytes_din_free(bytes_din_t b)
 {
-    BYTES_DEC();
+    BYTES_DIN_DEC();
     free(b.s);
 }
 
 
-uchar bytes_get(bytes_t b, int n)
+uchar bytes_din_get(bytes_din_t b, int n)
 {
     if(n >= b.n) return 0;
     return b.s[n];
 }
 
-bytes_t bytes_get_mult(bytes_t b, int n, int size)
+bytes_din_t bytes_din_get_mult(bytes_din_t b, int n, int size)
 {
     uchar *s = malloc(size);
     assert(s);
-    BYTES_INC();
+    BYTES_DIN_INC();
 
     for(int i=0; i<size; i++)
-        s[i] = bytes_get(b, n+i);
+        s[i] = bytes_din_get(b, n+i);
     
-    return (bytes_t){size, s};
+    return (bytes_din_t){size, s};
 }
 
-bytes32_t bytes32_bytes(bytes_t b)
+bytes32_t bytes32_bytes_din(bytes_din_t b)
 {
     assert(b.n <= 32);
     bytes32_t b32;
     BYTES32_RESET(b32)
     for(int i=0; i<b.n; i++)
         ((uchar*)&b32)[i] = b.s[b.n-1-i];
-    bytes_free(b);
+    bytes_din_free(b);
 
     return b32;
 }

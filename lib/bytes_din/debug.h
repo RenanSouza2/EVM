@@ -14,8 +14,8 @@
         assert(memcmp(BYTES.s, b_exp, SIZE) == 0);  \
     }
 
-bool bytes_memory();
-void bytes_display(bytes_t b);
+bool bytes_din_memory();
+void bytes_din_display(bytes_din_t b);
 
 #endif
 
