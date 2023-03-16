@@ -3,9 +3,11 @@
 
 #include "header.h"
 
-extern int stack_created;
+#ifdef DEBUG
 
 void stack_display(stack_t s);
 bool stack_memory();
+
+#endif
 
 #endif

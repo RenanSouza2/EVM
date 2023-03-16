@@ -31,7 +31,11 @@ typedef bytes32_t (*bytes32_2_1_f)(bytes32_t,bytes32_t);
 typedef bytes32_t (*bytes32_3_1_f)(bytes32_t,bytes32_t,bytes32_t);
 typedef bool (*stack_int_f)(stack_p, int);
 
+#ifdef DEBUG
+
 bool machine_memory();
+
+#endif
 
 machine_t machine_init(char s[]);
 void machine_free(machine_t m);
