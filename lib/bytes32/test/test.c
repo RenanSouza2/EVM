@@ -7,26 +7,6 @@
 
 
 
-void test_is_zero_bool()
-{
-    printf("\n\t\t\ttest is zero bool\t\t");
-
-    bytes32_t b = BYTES32_UINT(0);
-    bool is_zero = bytes_n_is_zero_bool(SCALAR32, b.v);
-    assert(is_zero == true);
-
-    for(int i=0; i<SCALAR32; i++)
-    {
-        b = BYTES32_UINT(0);
-        b.v[i] = 1;
-        is_zero = bytes_n_is_zero_bool(SCALAR32, b.v);
-        assert(is_zero == false);
-    }
-
-    is_zero = bytes_n_is_zero_bool(SCALAR32, b_max.v);
-    assert(is_zero == false);
-}
-
 void test_cmp()
 {
     printf("\n\t\t\ttest cmp");
@@ -72,7 +52,6 @@ void test_base_compare()
 {
     printf("\n\t\ttest base compare");
 
-    test_is_zero_bool();
     test_cmp();
 }
 

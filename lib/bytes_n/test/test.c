@@ -75,6 +75,29 @@ void test_bytes_n()
     test_suit(8);
 }
 
+void test_is_zero_bool(int scalar)
+{
+    printf("\n\t\t\ttest is zero bool\t\t");
+
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+    bool is_zero = bytes_n_is_zero(scalar, b);
+    assert(is_zero == true);
+
+    for(int i=0; i<scalar; i++)
+    {
+        BYTES_N_RESET(scalar, b);
+        b[i] = 1;
+        is_zero = bytes_n_is_zero(scalar, b);
+        assert(is_zero == false);
+    }
+
+    memset(b, 255, scalar << 2);
+    is_zero = bytes_n_is_zero(scalar, b);
+    assert(is_zero == false);
+}
+
+
 
 int main() 
 {

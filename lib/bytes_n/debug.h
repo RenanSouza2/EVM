@@ -5,8 +5,6 @@
 
 #include <string.h>
 
-#define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
-#define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
 #define BYTES_N_SET_UINT(SCALAR, B, UINT)    \
     {   \
         BYTES_N_RESET(SCALAR, B);    \

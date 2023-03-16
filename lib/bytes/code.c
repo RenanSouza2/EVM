@@ -22,13 +22,6 @@ bool bytes_memory()
     return bytes_created == 0;
 }
 
-#else
-#define BYTES_INC()
-#define BYTES_DEC()
-#endif
-
-
-
 void bytes_display(bytes_t b)
 {
     printf("\nbytes size: %d", b.n);
@@ -36,6 +29,15 @@ void bytes_display(bytes_t b)
         printf("\nbytes[%d]: %2x", i, b.s[i]);
     printf("\n");
 }
+
+#else
+#define BYTES_INC()
+#define BYTES_DEC()
+#endif
+
+
+
+
 
 uchar byte_char_1(uchar c)
 {

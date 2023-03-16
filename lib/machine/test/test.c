@@ -9,16 +9,19 @@ void test_push()
 {
     printf("\n\ttest push\t\t");
 
+    printf("\n\t\ttest push 1\t\t");
     machine_t m = machine_init("ab");
     assert(machine_push(&m, 0x60));
     ASSERT_BYTES32_UINT(m.st.b[0], 0xAB);
     machine_free(m);
     
+    printf("\n\t\ttest push 2\t\t");
     m = machine_init("ab");
     assert(machine_push(&m, 0x61));
     ASSERT_BYTES32_UINT(m.st.b[0], 0xAB00);
     machine_free(m);
     
+    printf("\n\t\ttest push 3\t\t");
     m = machine_init("ab");
     assert(machine_push(&m, 0x7f));
     ASSERT_BYTES32(m.st.b[0], 0xAB000000, 0, 0, 0, 0, 0, 0, 0);

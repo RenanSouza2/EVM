@@ -145,7 +145,6 @@ void bytes32_display(bytes32_t b);
 #define BYTES_N_OP_UINT(OP, SCALAR, B, ARGS...) bytes_n_##OP##_uint(SCALAR, B.v, ARGS)
 #define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, SCALAR32, B, ARGS)
 
-bool bytes_n_is_zero_bool(int scalar, const uint b[scalar]);
 int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
 int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
 

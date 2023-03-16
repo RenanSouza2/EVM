@@ -34,8 +34,9 @@ void machine_free(machine_t m)
     bytes_free(m.code);
 }
 
-bool machine_push(machine_p m, int size)
+bool machine_push(machine_p m, uchar op)
 {
+    int size = op - 0x5f;
     bytes_t bs = bytes_get_mult(m->code, m->pc, size);
     bytes32_t b = bytes32_bytes(bs);
     TRY(stack_push(&m->st, b));
@@ -127,7 +128,7 @@ bool machine_exec(machine_p m, char code[])
 
             case 0x50: TRY(machine_pop(m)); break;
 
-            case 0x60 ... 0x7f: TRY(machine_push(m, op - 0x5f)); break;
+            case 0x60 ... 0x7f: TRY(machine_push(m, op)); break;
             case 0x80 ... 0x8f: TRY(machine_stack(m, stack_dup, op - 0x7f)); break;
             case 0x90 ... 0x9f: TRY(machine_stack(m, stack_swap, op - 0x8f)); break;
         
