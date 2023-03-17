@@ -199,12 +199,73 @@ void test_cmps(int scalar)
 
 
 
+void test_not(int scalar)
+{
+    printf("\n\t\t\ttest not\t\t");
+
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+    bytes_n_not(scalar, b);
+    {
+        uint b_res[scalar];
+        BYTES_N_SET_MAX(scalar, b_res);
+        ASSERT_BYTES_N_MUTUAL(scalar, b, b_res);
+    }
+}
+
+void test_minus(int scalar)
+{
+    printf("\n\t\t\ttest minus\t\t");
+
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+    bytes_n_minus(scalar, b);
+    ASSERT_BYTES_N(scalar, b, 0);
+    
+    BYTES_N_SET_UINT(scalar, b, 1);
+    bytes_n_minus(scalar, b);
+    {
+        uint b_res[scalar];
+        BYTES_N_SET_MAX(scalar, b_res);
+        ASSERT_BYTES_N_MUTUAL(scalar, b, b_res);
+    }
+    
+    
+    BYTES_N_SET_UINT(scalar, b, 2);
+    bytes_n_minus(scalar, b);
+    {
+        uint b_res[scalar];
+        BYTES_N_SET_MAX(scalar, b_res);
+        b_res[0] = UINT_MAX - 1;
+        ASSERT_BYTES_N_MUTUAL(scalar, b, b_res);
+    }
+
+    BYTES_N_SET_POS(scalar, b, 0x80000000, scalar - 1);
+    bytes_n_minus(scalar, b);
+    {
+        uint b_res[scalar];
+        BYTES_N_SET_POS(scalar, b_res, 0x80000000, scalar - 1);
+        ASSERT_BYTES_N_MUTUAL(scalar, b, b_res);
+    }
+}
+
+void test_unary(int scalar)
+{
+    printf("\n\t\ttest unary\t\t");
+    
+    test_not(scalar);
+    test_minus(scalar);
+}
+
+
+
 void test_suit(int scalar)
 {
     printf("\n\ttest suit %d", scalar << 2);
 
     test_uint(scalar);
     test_cmps(scalar);
+    test_unary(scalar);
 }
 
 void test_bytes_n()
