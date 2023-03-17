@@ -280,11 +280,38 @@ void test_add(int scalar)
     ASSERT_BYTES_N(scalar, b1, 0);
 }
 
+
+void test_sub(int scalar)
+{
+    printf("\n\t\t\ttest sub\t\t");
+
+    uint b1[scalar], b2[scalar];
+    BYTES_N_SET_UINT(scalar, b1, 3, 4);
+    BYTES_N_SET_UINT(scalar, b2, 1, 2);
+    bytes_n_sub(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 2, 2);
+    
+    BYTES_N_SET_UINT(scalar, b1, UINT_MAX, UINT_MAX);
+    BYTES_N_SET_UINT(scalar, b2, 1, UINT_MAX);
+    bytes_n_sub(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, UINT_MAX - 1);
+    
+    BYTES_N_SET_UINT(scalar, b1, 3);
+    BYTES_N_SET_UINT(scalar, b2, 5);
+    bytes_n_sub(scalar, b1, b2);
+    {
+        BYTES_N_SET_MAX(scalar, b2);
+        b2[0] = UINT_MAX - 1;
+        ASSERT_BYTES_N_MUTUAL(scalar, b1, b2);
+    }
+}
+
 void test_binary(int scalar)
 {
     printf("\n\t\ttest binary\t\t");
     
     test_add(scalar);
+    test_sub(scalar);
 }
 
 
