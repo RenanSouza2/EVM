@@ -42,7 +42,6 @@ void test_cmp_uint(int scalar)
     assert(res == 0);
 }
 
-// void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i)
 void test_add_uint(int scalar)
 {
     printf("\n\t\t\ttest add uint\t\t");
@@ -50,8 +49,33 @@ void test_add_uint(int scalar)
     uint b[scalar];
     BYTES_N_RESET(scalar, b);
     bytes_n_add_uint(scalar, b, 0, 0);
+    ASSERT_BYTES_N(scalar, b, 0);
+    
+    BYTES_N_SET_UINT(scalar, b, 2);
+    bytes_n_add_uint(scalar, b, 3, 0);
+    ASSERT_BYTES_N(scalar, b, 5);
+
+    BYTES_N_SET_UINT(scalar, b, UINT_MAX);
+    bytes_n_add_uint(scalar, b, UINT_MAX, 0);
+    ASSERT_BYTES_N(scalar, b, UINT_MAX - 1, 1);
+
+    BYTES_N_SET_POS(scalar, b, UINT_MAX, scalar - 1);
+    bytes_n_add_uint(scalar, b, 1, scalar-1);
+    ASSERT_BYTES_N(scalar, b, 0);
+}
+
+// void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift)
+void test_shl_uint(int scalar)
+{
+    printf("\n\t\t\ttest shl uint\t\t");
+
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+    bytes_n_add_uint(scalar, b, 0, 0);
 
 }
+
+
 
 void test_uint(int scalar)
 {
@@ -59,7 +83,10 @@ void test_uint(int scalar)
 
     test_cmp_uint(scalar);
     test_add_uint(scalar);
+    test_shl_uint(scalar);
 }
+
+
 
 void test_suit(int scalar)
 {

@@ -15,6 +15,8 @@ void bytes_n_display(int scalar, const uint b[scalar])
 
 #endif
 
+
+
 int bytes_n_cmp_uint(int scalar, const uint b[scalar], uint u)
 {
     for(int i=scalar-1; i>0; i--)
