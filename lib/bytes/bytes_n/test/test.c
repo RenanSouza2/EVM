@@ -4,6 +4,8 @@
 
 #include "../debug.h"
 
+
+
 void test_cmp_uint(int scalar)
 {
     printf("\n\t\t\ttest cmp uint\t\t");
@@ -122,8 +124,6 @@ void test_shr_uint(int scalar)
     ASSERT_BYTES_N(scalar, b, 0);
 }
 
-
-
 void test_uint(int scalar)
 {
     printf("\n\t\ttest uint\t\t");
@@ -136,11 +136,40 @@ void test_uint(int scalar)
 
 
 
+void test_is_zero(int scalar)
+{
+    printf("\n\t\t\ttest is zero\t\t");
+
+    uint b[scalar];
+    BYTES_N_RESET(scalar, b);
+    bool res = bytes_n_is_zero(scalar, b);
+    assert(res);
+
+    for(int i=0; i<scalar; i++)
+    {
+        BYTES_N_SET_POS(scalar, b, 1, i);
+        res = bytes_n_is_zero(scalar, b);
+        assert(res == false);
+    }
+}
+
+
+
+void test_cmps(int scalar)
+{
+    printf("\n\t\ttest cmps\t\t");
+    
+    test_is_zero(scalar);
+}
+
+
+
 void test_suit(int scalar)
 {
     printf("\n\ttest suit %d", scalar << 2);
 
     test_uint(scalar);
+    test_cmps(scalar);
 }
 
 void test_bytes_n()
