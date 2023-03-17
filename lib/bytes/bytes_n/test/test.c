@@ -259,6 +259,36 @@ void test_unary(int scalar)
 
 
 
+void test_add(int scalar)
+{
+    printf("\n\t\t\ttest add\t\t");
+
+    uint b1[scalar], b2[scalar];
+    BYTES_N_SET_UINT(scalar, b1, 1, 2);
+    BYTES_N_SET_UINT(scalar, b2, 3, 4);
+    bytes_n_add(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 4, 6);
+    
+    BYTES_N_SET_UINT(scalar, b1, UINT_MAX, UINT_MAX);
+    BYTES_N_SET_UINT(scalar, b2, 1, UINT_MAX);
+    bytes_n_add(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 0, UINT_MAX, 1);
+    
+    BYTES_N_SET_MAX(scalar, b1);
+    BYTES_N_SET_UINT(scalar, b2, 1);
+    bytes_n_add(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 0);
+}
+
+void test_binary(int scalar)
+{
+    printf("\n\t\ttest binary\t\t");
+    
+    test_add(scalar);
+}
+
+
+
 void test_suit(int scalar)
 {
     printf("\n\ttest suit %d", scalar << 2);
@@ -266,6 +296,7 @@ void test_suit(int scalar)
     test_uint(scalar);
     test_cmps(scalar);
     test_unary(scalar);
+    test_binary(scalar);
 }
 
 void test_bytes_n()
@@ -275,28 +306,6 @@ void test_bytes_n()
     test_suit(8);
     // test_suit(16);
     // test_suit(20);
-}
-
-void test_is_zero_bool(int scalar)
-{
-    printf("\n\t\t\ttest is zero bool\t\t");
-
-    uint b[scalar];
-    BYTES_N_RESET(scalar, b);
-    bool is_zero = bytes_n_is_zero(scalar, b);
-    assert(is_zero == true);
-
-    for(int i=0; i<scalar; i++)
-    {
-        BYTES_N_RESET(scalar, b);
-        b[i] = 1;
-        is_zero = bytes_n_is_zero(scalar, b);
-        assert(is_zero == false);
-    }
-
-    memset(b, 255, scalar << 2);
-    is_zero = bytes_n_is_zero(scalar, b);
-    assert(is_zero == false);
 }
 
 
