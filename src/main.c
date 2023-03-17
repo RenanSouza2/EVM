@@ -7,7 +7,7 @@
 #include "../utils/struct.h"
 
 #include "../lib/uint/header.h"
-#include "../lib/bytes32/header.h"
+#include "../lib/bytes/bytes32/header.h"
 
 // STRUCT(stack)
 // {
