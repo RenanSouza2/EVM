@@ -153,13 +153,48 @@ void test_is_zero(int scalar)
     }
 }
 
+void test_cmp(int scalar)
+{
+    printf("\n\t\t\ttest cmp\t\t");
 
+    uint b1[scalar], b2[scalar];
+    BYTES_N_RESET(scalar, b1);
+    BYTES_N_RESET(scalar, b2);
+    int res = bytes_n_cmp(scalar, b1, b2);
+    assert(res == 0);
+
+    BYTES_N_RESET(scalar, b1);
+    BYTES_N_SET_UINT(scalar, b2, 1);
+    res = bytes_n_cmp(scalar, b1, b2);
+    assert(res < 0);
+
+    BYTES_N_SET_UINT(scalar, b1, 1);
+    BYTES_N_RESET(scalar, b2);
+    res = bytes_n_cmp(scalar, b1, b2);
+    assert(res > 0);
+
+    BYTES_N_SET_UINT(scalar, b1, 1);
+    BYTES_N_SET_UINT(scalar, b2, 1);
+    res = bytes_n_cmp(scalar, b1, b2);
+    assert(res == 0);
+
+    BYTES_N_SET_UINT(scalar, b1, 0, 1);
+    BYTES_N_SET_UINT(scalar, b2, 1);
+    res = bytes_n_cmp(scalar, b1, b2);
+    assert(res > 0);
+
+    BYTES_N_SET_UINT(scalar, b1, 1);
+    BYTES_N_SET_UINT(scalar, b2, 0, 1);
+    res = bytes_n_cmp(scalar, b1, b2);
+    assert(res < 0);
+}
 
 void test_cmps(int scalar)
 {
     printf("\n\t\ttest cmps\t\t");
     
     test_is_zero(scalar);
+    test_cmp(scalar);
 }
 
 
