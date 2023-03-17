@@ -88,6 +88,38 @@ void test_shl_uint(int scalar)
     BYTES_N_SET_POS(scalar, b, UINT_MAX, scalar-2);
     bytes_n_shl_uint(scalar, b, 48);
     ASSERT_BYTES_N_LAST(scalar, b, 0xFFFF0000);
+
+    BYTES_N_SET_MAX(scalar, b);
+    bytes_n_shl_uint(scalar, b, 1000);
+    ASSERT_BYTES_N(scalar, b, 0);
+}
+
+void test_shr_uint(int scalar)
+{
+    printf("\n\t\t\ttest shr uint\t\t");
+
+    const uint last = 0x80000000;
+
+    uint b[scalar];
+    BYTES_N_SET_UINT(scalar, b, last);
+    bytes_n_shr_uint(scalar, b, 0);
+    ASSERT_BYTES_N(scalar, b, last);
+
+    BYTES_N_SET_UINT(scalar, b, last);
+    bytes_n_shr_uint(scalar, b, 1);
+    ASSERT_BYTES_N(scalar, b, 0x40000000);
+
+    BYTES_N_SET_UINT(scalar, b, 0, 1);
+    bytes_n_shr_uint(scalar, b, 32);
+    ASSERT_BYTES_N(scalar, b, 1);
+
+    BYTES_N_SET_UINT(scalar, b, 0x11111111, 0x22222222);
+    bytes_n_shr_uint(scalar, b, 16);
+    ASSERT_BYTES_N(scalar, b, 0x22221111, 0x00002222);
+
+    BYTES_N_SET_MAX(scalar, b);
+    bytes_n_shr_uint(scalar, b, 1000);
+    ASSERT_BYTES_N(scalar, b, 0);
 }
 
 
@@ -99,6 +131,7 @@ void test_uint(int scalar)
     test_cmp_uint(scalar);
     test_add_uint(scalar);
     test_shl_uint(scalar);
+    test_shr_uint(scalar);
 }
 
 

@@ -28,6 +28,8 @@
         memcpy(B, b_tmp_all, sizeof b_tmp_all);    \
     }
 
+#define BYTES_N_SET_MAX(SCALAR, B) memset(B, 1, SCALAR << 2)
+
 #define ASSERT_BYTES_N_MUTUAL(SCALAR, B1, B2) assert(memcmp(B1, B2, SCALAR << 2) == 0)
 
 #define ASSERT_BYTES_N(SCALAR, B, UINT...)    \
