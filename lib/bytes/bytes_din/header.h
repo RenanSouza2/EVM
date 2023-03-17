@@ -1,7 +1,7 @@
 #ifndef __BYTES_H__
 #define __BYTES_H__
 
-#include "../../utils/struct.h"
+#include "../../../utils/struct.h"
 #include "../bytes32/header.h"
 
 typedef unsigned char uchar;

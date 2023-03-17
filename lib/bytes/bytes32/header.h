@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "../../utils/struct.h"
-#include "../uint/header.h"
+#include "../../../utils/struct.h"
+#include "../../uint/header.h"
 
 #define SCALAR32 8
 STRUCT(bytes32)

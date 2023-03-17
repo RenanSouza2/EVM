@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "header.h"
-#include "../bytes_din/header.h"
+#include "../bytes/bytes_din/header.h"
 #include "../stack/header.h"
 
 STRUCT(env)

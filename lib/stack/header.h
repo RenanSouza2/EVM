@@ -2,7 +2,7 @@
 #define __STACK_H__
 
 #include "../../utils/struct.h"
-#include "../bytes32/header.h"
+#include "../bytes/bytes32/header.h"
 
 #define STACK_MAX 1024
 

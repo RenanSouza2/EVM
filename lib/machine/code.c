@@ -8,9 +8,9 @@
 
 #ifdef DEBUG
 
-#include "../bytes32/debug.h"
+#include "../bytes/bytes32/debug.h"
+#include "../bytes/bytes_din/debug.h"
 #include "../stack/debug.h"
-#include "../bytes_din/debug.h"
 
 bool machine_memory()
 {

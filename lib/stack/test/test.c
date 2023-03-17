@@ -2,7 +2,7 @@
 #include <assert.h>
 
 #include "../debug.h"
-#include "../../bytes32/debug.h"
+#include "../../bytes/bytes32/debug.h"
 
 void test_push()
 {

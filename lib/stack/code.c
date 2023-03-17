@@ -6,7 +6,7 @@
 
 #ifdef DEBUG
 
-#include "../bytes32/debug.h"
+#include "../bytes/bytes32/debug.h"
 
 int stack_created;
 

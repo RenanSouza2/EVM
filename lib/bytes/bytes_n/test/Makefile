@@ -5,6 +5,8 @@ test: test.o
 	./test.o 
 
 test.o: test.c $(DEBUG_FILE)
+	echo "AQUI CARALHO"
+	echo $(DEBUG_FILE)
 	gcc -o $@ $^ $(FLAGS) -D DEBUG
 
 .PHONY: $(DEBUG_FILE)
