@@ -280,7 +280,6 @@ void test_add(int scalar)
     ASSERT_BYTES_N(scalar, b1, 0);
 }
 
-
 void test_sub(int scalar)
 {
     printf("\n\t\t\ttest sub\t\t");
@@ -306,12 +305,56 @@ void test_sub(int scalar)
     }
 }
 
+void test_mul(int scalar)
+{
+    printf("\n\t\t\ttest mul\t\t");
+
+    uint b1[scalar], b2[scalar];
+    BYTES_N_SET_UINT(scalar, b1, 2, 3);
+    BYTES_N_SET_UINT(scalar, b2, 4, 5);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 8, 22, 15);
+    
+    BYTES_N_SET_UINT(scalar, b1, UINT_MAX, UINT_MAX);
+    BYTES_N_SET_UINT(scalar, b2, UINT_MAX);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 1, UINT_MAX, UINT_MAX - 1);
+    
+    BYTES_N_SET_MAX(scalar, b1);
+    BYTES_N_SET_MAX(scalar, b2);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 1);
+}
+
+void test_div_mod(int scalar)
+{
+    printf("\n\t\t\ttest div mod\t\t");
+
+    uint b1[scalar], b2[scalar];
+    BYTES_N_SET_UINT(scalar, b1, 2, 3);
+    BYTES_N_SET_UINT(scalar, b2, 4, 5);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 8, 22, 15);
+    
+    BYTES_N_SET_UINT(scalar, b1, UINT_MAX, UINT_MAX);
+    BYTES_N_SET_UINT(scalar, b2, UINT_MAX);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 1, UINT_MAX, UINT_MAX - 1);
+    
+    BYTES_N_SET_MAX(scalar, b1);
+    BYTES_N_SET_MAX(scalar, b2);
+    bytes_n_mul(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 1);
+}
+
 void test_binary(int scalar)
 {
     printf("\n\t\ttest binary\t\t");
     
     test_add(scalar);
     test_sub(scalar);
+    test_mul(scalar);
+    test_div_mod(scalar);
 }
 
 

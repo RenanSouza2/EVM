@@ -157,11 +157,17 @@ void bytes_n_mul(int scalar, uint b1[scalar], const uint b2[scalar])
     BYTES_N_RESET(scalar, b);
 
     for(int i=0; i<scalar; i++)
-    for(int j=0; j+i<scalar; j++)
     {
-        luint lu = uint_mul(b1[i], b2[j]);
-        bytes_n_add_uint(scalar, b, DECL(lu), i+j);
-        bytes_n_add_uint(scalar, b, DECH(lu), i+j+1);
+        if(b1[i] == 0) continue;
+        
+        for(int j=0; j+i<scalar; j++)
+        {
+            if(b2[j] == 0) continue;
+
+            luint lu = uint_mul(b1[i], b2[j]);
+            bytes_n_add_uint(scalar, b, DECL(lu), i+j);
+            bytes_n_add_uint(scalar, b, DECH(lu), i+j+1);
+        }
     }
     
     BYTES_N_SET(scalar, b1, b);
