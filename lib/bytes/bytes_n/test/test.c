@@ -64,15 +64,30 @@ void test_add_uint(int scalar)
     ASSERT_BYTES_N(scalar, b, 0);
 }
 
-// void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift)
 void test_shl_uint(int scalar)
 {
     printf("\n\t\t\ttest shl uint\t\t");
 
     uint b[scalar];
-    BYTES_N_RESET(scalar, b);
-    bytes_n_add_uint(scalar, b, 0, 0);
+    BYTES_N_SET_UINT(scalar, b, 1);
+    bytes_n_shl_uint(scalar, b, 0);
+    ASSERT_BYTES_N(scalar, b, 1);
 
+    BYTES_N_SET_UINT(scalar, b, 1);
+    bytes_n_shl_uint(scalar, b, 1);
+    ASSERT_BYTES_N(scalar, b, 2);
+
+    BYTES_N_SET_UINT(scalar, b, 1);
+    bytes_n_shl_uint(scalar, b, 32);
+    ASSERT_BYTES_N(scalar, b, 0, 1);
+
+    BYTES_N_SET_UINT(scalar, b, 0x11111111, 0x22222222);
+    bytes_n_shl_uint(scalar, b, 16);
+    ASSERT_BYTES_N(scalar, b, 0x11110000, 0x22221111, 0x00002222);
+
+    BYTES_N_SET_POS(scalar, b, UINT_MAX, scalar-2);
+    bytes_n_shl_uint(scalar, b, 48);
+    ASSERT_BYTES_N_LAST(scalar, b, 0xFFFF0000);
 }
 
 
@@ -100,6 +115,8 @@ void test_bytes_n()
     printf("\ntest example library\t\t");
 
     test_suit(8);
+    // test_suit(16);
+    // test_suit(20);
 }
 
 void test_is_zero_bool(int scalar)

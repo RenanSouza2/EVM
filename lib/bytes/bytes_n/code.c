@@ -181,7 +181,7 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
     bytes_n_shr_uint(scalar, b1_aux, 1);
 
     uint b_base[scalar];
-    BYTES_N_SET_UINT(scalar, b_base, 1);
+    BYTES_N_SET_FIRST(scalar, b_base, 1);
 
     while(bytes_n_cmp(scalar, b1_aux, b2) >= 0)
     {

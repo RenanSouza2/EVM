@@ -5,12 +5,6 @@
 
 #include <string.h>
 
-#define BYTES_N_SET_UINT(SCALAR, B, UINT)    \
-    {   \
-        BYTES_N_RESET(SCALAR, B);    \
-        B[0] = UINT;    \
-    }
-
 #ifdef DEBUG
 
 #define BYTES_N_DISPLAY(SCALAR, B)  \
@@ -25,7 +19,7 @@
         B[POS] = UINT;  \
     }
 
-#define BYTES_N_SET_ALL(SCALAR, B, ARGS...)    \
+#define BYTES_N_SET_UINT(SCALAR, B, ARGS...)    \
     {   \
         uint b_tmp_all[] = {ARGS};  \
         assert(sizeof b_tmp_all <= (SCALAR << 2)); \
@@ -39,8 +33,16 @@
 #define ASSERT_BYTES_N(SCALAR, B, UINT...)    \
     {   \
         uint b_tmp[SCALAR]; \
-        BYTES_N_SET_ALL(SCALAR, b_tmp, UINT);  \
+        BYTES_N_SET_UINT(SCALAR, b_tmp, UINT);  \
         ASSERT_BYTES_N_MUTUAL(SCALAR, B, b_tmp);    \
+    }
+
+#define ASSERT_BYTES_N_LAST(SCALAR, B, UINT)    \
+    {   \
+        uint b_tmp_last[SCALAR];    \
+        BYTES_N_RESET(SCALAR, b_tmp_last);  \
+        b_tmp_last[SCALAR-1] = UINT;    \
+        ASSERT_BYTES_N_MUTUAL(SCALAR, B, b_tmp_last);   \
     }
 
 void bytes_n_display(int scalar, const uint b[scalar]);
