@@ -112,7 +112,7 @@ void test_bytes32()
     
     b = bytes_din_create_string("0123456789abcdef");
     b32 = bytes32_bytes_din(b);
-    ASSERT_BYTES32_UINT(b32, 0x0123456789abcdef);
+    ASSERT_BYTES32(b32, 0, 0, 0, 0, 0, 0, 0x01234567, 0x89abcdef);
 
     assert(bytes_din_memory());
 }

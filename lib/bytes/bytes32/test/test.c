@@ -952,7 +952,6 @@ void test_sign_extend()
     b = bytes32_sign_extend(b_zero, b2);
     ASSERT_BYTES32_UINT(b, 0x7fffffff);
     
-    // TODO
     b2 = BYTES32(0, 0, 0, 0, 0, 0, 0x80000000, 0);
     b = bytes32_sign_extend(b_one, b2);
     ASSERT_BYTES32(b,   \
