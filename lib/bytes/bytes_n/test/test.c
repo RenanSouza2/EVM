@@ -331,20 +331,25 @@ void test_div_mod(int scalar)
     printf("\n\t\t\ttest div mod\t\t");
 
     uint b1[scalar], b2[scalar];
-    BYTES_N_SET_UINT(scalar, b1, 2, 3);
-    BYTES_N_SET_UINT(scalar, b2, 4, 5);
-    bytes_n_mul(scalar, b1, b2);
-    ASSERT_BYTES_N(scalar, b1, 8, 22, 15);
-    
-    BYTES_N_SET_UINT(scalar, b1, UINT_MAX, UINT_MAX);
+    BYTES_N_SET_UINT(scalar, b1, 108);
+    BYTES_N_SET_UINT(scalar, b2, 0);
+    bytes_n_div_mod(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 0);
+    ASSERT_BYTES_N(scalar, b2, 0);
+
+    BYTES_N_SET_UINT(scalar, b1, 108);
+    BYTES_N_SET_UINT(scalar, b2, 5);
+    bytes_n_div_mod(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 3);
+    ASSERT_BYTES_N(scalar, b2, 21);
+
+    BYTES_N_SET_MAX(scalar, b1); b1[0] = 0;
     BYTES_N_SET_UINT(scalar, b2, UINT_MAX);
-    bytes_n_mul(scalar, b1, b2);
-    ASSERT_BYTES_N(scalar, b1, 1, UINT_MAX, UINT_MAX - 1);
-    
-    BYTES_N_SET_MAX(scalar, b1);
-    BYTES_N_SET_MAX(scalar, b2);
-    bytes_n_mul(scalar, b1, b2);
-    ASSERT_BYTES_N(scalar, b1, 1);
+    bytes_n_div_mod(scalar, b1, b2);
+    ASSERT_BYTES_N(scalar, b1, 0);
+    assert(b2[0] == 0);
+    for(int i=1; i<scalar; i++)
+        assert(b2[i] == 1);
 }
 
 void test_binary(int scalar)

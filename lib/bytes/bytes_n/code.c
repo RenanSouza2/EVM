@@ -159,7 +159,7 @@ void bytes_n_mul(int scalar, uint b1[scalar], const uint b2[scalar])
     for(int i=0; i<scalar; i++)
     {
         if(b1[i] == 0) continue;
-        
+
         for(int j=0; j+i<scalar; j++)
         {
             if(b2[j] == 0) continue;
@@ -178,7 +178,6 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
     if(bytes_n_is_zero(scalar, b2))
     {
         BYTES_N_RESET(scalar, b1);
-        BYTES_N_RESET(scalar, b2);
         return;
     }
     
@@ -194,7 +193,7 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
         bytes_n_shl_uint(scalar, b2, 1);
         bytes_n_shl_uint(scalar, b_base, 1);
     }
-    
+
     uint b_out[scalar];
     BYTES_N_RESET(scalar, b_out);
     while(!bytes_n_is_zero(scalar, b_base))

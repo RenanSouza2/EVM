@@ -30,7 +30,19 @@
 
 #define BYTES_N_SET_MAX(SCALAR, B) memset(B, 0xFF, SCALAR << 2)
 
-#define ASSERT_BYTES_N_MUTUAL(SCALAR, B1, B2) assert(memcmp(B1, B2, SCALAR << 2) == 0)
+#define ASSERT_BYTES_N_MUTUAL(SCALAR, B1, B2)   \
+    {   \
+        if(memcmp(B1, B2, SCALAR << 2)) \
+        {   \
+            printf("\n\nAssertion failled");    \
+            printf("\nreturned: "); \
+            bytes_n_display(SCALAR, B1);    \
+            printf("\nexpected: "); \
+            bytes_n_display(SCALAR, B2);    \
+            printf("\n\n\t\t"); \
+            assert(false);  \
+        }   \
+    }
 
 #define ASSERT_BYTES_N(SCALAR, B, UINT...)    \
     {   \
