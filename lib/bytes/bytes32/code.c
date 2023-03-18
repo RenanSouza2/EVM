@@ -44,7 +44,7 @@ bytes32_t bytes32_sign(bytes32_sign_t bs)
     return bs.b;
 }
 
-int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
+int bytes32_scmp(bytes32_t b1, bytes32_t b2)
 {
     bytes32_sign_t bs1, bs2;
     bs1 = bytes32_design(b1);
@@ -73,16 +73,6 @@ int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2)
 
 
 
-bytes32_t bytes32_is_zero(bytes32_t b)
-{
-    return BYTES32_UINT(BYTES32_OP_1(is_zero, b));
-}
-
-bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
-{
-    return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) == 0);
-}
-
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
 {
     return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) < 0);
@@ -93,14 +83,24 @@ bytes32_t bytes32_gt(bytes32_t b1, bytes32_t b2)
     return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) > 0);
 }
 
-bytes32_t bytes32_sign_lt(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_slt(bytes32_t b1, bytes32_t b2)
 {
-    return BYTES32_UINT(bytes32_sign_cmp(b1, b2) < 0);
+    return BYTES32_UINT(bytes32_scmp(b1, b2) < 0);
 }
 
-bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
+bytes32_t bytes32_sgt(bytes32_t b1, bytes32_t b2)
 {
-    return BYTES32_UINT(bytes32_sign_cmp(b1, b2) > 0);
+    return BYTES32_UINT(bytes32_scmp(b1, b2) > 0);
+}
+
+bytes32_t bytes32_eq(bytes32_t b1, bytes32_t b2)
+{
+    return BYTES32_UINT(BYTES32_OP_2(cmp, b1, b2) == 0);
+}
+
+bytes32_t bytes32_is_zero(bytes32_t b)
+{
+    return BYTES32_UINT(BYTES32_OP_1(is_zero, b));
 }
 
 

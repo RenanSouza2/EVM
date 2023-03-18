@@ -7,6 +7,74 @@
 
 
 
+void test_design()
+{
+    printf("\n\t\t\ttest design\t\t");
+
+    bytes32_sign_t bs = bytes32_design(b_zero);
+    assert(bs.sign == 1);
+    ASSERT_BYTES32_UINT(bs.b, 0);
+    
+    bs = bytes32_design(b_one);
+    assert(bs.sign == 1);
+    ASSERT_BYTES32_UINT(bs.b, 1);
+    
+    bytes32_t b = BYTES32(    \
+        0x7FFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, \
+        0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF  \
+    );
+    bs = bytes32_design(b);
+    assert(bs.sign == 1);
+    ASSERT_BYTES32_MUTUAL(bs.b, b);
+    
+    bs = bytes32_design(b_max);
+    assert(bs.sign == -1);
+    ASSERT_BYTES32_UINT(bs.b, 1);
+
+    bs = bytes32_design(b_Q255);
+    assert(bs.sign == -1);
+    ASSERT_BYTES32_MUTUAL(bs.b, b_Q255);
+}
+
+void test_sign()
+{
+    printf("\n\t\t\ttest sign\t\t");
+
+    bytes32_sign_t bs32 = (bytes32_sign_t){1, b_zero};
+    bytes32_t b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    bs32 = (bytes32_sign_t){-1, b_zero};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    bs32 = (bytes32_sign_t){1, b_one};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_UINT(b, 1);
+    
+    bs32 = (bytes32_sign_t){-1, b_one};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+    
+    bs32 = (bytes32_sign_t){1, b_Q255};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
+    
+    bs32 = (bytes32_sign_t){-1, b_Q255};
+    b = bytes32_sign(bs32);
+    ASSERT_BYTES32_MUTUAL(b, b_Q255);
+}
+
+void test_base_sign()
+{
+    printf("\n\t\ttest base sign");
+
+    test_design();
+    test_sign();
+}
+
+
+
 void test_cmp()
 {
     printf("\n\t\t\ttest cmp");
@@ -48,11 +116,52 @@ void test_cmp()
     assert(res < 0); 
 }
 
+// int bytes32_scmp(bytes32_t b1, bytes32_t b2)
+void test_scmp()
+{
+    printf("\n\t\t\ttest scmp");
+
+    bytes32_t b1, b2;
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(0);
+    int res = bytes32_scmp(b1, b2);
+    assert(res == 0);
+    
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(2);
+    res = bytes32_scmp(b1, b2);
+    assert(res < 0);
+    
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(1);
+    res = bytes32_scmp(b1, b2);
+    assert(res > 0);
+    
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(1);
+    res = bytes32_scmp(b1, b2);
+    assert(res < 0);
+    
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(0);
+    res = bytes32_scmp(b1, b2);
+    assert(res > 0);
+
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_MINUS(1);
+    res = bytes32_scmp(b1, b2);
+    assert(res > 0);
+
+    printf("\n\n\tsuccess\n\n\t\t");
+    assert(false);
+}
+
 void test_base_compare()
 {
     printf("\n\t\ttest base compare");
 
     test_cmp();
+    test_scmp();
 }
 
 
@@ -220,101 +329,16 @@ void test_base_operations()
 
 
 
-void test_design()
-{
-    printf("\n\t\t\ttest design\t\t");
-
-    bytes32_sign_t bs = bytes32_design(b_zero);
-    assert(bs.sign == 1);
-    ASSERT_BYTES32_UINT(bs.b, 0);
-    
-    bs = bytes32_design(b_one);
-    assert(bs.sign == 1);
-    ASSERT_BYTES32_UINT(bs.b, 1);
-    
-    bytes32_t b = BYTES32(    \
-        0x7FFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, \
-        0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF, 0XFFFFFFFF  \
-    );
-    bs = bytes32_design(b);
-    assert(bs.sign == 1);
-    ASSERT_BYTES32_MUTUAL(bs.b, b);
-    
-    bs = bytes32_design(b_max);
-    assert(bs.sign == -1);
-    ASSERT_BYTES32_UINT(bs.b, 1);
-
-    bs = bytes32_design(b_Q255);
-    assert(bs.sign == -1);
-    ASSERT_BYTES32_MUTUAL(bs.b, b_Q255);
-}
-
-void test_sign()
-{
-    printf("\n\t\t\ttest sign\t\t");
-
-    bytes32_sign_t bs32 = (bytes32_sign_t){1, b_zero};
-    bytes32_t b = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b, 0);
-    
-    bs32 = (bytes32_sign_t){-1, b_zero};
-    b = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b, 0);
-    
-    bs32 = (bytes32_sign_t){1, b_one};
-    b = bytes32_sign(bs32);
-    ASSERT_BYTES32_UINT(b, 1);
-    
-    bs32 = (bytes32_sign_t){-1, b_one};
-    b = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b, b_max);
-    
-    bs32 = (bytes32_sign_t){1, b_Q255};
-    b = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b, b_Q255);
-    
-    bs32 = (bytes32_sign_t){-1, b_Q255};
-    b = bytes32_sign(bs32);
-    ASSERT_BYTES32_MUTUAL(b, b_Q255);
-}
-
-void test_base_sign()
-{
-    printf("\n\t\ttest base sign");
-
-    test_design();
-    test_sign();
-}
-
 void test_base()
 {
     printf("\n\ttest base");
 
+    test_base_sign();
     test_base_compare();
     test_base_operations();
-    test_base_sign();
 }
 
 
-
-void test_is_zero()
-{
-    printf("\n\t\t\ttest is zero");
-
-    bytes32_t b_in, b_out;
-    b_in = BYTES32_UINT(0);
-    b_out = bytes32_is_zero(b_in);
-    ASSERT_BYTES32_UINT(b_out, 1);
-
-    for(int i=0; i<SCALAR32; i++)
-    {
-        b_in = BYTES32_UINT(0);
-        b_in.v[i] = 1;
-
-        b_out = bytes32_is_zero(b_in);
-        ASSERT_BYTES32_UINT(b_out, 0);
-    }
-}
 
 void test_lt()
 {
@@ -358,6 +382,40 @@ void test_gt()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+// bytes32_t bytes32_slt(bytes32_t b1, bytes32_t b2)
+void test_slt()
+{
+    printf("\n\t\t\ttest slt");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(2);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(1);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b1 = BYTES32_UINT(0);
+    b2 = BYTES32_UINT(1);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(0);
+    b = bytes32_gt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+}
+
+// bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
+
 void test_eq()
 {
     printf("\n\t\t\ttest eq");
@@ -379,14 +437,60 @@ void test_eq()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
+void test_is_zero()
+{
+    printf("\n\t\t\ttest is zero");
+
+    bytes32_t b_in, b_out;
+    b_in = BYTES32_UINT(0);
+    b_out = bytes32_is_zero(b_in);
+    ASSERT_BYTES32_UINT(b_out, 1);
+
+    for(int i=0; i<SCALAR32; i++)
+    {
+        b_in = BYTES32_UINT(0);
+        b_in.v[i] = 1;
+
+        b_out = bytes32_is_zero(b_in);
+        ASSERT_BYTES32_UINT(b_out, 0);
+    }
+}
+
 void test_bytes32_compare()
 {
     printf("\n\t\ttest bytes compare");
 
-    test_is_zero();
     test_lt();
     test_gt();
+    test_slt();
     test_eq();
+    test_is_zero();
+}
+
+
+
+// bytes32_t bytes32_and(bytes32_t b1, bytes32_t b2)
+// bytes32_t bytes32_or(bytes32_t b1, bytes32_t b2)
+// bytes32_t bytes32_xor(bytes32_t b1, bytes32_t b2)
+
+void test_not()
+{
+    printf("\n\t\t\ttest not");
+
+    bytes32_t b = bytes32_not(b_zero);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    b = bytes32_not(b_one);
+    ASSERT_BYTES32_MUTUAL(b, b_max_1);
+}
+
+// bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
+
+void test_bitwise()
+{
+    printf("\n\t\ttest bitwise");
+
+    test_not();
 }
 
 
@@ -425,16 +529,7 @@ void test_shr()
     ASSERT_BYTES32_UINT(b, 1);
 }
 
-void test_not()
-{
-    printf("\n\t\t\ttest not");
-
-    bytes32_t b = bytes32_not(b_zero);
-    ASSERT_BYTES32_MUTUAL(b, b_max);
-
-    b = bytes32_not(b_one);
-    ASSERT_BYTES32_MUTUAL(b, b_max_1);
-}
+// bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2)
 
 void test_shift()
 {
@@ -442,7 +537,6 @@ void test_shift()
 
     test_shl();
     test_shr();
-    test_not();
 }
 
 
@@ -758,6 +852,7 @@ void test_sign_extend()
     b = bytes32_sign_extend(b_zero, b2);
     ASSERT_BYTES32_UINT(b, 0x7fffffff);
     
+    // TODO
     b2 = BYTES32_UINT(0x8000000000000000);
     b = bytes32_sign_extend(b_one, b2);
     ASSERT_BYTES32(b,   \
@@ -796,6 +891,7 @@ void test_operations()
     printf("\n\ttest operation");
 
     test_bytes32_compare();
+    test_bitwise();
     test_shift();
     test_arithmetic();
 }

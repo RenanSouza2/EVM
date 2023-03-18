@@ -379,8 +379,8 @@ void test_bytes_n()
     printf("\ntest example library\t\t");
 
     test_suit(8);
-    // test_suit(16);
-    // test_suit(20);
+    test_suit(16);
+    test_suit(20);
 }
 
 
