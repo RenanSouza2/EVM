@@ -15,6 +15,8 @@ void bytes_n_display(int scalar, const uint b[scalar])
 
 #endif
 
+
+
 int bytes_n_cmp_uint(int scalar, const uint b[scalar], uint u)
 {
     for(int i=scalar-1; i>0; i--)
@@ -155,11 +157,17 @@ void bytes_n_mul(int scalar, uint b1[scalar], const uint b2[scalar])
     BYTES_N_RESET(scalar, b);
 
     for(int i=0; i<scalar; i++)
-    for(int j=0; j+i<scalar; j++)
     {
-        luint lu = uint_mul(b1[i], b2[j]);
-        bytes_n_add_uint(scalar, b, DECL(lu), i+j);
-        bytes_n_add_uint(scalar, b, DECH(lu), i+j+1);
+        if(b1[i] == 0) continue;
+
+        for(int j=0; j+i<scalar; j++)
+        {
+            if(b2[j] == 0) continue;
+
+            luint lu = uint_mul(b1[i], b2[j]);
+            bytes_n_add_uint(scalar, b, DECL(lu), i+j);
+            bytes_n_add_uint(scalar, b, DECH(lu), i+j+1);
+        }
     }
     
     BYTES_N_SET(scalar, b1, b);
@@ -170,7 +178,6 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
     if(bytes_n_is_zero(scalar, b2))
     {
         BYTES_N_RESET(scalar, b1);
-        BYTES_N_RESET(scalar, b2);
         return;
     }
     
@@ -179,14 +186,14 @@ void bytes_n_div_mod(int scalar, uint b1[scalar], uint b2[scalar])
     bytes_n_shr_uint(scalar, b1_aux, 1);
 
     uint b_base[scalar];
-    BYTES_N_SET_UINT(scalar, b_base, 1);
+    BYTES_N_SET_FIRST(scalar, b_base, 1);
 
     while(bytes_n_cmp(scalar, b1_aux, b2) >= 0)
     {
         bytes_n_shl_uint(scalar, b2, 1);
         bytes_n_shl_uint(scalar, b_base, 1);
     }
-    
+
     uint b_out[scalar];
     BYTES_N_RESET(scalar, b_out);
     while(!bytes_n_is_zero(scalar, b_base))

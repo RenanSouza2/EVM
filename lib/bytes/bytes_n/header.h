@@ -7,6 +7,11 @@
 
 #define BYTES_N_RESET(SCALAR, B) memset(B, 0, SCALAR << 2)
 #define BYTES_N_SET(SCALAR, B1, B2) memcpy(B1, B2, SCALAR << 2)
+#define BYTES_N_SET_FIRST(SCALAR, B, UINT)    \
+    {   \
+        BYTES_N_RESET(SCALAR, B);    \
+        B[0] = UINT;    \
+    }
 
 bool bytes_n_is_zero(int scalar, const uint b[scalar]);
 int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
