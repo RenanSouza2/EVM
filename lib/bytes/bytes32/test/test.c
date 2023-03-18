@@ -384,11 +384,13 @@ void test_slt()
 {
     printf("\n\t\t\ttest slt");
 
-    bytes32_t b = bytes32_slt(b_max_1, b_one);
+    bytes32_t b = bytes32_slt(b_max, b_one);
     ASSERT_BYTES32_UINT(b, 1);
     
-    b = bytes32_slt(b_one, b_max_1);
+    b = bytes32_slt(b_one, b_max);
     ASSERT_BYTES32_UINT(b, 0);
+
+    // b = bytes32_slt()
 }
 
 // bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)

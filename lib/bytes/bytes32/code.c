@@ -46,32 +46,12 @@ bytes32_t bytes32_sign(bytes32_sign_t bs)
 
 int bytes32_scmp(bytes32_t b1, bytes32_t b2)
 {
-    bool sign1 = b1[SCALAR32 - 1] & 0x80000000;
-    bool sign1 = b1[SCALAR32 - 1] & 0x80000000;
+    bool sign1, sign2;
+    sign1 = (b1.v[SCALAR32 - 1] >> 31);
+    sign2 = (b2.v[SCALAR32 - 1] >> 31);
+    if(sign1 ^ sign2) return sign2 - sign1;
 
-    bytes32_sign_t bs1, bs2;
-    bs1 = bytes32_design(b1);
-    bs2 = bytes32_design(b2);
-
-    switch (bs1.sign)
-    {
-        case  1:
-        switch (bs2.sign)
-        {
-            case  1: return BYTES32_OP_2(cmp, bs1.b, bs2.b);
-            case -1: return 1;
-        }
-        break;
-        
-        case -1:
-        switch (bs2.sign)
-        {
-            case  1: return -1;
-            case -1: return BYTES32_OP_2(cmp, bs2.b, bs1.b);
-        }
-        break;
-    }
-    assert(false);
+    return BYTES32_OP_2(cmp, b1, b2);
 }
 
 
