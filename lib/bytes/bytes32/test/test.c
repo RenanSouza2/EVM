@@ -552,13 +552,13 @@ void test_shl()
     printf("\n\t\t\ttest shl");
 
     bytes32_t b, b1, b2;
-    b1 = BYTES32_UINT(1);
-    b2 = BYTES32_UINT(255);
+    b1 = BYTES32_UINT(255);
+    b2 = BYTES32_UINT(1);
     b  = bytes32_shl(b1, b2);
     ASSERT_BYTES32_MUTUAL(b, b_Q255);
     
-    b1 = BYTES32_UINT(1);
-    b2 = BYTES32_UINT(256);
+    b1 = BYTES32_UINT(256);
+    b2 = BYTES32_UINT(1);
     b  = bytes32_shl(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
 }
@@ -567,17 +567,20 @@ void test_shr()
 {
     printf("\n\t\t\ttest shr");
 
-    bytes32_t b;
-    b = BYTES32_UINT(255);
-    b = bytes32_shr(b_Q255, b);
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(255);
+    b2 = b_Q255;
+    b = bytes32_shr(b1, b2);
     ASSERT_BYTES32_UINT(b, 1);
     
-    b = BYTES32_UINT(256);
-    b = bytes32_shr(b_Q255, b);
+    b1 = BYTES32_UINT(256);
+    b2 = b_Q255;
+    b = bytes32_shr(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
 
-    b = BYTES32_UINT(2);
-    b = bytes32_shr(b, b_one);
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(2);
+    b = bytes32_shr(b1, b2);
     ASSERT_BYTES32_UINT(b, 1);
 }
 
@@ -585,23 +588,46 @@ void test_sar()
 {
     printf("\n\t\t\ttest sar");
 
-    bytes32_t b;
-    // b1 = BYTES32()
-    b = BYTES32_UINT(3);
-    b = bytes32_sar(b_Q255, b);
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(0);
+    b2 = b_max;
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32_MUTUAL(b, b_max);
+
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_UINT(5);
+    b = bytes32_sar(b1, b2);
     ASSERT_BYTES32_UINT(b, 2);
 
-    b = BYTES32_UINT(3);
-    b = bytes32_sar(b_Q255, b);
-    ASSERT_BYTES32_UINT(b, 2);
+    b1 = BYTES32_UINT(32);
+    b2 = BYTES32(0x7FFFFFFF, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32(b, 0, 0x7FFFFFFF, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX);
     
-    b = BYTES32_UINT(2);
-    b = bytes32_sar(b_Q255, b);
+    b1 = BYTES32_UINT(15);
+    b2 = b_Q255;
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32(b, 0xFFFF0000, 0, 0, 0, 0, 0, 0, 0);
+
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_MINUS(1);
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 1);
+
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_MINUS(5);
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 3);
+
+    b1 = BYTES32_UINT(256);
+    b2 = BYTES32_MINUS(0);
+    b = bytes32_sar(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
 
-    b = BYTES32_UINT(2);
-    b = bytes32_sar(b, b_one);
-    ASSERT_BYTES32_UINT(b, 1);
+    b1 = BYTES32_UINT(256);
+    b2 = b_Q255;
+    b = bytes32_sar(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 1);
 }
 
 void test_shift()
@@ -610,6 +636,7 @@ void test_shift()
 
     test_shl();
     test_shr();
+    test_sar();
 }
 
 

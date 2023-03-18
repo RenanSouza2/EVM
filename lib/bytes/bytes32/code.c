@@ -133,33 +133,33 @@ bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
 
 bytes32_t bytes32_shl(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
-    BYTES32_OP_UINT(shl, b1, b2.v[0]);
-    return b1;
+    if(BYTES32_OP_UINT(cmp, b1, 256) >= 0) return BYTES32_UINT(0);
+    BYTES32_OP_UINT(shl, b2, b1.v[0]);
+    return b2;
 }
 
 bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
-    BYTES32_OP_UINT(shr, b1, b2.v[0]);
-    return b1;
+    if(BYTES32_OP_UINT(cmp, b1, 256) >= 0) return BYTES32_UINT(0);
+    BYTES32_OP_UINT(shr, b2, b1.v[0]);
+    return b2;
 }
 
 bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_1(is_zero, b2)) return b1;
+    if(BYTES32_OP_1(is_zero, b1)) return b2;
     
-    bool b1_sign = (b1.v[SCALAR32-1] >> 31);
-    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) 
-        return b1_sign ? BYTES32_MAX() : BYTES32_UINT(0);
+    bool b2_sign = (b2.v[SCALAR32-1] >> 31);
+    if(BYTES32_OP_UINT(cmp, b1, 256) >= 0) 
+        return b2_sign ? BYTES32_MAX() : BYTES32_UINT(0);
 
-    bytes32_t b = bytes32_shr(b1, b2);
-    if((b1.v[SCALAR32-1] >> 31) == 0) return b;
+    b2 = bytes32_shr(b1, b2);
+    if(b2_sign == 0) return b2;
 
-    bytes32_t b_q255 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
-    BYTES32_OP_UINT(shr, b_q255, b2.v[0] - 1);
-    BYTES32_OP_1(minus, b_q255);
-    return bytes32_or(b_q255, b1);
+    bytes32_t b_fill = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
+    BYTES32_OP_UINT(shr, b_fill, b1.v[0] - 1);
+    BYTES32_OP_1(minus, b_fill);
+    return bytes32_or(b_fill, b2);
 }
 
 
