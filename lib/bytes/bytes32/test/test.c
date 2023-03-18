@@ -148,7 +148,7 @@ void test_scmp()
     assert(res > 0);
 
     b1 = BYTES32_UINT(1);
-    b2 = BYTES32_MINUS(1);
+    // b2 = BYTES32_MINUS(1);
     res = bytes32_scmp(b1, b2);
     assert(res > 0);
 
@@ -221,7 +221,7 @@ void test_shl_uint()
     printf("\n\t\t\t\ttest shl uint 5\t\t");
     b = BYTES32_UINT(1);
     BYTES32_OP_UINT(shl, b, 32);
-    ASSERT_BYTES32_UINT(b, 0x100000000);
+    ASSERT_BYTES32(b, 0, 0, 0, 0, 0, 0, 1, 0);
 
     printf("\n\t\t\t\ttest shl uint 6\t\t");
     b = BYTES32(    \
@@ -853,7 +853,7 @@ void test_sign_extend()
     ASSERT_BYTES32_UINT(b, 0x7fffffff);
     
     // TODO
-    b2 = BYTES32_UINT(0x8000000000000000);
+    b2 = BYTES32(0, 0, 0, 0, 0, 0, 0x80000000, 0);
     b = bytes32_sign_extend(b_one, b2);
     ASSERT_BYTES32(b,   \
         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, \
