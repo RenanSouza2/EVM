@@ -42,6 +42,9 @@ void bytes32_display(bytes32_t b);
 #define BYTES32_DISPLAY(B32) \
     printf("\n%s: ", #B32);bytes32_display(B32);printf("\t\t");
 
+#define BYTES32_MINUS(UINT) \
+    bytes32_sign((bytes32_sign_t){-1, BYTES32_UINT(UINT)})
+
 #define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
     {   \
         if(memcmp(BYTES1.v, BYTES2.v, 32))  \
@@ -96,19 +99,14 @@ void bytes32_display(bytes32_t b);
 #define BYTES_N_OP_UINT(OP, SCALAR, B, ARGS...) bytes_n_##OP##_uint(SCALAR, B.v, ARGS)
 #define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, SCALAR32, B, ARGS)
 
+bytes32_sign_t bytes32_design(bytes32_t b);
+bytes32_t bytes32_sign(bytes32_sign_t bs);
+
 int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
 int bytes32_scmp(bytes32_t b1, bytes32_t b2);
 
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
 void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift);
 void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift);
-
-bytes32_sign_t bytes32_design(bytes32_t b);
-bytes32_t bytes32_sign(bytes32_sign_t bs);
-
-bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i);
-
-bytes64_t bytes64_add(bytes64_t b1, bytes64_t b2);
-bytes64_t bytes64_sub(bytes64_t b1, bytes64_t b2);
 
 #endif

@@ -46,6 +46,9 @@ bytes32_t bytes32_sign(bytes32_sign_t bs)
 
 int bytes32_scmp(bytes32_t b1, bytes32_t b2)
 {
+    bool sign1 = b1[SCALAR32 - 1] & 0x80000000;
+    bool sign1 = b1[SCALAR32 - 1] & 0x80000000;
+
     bytes32_sign_t bs1, bs2;
     bs1 = bytes32_design(b1);
     bs2 = bytes32_design(b2);

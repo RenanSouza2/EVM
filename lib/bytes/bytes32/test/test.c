@@ -116,20 +116,14 @@ void test_cmp()
     assert(res < 0); 
 }
 
-// int bytes32_scmp(bytes32_t b1, bytes32_t b2)
 void test_scmp()
 {
     printf("\n\t\t\ttest scmp");
 
     bytes32_t b1, b2;
-    b1 = BYTES32_UINT(0);
-    b2 = BYTES32_UINT(0);
-    int res = bytes32_scmp(b1, b2);
-    assert(res == 0);
-    
     b1 = BYTES32_UINT(1);
     b2 = BYTES32_UINT(2);
-    res = bytes32_scmp(b1, b2);
+    int res = bytes32_scmp(b1, b2);
     assert(res < 0);
     
     b1 = BYTES32_UINT(2);
@@ -137,23 +131,27 @@ void test_scmp()
     res = bytes32_scmp(b1, b2);
     assert(res > 0);
     
-    b1 = BYTES32_UINT(0);
-    b2 = BYTES32_UINT(1);
+    b1 = BYTES32_UINT(2);
+    b2 = BYTES32_UINT(2);
     res = bytes32_scmp(b1, b2);
-    assert(res < 0);
+    assert(res == 0);
     
     b1 = BYTES32_UINT(1);
-    b2 = BYTES32_UINT(0);
-    res = bytes32_scmp(b1, b2);
+    res = bytes32_scmp(b1, b_max);
     assert(res > 0);
-
-    b1 = BYTES32_UINT(1);
-    // b2 = BYTES32_MINUS(1);
-    res = bytes32_scmp(b1, b2);
+    
+    b2 = BYTES32_UINT(1);
+    res = bytes32_scmp(b_max, b2);
+    assert(res < 0);
+    
+    res = bytes32_scmp(b_max, b_max_1);
     assert(res > 0);
-
-    printf("\n\n\tsuccess\n\n\t\t");
-    assert(false);
+    
+    res = bytes32_scmp(b_max_1, b_max);
+    assert(res < 0);
+    
+    res = bytes32_scmp(b_max_1, b_max_1);
+    assert(res == 0);
 }
 
 void test_base_compare()
@@ -382,35 +380,14 @@ void test_gt()
     ASSERT_BYTES32_UINT(b, 0);
 }
 
-// bytes32_t bytes32_slt(bytes32_t b1, bytes32_t b2)
 void test_slt()
 {
     printf("\n\t\t\ttest slt");
 
-    bytes32_t b, b1, b2;
-    b1 = BYTES32_UINT(0);
-    b2 = BYTES32_UINT(0);
-    b = bytes32_gt(b1, b2);
-    ASSERT_BYTES32_UINT(b, 0);
+    bytes32_t b = bytes32_slt(b_max_1, b_one);
+    ASSERT_BYTES32_UINT(b, 1);
     
-    b1 = BYTES32_UINT(1);
-    b2 = BYTES32_UINT(2);
-    b = bytes32_gt(b1, b2);
-    ASSERT_BYTES32_UINT(b, 1);
-
-    b1 = BYTES32_UINT(2);
-    b2 = BYTES32_UINT(1);
-    b = bytes32_gt(b1, b2);
-    ASSERT_BYTES32_UINT(b, 0);
-
-    b1 = BYTES32_UINT(0);
-    b2 = BYTES32_UINT(1);
-    b = bytes32_gt(b1, b2);
-    ASSERT_BYTES32_UINT(b, 1);
-
-    b1 = BYTES32_UINT(1);
-    b2 = BYTES32_UINT(0);
-    b = bytes32_gt(b1, b2);
+    b = bytes32_slt(b_one, b_max_1);
     ASSERT_BYTES32_UINT(b, 0);
 }
 
