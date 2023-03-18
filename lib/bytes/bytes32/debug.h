@@ -28,6 +28,8 @@ STRUCT(bytes32_sign)
 
 #define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, 0, UINT)
 
+#define BYTES32_MAX() BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX)
+
 #ifdef DEBUG
 
 extern const bytes32_t b_zero;
@@ -77,6 +79,12 @@ void bytes32_display(bytes32_t b);
         bytes32_t b_exp; \
         b_exp = BYTES32_UINT(UINT); \
         ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
+    }
+
+#define ASSERT_BYTES32_MINUS(BYTES, UINT)   \
+    {   \
+        bytes32_t b_exp = BYTES32_MINUS(UINT);  \
+        ASSERT_BYTES32_MUTUAL(BYTES, b_exp);    \
     }
 
 #endif

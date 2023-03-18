@@ -29,7 +29,7 @@ void bytes32_display(bytes32_t b)
 
 bytes32_sign_t bytes32_design(bytes32_t b)
 {
-    if((b.v[SCALAR32-1] & 0x80000000) == 0) 
+    if((b.v[SCALAR32-1] >> 31) == 0) 
         return (bytes32_sign_t){1, b};
     
     BYTES32_OP_1(minus, b);
@@ -117,12 +117,12 @@ bytes32_t bytes32_not(bytes32_t b)
 
 bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
 {
-    if(BYTES32_OP_UINT(cmp, b1, 32)) return BYTES32_UINT(0);
+    if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return BYTES32_UINT(0);
     
-    int pos = b1.v[0] >> 4;
-    int off = b1.v[0] &  3;
+    int pos = b1.v[0] >> 2;
+    int off = 3 - (b1.v[0] & 3);
 
-    uint u = (b2.v[SCALAR32-1-pos] >> (off << 3)) && 3;
+    uint u = (b2.v[SCALAR32-1-pos] >> (off << 3)) & 0xFF;
     BYTES_N_RESET(SCALAR32, &b2);
     b2.v[0] = u;
 
@@ -148,10 +148,13 @@ bytes32_t bytes32_shr(bytes32_t b1, bytes32_t b2)
 bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2)
 {
     if(BYTES32_OP_1(is_zero, b2)) return b1;
-    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) return BYTES32_UINT(0);
+    
+    bool b1_sign = (b1.v[SCALAR32-1] >> 31);
+    if(BYTES32_OP_UINT(cmp, b2, 256) >= 0) 
+        return b1_sign ? BYTES32_MAX() : BYTES32_UINT(0);
 
     bytes32_t b = bytes32_shr(b1, b2);
-    if((b1.v[SCALAR32-1] & 0x80000000) == 0) return b;
+    if((b1.v[SCALAR32-1] >> 31) == 0) return b;
 
     bytes32_t b_q255 = BYTES32(0x80000000, 0, 0, 0, 0, 0, 0, 0);
     BYTES32_OP_UINT(shr, b_q255, b2.v[0] - 1);
@@ -235,7 +238,7 @@ bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
     if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return b2;
 
     int off = b1.v[0];
-    uint value = (b2.v[off] & 0x80000000) ? UINT_MAX : 0;
+    uint value = (b2.v[off] >> 31) ? UINT_MAX : 0;
     for(int i=off+1; i<SCALAR32; i++)
         b2.v[i] = value;
     return b2;

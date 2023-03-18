@@ -27,7 +27,8 @@ void test_design()
     assert(bs.sign == 1);
     ASSERT_BYTES32_MUTUAL(bs.b, b);
     
-    bs = bytes32_design(b_max);
+    b = BYTES32_MINUS(1);
+    bs = bytes32_design(b);
     assert(bs.sign == -1);
     ASSERT_BYTES32_UINT(bs.b, 1);
 
@@ -144,13 +145,19 @@ void test_scmp()
     res = bytes32_scmp(b_max, b2);
     assert(res < 0);
     
-    res = bytes32_scmp(b_max, b_max_1);
+    b1 = BYTES32_MINUS(1);
+    b2 = BYTES32_MINUS(2);
+    res = bytes32_scmp(b1, b2);
     assert(res > 0);
     
-    res = bytes32_scmp(b_max_1, b_max);
+    b1 = BYTES32_MINUS(2);
+    b2 = BYTES32_MINUS(1);
+    res = bytes32_scmp(b1, b2);
     assert(res < 0);
     
-    res = bytes32_scmp(b_max_1, b_max_1);
+    b1 = BYTES32_MINUS(2);
+    b2 = BYTES32_MINUS(2);
+    res = bytes32_scmp(b1, b2);
     assert(res == 0);
 }
 
@@ -384,16 +391,33 @@ void test_slt()
 {
     printf("\n\t\t\ttest slt");
 
-    bytes32_t b = bytes32_slt(b_max, b_one);
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_MINUS(1);
+    b2 = BYTES32_UINT(1);
+    b = bytes32_slt(b1, b2);
     ASSERT_BYTES32_UINT(b, 1);
     
-    b = bytes32_slt(b_one, b_max);
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_MINUS(1);
+    b = bytes32_slt(b1, b2);
     ASSERT_BYTES32_UINT(b, 0);
-
-    // b = bytes32_slt()
 }
 
-// bytes32_t bytes32_sign_gt(bytes32_t b1, bytes32_t b2)
+void test_sgt()
+{
+    printf("\n\t\t\ttest sgt");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_MINUS(1);
+    b2 = BYTES32_UINT(1);
+    b = bytes32_sgt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+    
+    b1 = BYTES32_UINT(1);
+    b2 = BYTES32_MINUS(1);
+    b = bytes32_sgt(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+}
 
 void test_eq()
 {
@@ -442,15 +466,45 @@ void test_bytes32_compare()
     test_lt();
     test_gt();
     test_slt();
+    test_sgt();
     test_eq();
     test_is_zero();
 }
 
 
 
-// bytes32_t bytes32_and(bytes32_t b1, bytes32_t b2)
-// bytes32_t bytes32_or(bytes32_t b1, bytes32_t b2)
-// bytes32_t bytes32_xor(bytes32_t b1, bytes32_t b2)
+void test_and()
+{
+    printf("\n\t\t\ttest and");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(0b11);
+    b2 = BYTES32_UINT(0b101);
+    b = bytes32_and(b1, b2);
+    ASSERT_BYTES32_UINT(b, 1);
+}
+
+void test_or()
+{
+    printf("\n\t\t\ttest or");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(0b11);
+    b2 = BYTES32_UINT(0b101);
+    b = bytes32_or(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0b111);
+}
+
+void test_xor()
+{
+    printf("\n\t\t\ttest xor");
+
+    bytes32_t b, b1, b2;
+    b1 = BYTES32_UINT(0b11);
+    b2 = BYTES32_UINT(0b101);
+    b = bytes32_xor(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0b110);
+}
 
 void test_not()
 {
@@ -463,13 +517,32 @@ void test_not()
     ASSERT_BYTES32_MUTUAL(b, b_max_1);
 }
 
-// bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
+void test_byte()
+{
+    printf("\n\t\t\ttest byte");
+
+    bytes32_t b, b1, b2;
+    b2 = BYTES32(   \
+        0x01020304, 0x05060708, 0x090A0B0C, 0x0D0E0F10, \
+        0x11121314, 0x15161718, 0x191A1B1C, 0x1D1E1F20  \
+    );
+    for(int i=0; i<32; i++)
+    {
+        b1 = BYTES32_UINT(i);
+        b = bytes32_byte(b1, b2);
+        ASSERT_BYTES32_UINT(b, i + 1);
+    }
+}
 
 void test_bitwise()
 {
     printf("\n\t\ttest bitwise");
 
+    test_and();
+    test_or();
+    test_xor();
     test_not();
+    test_byte();
 }
 
 
@@ -508,7 +581,28 @@ void test_shr()
     ASSERT_BYTES32_UINT(b, 1);
 }
 
-// bytes32_t bytes32_sar(bytes32_t b1, bytes32_t b2)
+void test_sar()
+{
+    printf("\n\t\t\ttest sar");
+
+    bytes32_t b;
+    // b1 = BYTES32()
+    b = BYTES32_UINT(3);
+    b = bytes32_sar(b_Q255, b);
+    ASSERT_BYTES32_UINT(b, 2);
+
+    b = BYTES32_UINT(3);
+    b = bytes32_sar(b_Q255, b);
+    ASSERT_BYTES32_UINT(b, 2);
+    
+    b = BYTES32_UINT(2);
+    b = bytes32_sar(b_Q255, b);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b = BYTES32_UINT(2);
+    b = bytes32_sar(b, b_one);
+    ASSERT_BYTES32_UINT(b, 1);
+}
 
 void test_shift()
 {
@@ -643,7 +737,7 @@ void test_div()
     ASSERT_BYTES32_UINT(b, 0);
     
 
-    printf("\n\t\t\t\ttest div 9\t\t");
+    printf("\n\t\t\t\ttest div 10\t\t");
     b = bytes32_div(b_max, b_max);
     ASSERT_BYTES32_UINT(b, 1);
 }
