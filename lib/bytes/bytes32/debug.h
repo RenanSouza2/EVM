@@ -26,28 +26,9 @@ STRUCT(bytes32_sign)
         VALUE4, VALUE5, VALUE6, VALUE7  \
     }}
 
-#define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT))
+#define BYTES32_UINT(UINT) BYTES32(0, 0, 0, 0, 0, 0, 0, UINT)
 
-#define LUINT(UINT0)    \
-    (*((luint*)(&(UINT0))))
-
-#define BYTES64(    \
-        VALUE15, VALUE14, VALUE13, VALUE12, \
-        VALUE11, VALUE10, VALUE9, VALUE8,   \
-        VALUE7, VALUE6, VALUE5, VALUE4, \
-        VALUE3, VALUE2, VALUE1, VALUE0  \
-    )   \
-    (bytes64_t){{   \
-        VALUE0, VALUE1, VALUE2, VALUE3, \
-        VALUE4, VALUE5, VALUE6, VALUE7, \
-        VALUE8, VALUE9, VALUE10, VALUE11,   \
-        VALUE12, VALUE13, VALUE14, VALUE15  \
-    }}
-
-#define BYTES64_UINT(UINT)  \
-    BYTES64( \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, DECH(UINT), DECL(UINT)    \
-    )
+#define BYTES32_MAX() BYTES32(UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX)
 
 #ifdef DEBUG
 
@@ -62,6 +43,9 @@ void bytes32_display(bytes32_t b);
 
 #define BYTES32_DISPLAY(B32) \
     printf("\n%s: ", #B32);bytes32_display(B32);printf("\t\t");
+
+#define BYTES32_MINUS(UINT) \
+    bytes32_sign((bytes32_sign_t){-1, BYTES32_UINT(UINT)})
 
 #define ASSERT_BYTES32_MUTUAL(BYTES1, BYTES2) \
     {   \
@@ -97,32 +81,10 @@ void bytes32_display(bytes32_t b);
         ASSERT_BYTES32_MUTUAL(BYTES, b_exp); \
     }
 
-
-#define ASSERT_BYTES64_MUTUAL(BYTES1, BYTES2) \
-    assert(memcmp(BYTES1.v, BYTES2.v, 64) == 0)
-
-#define ASSERT_BYTES64(BYTES, \
-        VALUE15, VALUE14, VALUE13, VALUE12, \
-        VALUE11, VALUE10, VALUE9, VALUE8,   \
-        VALUE7, VALUE6, VALUE5, VALUE4, \
-        VALUE3, VALUE2, VALUE1, VALUE0  \
-    ) \
-    { \
-        bytes64_t bd_exp; \
-        bd_exp = BYTES64( \
-            VALUE15, VALUE14, VALUE13, VALUE12, \
-            VALUE11, VALUE10, VALUE9, VALUE8,   \
-            VALUE7, VALUE6, VALUE5, VALUE4, \
-            VALUE3, VALUE2, VALUE1, VALUE0  \
-        ); \
-        ASSERT_BYTES64_MUTUAL(BYTES, bd_exp); \
-    }
-
-#define ASSERT_BYTES64_UINT(BYTES, UINT) \
-    { \
-        bytes64_t bd_exp; \
-        bd_exp = BYTES64_UINT(UINT); \
-        ASSERT_BYTES64_MUTUAL(BYTES, bd_exp); \
+#define ASSERT_BYTES32_MINUS(BYTES, UINT)   \
+    {   \
+        bytes32_t b_exp = BYTES32_MINUS(UINT);  \
+        ASSERT_BYTES32_MUTUAL(BYTES, b_exp);    \
     }
 
 #endif
@@ -145,19 +107,14 @@ void bytes32_display(bytes32_t b);
 #define BYTES_N_OP_UINT(OP, SCALAR, B, ARGS...) bytes_n_##OP##_uint(SCALAR, B.v, ARGS)
 #define BYTES32_OP_UINT(OP, B, ARGS...) BYTES_N_OP_UINT(OP, SCALAR32, B, ARGS)
 
+bytes32_sign_t bytes32_design(bytes32_t b);
+bytes32_t bytes32_sign(bytes32_sign_t bs);
+
 int bytes_n_cmp(int scalar, const uint b1[scalar], const uint b2[scalar]);
-int bytes32_sign_cmp(bytes32_t b1, bytes32_t b2);
+int bytes32_scmp(bytes32_t b1, bytes32_t b2);
 
 void bytes_n_add_uint(int scalar, uint b[scalar], uint u, int i);
 void bytes_n_shl_uint(int scalar, uint b[scalar], uint shift);
 void bytes_n_shr_uint(int scalar, uint b[scalar], uint shift);
-
-bytes32_sign_t bytes32_design(bytes32_t b);
-bytes32_t bytes32_sign(bytes32_sign_t bs);
-
-bytes64_t bytes64_add_uint(bytes64_t bd, uint u, int i);
-
-bytes64_t bytes64_add(bytes64_t b1, bytes64_t b2);
-bytes64_t bytes64_sub(bytes64_t b1, bytes64_t b2);
 
 #endif
