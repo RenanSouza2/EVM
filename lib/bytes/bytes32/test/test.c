@@ -519,7 +519,7 @@ void test_not()
 
 void test_byte()
 {
-    printf("\n\t\t\ttest byte");
+    printf("\n\t\t\ttest byte\t\t");
 
     bytes32_t b, b1, b2;
     b2 = BYTES32(   \
@@ -528,6 +528,7 @@ void test_byte()
     );
     for(int i=0; i<32; i++)
     {
+        printf("\n\t\t\t\ttest byte %2d\t\t", i);
         b1 = BYTES32_UINT(i);
         b = bytes32_byte(b1, b2);
         ASSERT_BYTES32_UINT(b, i + 1);
@@ -944,28 +945,38 @@ void test_sign_extend()
     printf("\n\t\t\ttest sign extend\t\t");
 
     bytes32_t b, b1, b2;
-    b2 = BYTES32_UINT(UINT_MAX);
-    b = bytes32_sign_extend(b_zero, b2);
-    ASSERT_BYTES32_MUTUAL(b, b_max);
-    
-    b2 = BYTES32_UINT(0x7fffffff);
-    b = bytes32_sign_extend(b_zero, b2);
-    ASSERT_BYTES32_UINT(b, 0x7fffffff);
-    
-    b2 = BYTES32(0, 0, 0, 0, 0, 0, 0x80000000, 0);
-    b = bytes32_sign_extend(b_one, b2);
+    b1 = BYTES32_UINT(31);
+    b2 = BYTES32_UINT(0x80);
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 0x80);
+
+    b1 = BYTES32_UINT(31);
+    b2 = BYTES32_MINUS(0x100);
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32_UINT(b, 0);
+
+    b1 = BYTES32_UINT(30);
+    b2 = BYTES32_UINT(0x8000);
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 0x8000);
+
+    b1 = BYTES32_UINT(29);
+    b2 = BYTES32_UINT(0x800000);
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 0x800000);
+
+    b1 = BYTES32_UINT(28);
+    b2 = BYTES32_UINT(0x80000000);
+    b = bytes32_sign_extend(b1, b2);
+    ASSERT_BYTES32_MINUS(b, 0x80000000);
+
+    b1 = BYTES32_UINT(27);
+    b2 = BYTES32(0, 0, 0, 0, 0, 0, 0x80, 0);
+    b = bytes32_sign_extend(b1, b2);
     ASSERT_BYTES32(b,   \
         UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, \
-        UINT_MAX, UINT_MAX, 0x80000000, 0   \
+        UINT_MAX, UINT_MAX, 0xFFFFFF80, 0 \
     );
-
-    b1 = BYTES32_UINT(2);
-    b2 = BYTES32(   \
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, \
-        UINT_MAX, 0x7fffffff, UINT_MAX, UINT_MAX  \
-    );
-    b = bytes32_sign_extend(b1, b2);
-    ASSERT_BYTES32(b, 0, 0, 0, 0, 0, 0x7fffffff, UINT_MAX, UINT_MAX);
 }
 
 void test_arithmetic()
