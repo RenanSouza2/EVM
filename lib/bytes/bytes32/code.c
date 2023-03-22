@@ -54,6 +54,26 @@ int bytes32_scmp(bytes32_t b1, bytes32_t b2)
     return BYTES32_OP_2(cmp, b1, b2);
 }
 
+typedef unsigned char uchar;
+
+uchar bytes32_get_byte(bytes32_t b, uint n)
+{
+    int pos = SCALAR32-1 - (n >> 2);
+    int off = 3 - (n & 3);
+
+    return (uchar)(b.v[pos] >> (off << 3));
+}
+
+bytes32_t bytes32_set_byte(bytes32_t b, uint n, uchar u)
+{
+    int pos = SCALAR32-1 - (n >> 2);
+    int off = (3 - (n & 3)) << 3;
+
+    uint mask = ~(0xFF << off);
+    b.v[pos] = (b.v[pos] & mask) | ((uint)u << off);
+    return b;
+}
+
 
 
 bytes32_t bytes32_lt(bytes32_t b1, bytes32_t b2)
@@ -118,15 +138,9 @@ bytes32_t bytes32_not(bytes32_t b)
 bytes32_t bytes32_byte(bytes32_t b1, bytes32_t b2)
 {
     if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return BYTES32_UINT(0);
-    
-    int pos = b1.v[0] >> 2;
-    int off = 3 - (b1.v[0] & 3);
 
-    uint u = (b2.v[SCALAR32-1-pos] >> (off << 3)) & 0xFF;
-    BYTES_N_RESET(SCALAR32, &b2);
-    b2.v[0] = u;
-
-    return b2;
+    uchar u = bytes32_get_byte(b2, b1.v[0]);
+    return BYTES32_UINT(u);
 }
 
 
@@ -237,10 +251,12 @@ bytes32_t bytes32_sign_extend(bytes32_t b1, bytes32_t b2)
 {
     if(BYTES32_OP_UINT(cmp, b1, 32) >= 0) return b2;
 
-    int off = b1.v[0];
-    uint value = (b2.v[off] >> 31) ? UINT_MAX : 0;
-    for(int i=off+1; i<SCALAR32; i++)
-        b2.v[i] = value;
+    uchar c1 = bytes32_get_byte(b2, b1.v[0]);
+    uchar c2 = (c1 >> 7) ? 0xFF : 0;
+
+    for(int i=0; i<b1.v[0]; i++)
+        b2 = bytes32_set_byte(b2, i, c2);
+
     return b2;
 }
 
